@@ -49,9 +49,11 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
     
     const threshold = window.innerHeight * 0.2;
     if (currentY.current - startY.current > threshold) {
-      setSheetHeight('55vh');
+      onClose();
     } else if (startY.current - currentY.current > threshold) {
       setSheetHeight('90vh');
+    } else {
+      setSheetHeight('55vh');
     }
     startY.current = 0;
   };
@@ -61,18 +63,24 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
   return (
     <div 
       ref={sheetRef}
-      className="fixed left-0 right-0 bg-white rounded-t-3xl z-50 transition-all duration-300 ease-out"
-      style={{ 
-        height: sheetHeight,
-        bottom: 0,
-        transform: isOpen ? 'translateY(0)' : 'translateY(100%)'
-      }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-lg transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-y-0' : 'translate-y-full'}`} 
+      style={{ height: sheetHeight }}
     >
-      <div className="sticky top-0 bg-white pt-2 pb-4 px-4 border-b drag-handle">
-        <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto" />
+      {/* Drag handle */}
+      <div 
+        className="w-full h-12 flex items-center justify-between px-4 cursor-grab active:cursor-grabbing drag-handle"
+        onTouchStart={handleTouchStart}
+      >
+        <div className="w-12"></div>
+        <div className="w-20 h-1 bg-gray-300 rounded-full"></div>
+        <button 
+          onClick={onClose}
+          className="w-12 h-12 flex items-center justify-center text-gray-500 hover:text-gray-700"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
       
       <div className="overflow-y-auto h-full pb-safe">
