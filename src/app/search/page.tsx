@@ -20,14 +20,21 @@ const defaultCenter = {
   lng: -73.9712 // Manhattan coordinates
 };
 
+const manhattanLocations = [
+  { lat: 40.7831, lng: -73.9712 }, // Upper East Side
+  { lat: 40.7505, lng: -73.9934 }, // Chelsea
+  { lat: 40.7589, lng: -73.9851 }, // Midtown
+  { lat: 40.7308, lng: -73.9973 }, // East Village
+  { lat: 40.7484, lng: -73.9857 }  // Murray Hill
+];
+
 const SearchResults = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [center] = useState(defaultCenter);
-  const [userLocation, setUserLocation] = useState<null | { lat: number; lng: number }>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(true);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number }>(defaultCenter);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && navigator.geolocation) {
@@ -93,15 +100,6 @@ const SearchResults = () => {
       
       // If no coordinates found, use the location string to approximate
       if (query.includes('NY') || query.includes('New York')) {
-        // Use different locations in Manhattan for better spread
-        const manhattanLocations = [
-          { lat: 40.7831, lng: -73.9712 }, // Upper East Side
-          { lat: 40.7505, lng: -73.9934 }, // Chelsea
-          { lat: 40.7589, lng: -73.9851 }, // Midtown
-          { lat: 40.7308, lng: -73.9973 }, // East Village
-          { lat: 40.7484, lng: -73.9857 }  // Murray Hill
-        ];
-        
         const index = Math.abs(query.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % manhattanLocations.length;
         return manhattanLocations[index];
       }
@@ -109,7 +107,7 @@ const SearchResults = () => {
       return defaultCenter;
     } catch (e) {
       console.error('Error parsing maps URL:', e);
-      return null;
+      return defaultCenter;
     }
   };
 
@@ -142,7 +140,7 @@ const SearchResults = () => {
             {isMapLoaded && (
               <GoogleMap
                 mapContainerStyle={{ width: '100%', height: '100%' }}
-                center={userLocation || center}
+                center={userLocation}
                 zoom={13}
                 options={mapOptions}
               >

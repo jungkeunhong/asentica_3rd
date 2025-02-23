@@ -16,61 +16,66 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
   const startY = useRef(0);
   const currentY = useRef(0);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    const target = e.target as HTMLElement;
-    // Only allow dragging from the handle
-    if (!target.closest('.drag-handle')) return;
-    
+    isDragging.current = true;
     startY.current = e.touches[0].clientY;
-    currentY.current = e.touches[0].clientY;
+    currentY.current = startY.current;
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (startY.current === 0) return; // Not dragging from handle
+    if (!isDragging.current) return;
     
-    const deltaY = e.touches[0].clientY - currentY.current;
     currentY.current = e.touches[0].clientY;
-
-    if (sheetRef.current) {
-      const newHeight = parseInt(sheetHeight) - (deltaY / window.innerHeight * 100);
-      if (newHeight >= 30 && newHeight <= 90) {
-        setSheetHeight(`${newHeight}vh`);
-      }
+    const deltaY = currentY.current - startY.current;
+    
+    // Prevent pulling up beyond 90vh
+    if (deltaY < 0 && sheetHeight === '90vh') {
+      return;
     }
+    
+    // Update sheet height based on drag
+    const newHeight = Math.max(
+      Math.min(window.innerHeight * 0.9, window.innerHeight - currentY.current),
+      window.innerHeight * 0.2
+    );
+    setSheetHeight(`${newHeight}px`);
   };
 
   const handleTouchEnd = () => {
-    if (startY.current === 0) return; // Not dragging from handle
+    if (!isDragging.current) return;
+    isDragging.current = false;
     
+    const deltaY = currentY.current - startY.current;
     const threshold = window.innerHeight * 0.2;
-    if (currentY.current - startY.current > threshold) {
+    
+    if (deltaY > threshold) {
       onClose();
-    } else if (startY.current - currentY.current > threshold) {
+    } else if (deltaY < -threshold) {
       setSheetHeight('90vh');
     } else {
       setSheetHeight('55vh');
     }
-    startY.current = 0;
   };
 
-  if (!mounted || !isOpen) return null;
+  if (!mounted) return null;
 
   return (
     <div 
       ref={sheetRef}
       className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-lg transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-y-0' : 'translate-y-full'}`} 
       style={{ height: sheetHeight }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Drag handle */}
-      <div 
-        className="w-full h-12 flex items-center justify-between px-4 cursor-grab active:cursor-grabbing drag-handle"
-        onTouchStart={handleTouchStart}
-      >
+      <div className="w-full h-12 flex items-center justify-between px-4 cursor-grab active:cursor-grabbing">
         <div className="w-12"></div>
         <div className="w-20 h-1 bg-gray-300 rounded-full"></div>
         <button 
@@ -82,36 +87,32 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
           </svg>
         </button>
       </div>
-      
-      <div className="overflow-y-auto h-full pb-safe">
-        {doctors.map((doctor, index) => (
-          <div key={doctor.id}>
-            <div className="p-4">
-              <div className="flex items-start gap-4">
-                <div className="relative w-20 h-20 flex-shrink-0">
-                  <Image
-                    src={doctor.image}
-                    alt={doctor.name}
-                    fill
-                    className="rounded-2xl object-cover border border-gray-200"
-                    sizes="80px"
-                    priority
-                  />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-black">{doctor.name}</h3>
-                  <p className="text-sm text-gray-600">{doctor.title}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <span className="text-yellow-400">★</span>
-                    <span className="text-black">{doctor.rating}</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">{doctor.intro}</p>
+
+      {/* Doctor list */}
+      <div className="overflow-y-auto h-[calc(100%-3rem)] pb-safe">
+        <div className="p-4 space-y-4">
+          {doctors.map((doctor) => (
+            <div key={doctor.id} className="flex items-start space-x-4 p-4 bg-white rounded-lg border">
+              <div className="relative w-24 h-24 flex-shrink-0">
+                <Image
+                  src={doctor.image}
+                  alt={doctor.name}
+                  fill
+                  className="object-cover rounded-lg border border-gray-100"
+                />
+              </div>
+              <div className="flex-grow">
+                <h3 className="text-lg font-semibold">{doctor.name}</h3>
+                <p className="text-sm text-gray-600">{doctor.title}</p>
+                <p className="text-sm text-gray-600">{doctor.clinic}</p>
+                <div className="mt-2 flex items-center">
+                  <span className="text-yellow-400">★</span>
+                  <span className="ml-1 text-sm">{doctor.rating}</span>
                 </div>
               </div>
             </div>
-            {index < doctors.length - 1 && <div className="border-b border-gray-100" />}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
