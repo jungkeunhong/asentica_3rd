@@ -31,7 +31,7 @@ export default function DynamicMap({ userLocation, mapOptions, doctors, getCoord
         gestureHandling: 'greedy',
       });
     }
-  }, [mapRef.current]);
+  }, []);
 
   if (!isLoaded) return <div>Loading...</div>;
 

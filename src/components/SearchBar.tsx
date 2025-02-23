@@ -7,7 +7,6 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 const SearchBar = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
-  const [isFocused, setIsFocused] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,8 +23,6 @@ const SearchBar = () => {
           placeholder="Search doctors, treatments, or locations"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
           className="w-full pl-4 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           style={{ fontSize: '16px' }}  // iOS에서 16px 이상이면 자동 확대 방지
           inputMode="search"
