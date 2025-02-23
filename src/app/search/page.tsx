@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import SearchBar from '@/components/SearchBar';
@@ -28,7 +28,8 @@ const manhattanLocations = [
   { lat: 40.7484, lng: -73.9857 }  // Murray Hill
 ];
 
-const SearchResults = () => {
+// Search content component that uses useSearchParams
+const SearchContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
@@ -170,6 +171,19 @@ const SearchResults = () => {
         />
       </div>
     </div>
+  );
+};
+
+// Main search page component with Suspense boundary
+const SearchResults = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    }>
+      <SearchContent />
+    </Suspense>
   );
 };
 
