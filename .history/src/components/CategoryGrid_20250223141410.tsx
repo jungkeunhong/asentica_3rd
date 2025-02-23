@@ -28,21 +28,19 @@ const CategoryGrid = () => {
   return (
     <div className="px-4 py-6">
       <h2 className="text-2xl font-semibold mb-4 text-gray-900">Select Treatment</h2>
-      <div className="overflow-x-auto pb-4 hide-scrollbar">
-        <div className="grid grid-rows-2 auto-cols-max grid-flow-col gap-x-2 gap-y-4">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => handleCategoryClick(category.name)}
-              className="flex flex-col items-center w-24"
-            >
-              <div className="w-14 h-14 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
-                <span className="text-xl">{category.icon}</span>
-              </div>
-              <span className="text-xs text-gray-700 text-center leading-tight mt-2">{category.name}</span>
-            </button>
-          ))}
-        </div>
+      <div className="grid grid-cols-6 gap-x-2 gap-y-4">
+        {categories.map((category) => (
+          <button
+            key={category.id}
+            onClick={() => handleCategoryClick(category.name)}
+            className="flex flex-col items-center"
+          >
+            <div className="w-14 h-14 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+              <span className="text-xl">{category.icon}</span>
+            </div>
+            <span className="text-xs text-gray-700 text-center leading-tight mt-2">{category.name}</span>
+          </button>
+        ))}
       </div>
     </div>
   );
