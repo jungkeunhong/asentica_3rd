@@ -7,9 +7,10 @@ import Image from 'next/image';
 interface DoctorModalSheetProps {
   doctors: Doctor[];
   isOpen: boolean;
+  onClose: () => void;
 }
 
-export default function DoctorModalSheet({ doctors, isOpen }: DoctorModalSheetProps) {
+export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorModalSheetProps) {
   const [mounted, setMounted] = useState(false);
   const [sheetHeight, setSheetHeight] = useState('55vh');
   const startY = useRef(0);
