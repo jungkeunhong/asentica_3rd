@@ -15,14 +15,18 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
   const [sheetHeight, setSheetHeight] = useState('55vh');
   const startY = useRef(0);
   const currentY = useRef(0);
-  const sheetRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Only allow dragging from the handle
+    const target = e.target as HTMLElement;
+    if (!target.closest('.drag-handle')) return;
+
     isDragging.current = true;
     startY.current = e.touches[0].clientY;
     currentY.current = startY.current;
@@ -45,6 +49,9 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
       window.innerHeight * 0.2
     );
     setSheetHeight(`${newHeight}px`);
+
+    // Prevent page scrolling while dragging
+    e.preventDefault();
   };
 
   const handleTouchEnd = () => {
@@ -68,28 +75,36 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
   return (
     <div 
       ref={sheetRef}
-      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-lg transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-y-0' : 'translate-y-full'}`} 
-      style={{ height: sheetHeight }}
+      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-lg transform transition-transform duration-300 ease-in-out ${
+        isOpen ? 'translate-y-0' : 'translate-y-full'
+      }`}
+      style={{ 
+        height: sheetHeight,
+        zIndex: 100,
+        touchAction: isDragging.current ? 'none' : 'auto'
+      }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
       {/* Drag handle */}
-      <div className="w-full h-12 flex items-center justify-between px-4 cursor-grab active:cursor-grabbing">
-        <div className="w-12"></div>
-        <div className="w-20 h-1 bg-gray-300 rounded-full"></div>
-        <button 
-          onClick={onClose}
-          className="w-12 h-12 flex items-center justify-center text-gray-500 hover:text-gray-700"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+      <div className="sticky top-0 bg-white z-10 drag-handle">
+        <div className="w-full h-12 flex items-center justify-between px-4">
+          <div className="w-12"></div>
+          <div className="w-20 h-1 bg-gray-300 rounded-full"></div>
+          <button 
+            onClick={onClose}
+            className="w-12 h-12 flex items-center justify-center text-gray-500 hover:text-gray-700"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Doctor list */}
-      <div className="overflow-y-auto h-[calc(100%-3rem)] pb-safe">
+      <div className="overflow-y-auto h-[calc(100%-3rem)] overscroll-contain">
         <div className="p-4 space-y-4">
           {doctors.map((doctor) => (
             <div key={doctor.id} className="flex items-start space-x-4 p-4 bg-white rounded-lg border">

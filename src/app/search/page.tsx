@@ -167,13 +167,13 @@ const SearchContent = () => {
         strategy="beforeInteractive"
       />
       {/* Fixed header */}
-      <div className="fixed top-0 left-0 right-0 bg-white z-50 border-b">
+      <div className="fixed top-0 left-0 right-0 bg-white z-[60] border-b">
         <div className="max-w-7xl mx-auto py-4 px-4 flex items-center gap-4">
           <button
             onClick={() => router.back()}
             className="p-2 hover:bg-gray-100 rounded-full"
           >
-            <ChevronLeftIcon className="w-6 h-6" />
+            <ChevronLeftIcon className="h-6 w-6" />
           </button>
           <div className="flex-grow">
             <SearchBar />
@@ -183,7 +183,7 @@ const SearchContent = () => {
 
       <div className="pt-16">
         {/* Map Section */}
-        <div className="h-[45vh] relative z-10">
+        <div className="fixed top-16 left-0 right-0 h-[45vh] z-[50]">
           <DynamicMap
             userLocation={userLocation}
             mapOptions={mapOptions}
@@ -191,6 +191,9 @@ const SearchContent = () => {
             getCoordinatesFromMapsUrl={getCoordinatesFromMapsUrl}
           />
         </div>
+
+        {/* Spacer for map */}
+        <div className="h-[45vh]" />
 
         {/* Modal Sheet */}
         <DoctorModalSheet
