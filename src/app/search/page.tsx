@@ -1,14 +1,15 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
+import Image from 'next/image';
 import SearchBar from '@/components/SearchBar';
 import DynamicMap from '@/components/DynamicMap';
 import DoctorModalSheet from '@/components/DoctorModalSheet';
 import { doctors } from '@/data/doctors';
 import { MapIcon, ListBulletIcon } from '@heroicons/react/24/outline';
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
   const [isModalOpen, setIsModalOpen] = useState(true);
@@ -69,11 +70,14 @@ export default function SearchPage() {
                 key={doctor.id} 
                 className="bg-white rounded-lg shadow p-4 flex items-start space-x-4"
               >
-                <img
-                  src={doctor.image}
-                  alt={doctor.name}
-                  className="w-24 h-24 object-cover rounded-lg"
-                />
+                <div className="relative w-24 h-24 flex-shrink-0">
+                  <Image
+                    src={doctor.image}
+                    alt={doctor.name}
+                    fill
+                    className="object-cover rounded-lg"
+                  />
+                </div>
                 <div>
                   <h3 className="text-lg font-semibold">{doctor.name}</h3>
                   <p className="text-sm text-gray-600">{doctor.title}</p>
@@ -98,5 +102,19 @@ export default function SearchPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+        </div>
+      }
+    >
+      <SearchContent />
+    </Suspense>
   );
 }
