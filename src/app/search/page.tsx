@@ -8,6 +8,7 @@ import SearchBar from '@/components/SearchBar';
 import { doctors } from '@/data/doctors';
 import DoctorModalSheet from '@/components/DoctorModalSheet';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import type { Libraries } from '@react-google-maps/api';
 
 const libraries: Libraries = ['places'];
@@ -25,8 +26,14 @@ const manhattanLocations = [
   { lat: 40.7484, lng: -73.9857 }  // Murray Hill
 ];
 
-const MapComponent = () => {
-  const { GoogleMap, LoadScript, Marker } = require('@react-google-maps/api');
+interface MapComponentProps {
+  userLocation: { lat: number; lng: number };
+  mapOptions: google.maps.MapOptions;
+  doctors: typeof doctors.botox;
+  getCoordinatesFromMapsUrl: (url: string) => { lat: number; lng: number } | null;
+}
+
+const MapComponent = ({ userLocation, mapOptions, doctors, getCoordinatesFromMapsUrl }: MapComponentProps) => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   if (typeof window === 'undefined') {
@@ -47,7 +54,7 @@ const MapComponent = () => {
           zoom={13}
           options={mapOptions}
         >
-          {filteredDoctors.map((doctor) => {
+          {doctors.map((doctor) => {
             const coords = getCoordinatesFromMapsUrl(doctor.reviews);
             if (coords) {
               return (
@@ -177,7 +184,12 @@ const SearchContent = () => {
       <div className="pt-16">
         {/* Map Section */}
         <div className="h-[45vh] relative z-10">
-          <DynamicMap />
+          <DynamicMap
+            userLocation={userLocation}
+            mapOptions={mapOptions}
+            doctors={filteredDoctors}
+            getCoordinatesFromMapsUrl={getCoordinatesFromMapsUrl}
+          />
         </div>
 
         {/* Modal Sheet */}
