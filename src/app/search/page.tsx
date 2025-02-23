@@ -59,12 +59,12 @@ function SearchContent() {
         </div>
 
         {/* List View */}
-        <div className={`h-full bg-gray-50 overflow-auto ${view === 'list' ? 'block' : 'hidden'}`}>
-          <div className="max-w-7xl mx-auto px-4 py-4 space-y-4">
+        <div className={`h-full bg-white overflow-auto ${view === 'list' ? 'block' : 'hidden'}`}>
+          <div className="max-w-7xl mx-auto divide-y divide-gray-200">
             {filteredDoctors.map((doctor) => (
               <div 
                 key={doctor.id} 
-                className="bg-white rounded-lg shadow p-4 flex items-start space-x-4"
+                className="p-4 flex items-start space-x-4"
               >
                 <div className="relative w-24 h-24 flex-shrink-0">
                   <Image
@@ -74,10 +74,10 @@ function SearchContent() {
                     className="object-cover rounded-lg"
                   />
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold">{doctor.name}</h3>
-                  <p className="text-sm text-gray-600">{doctor.title}</p>
-                  <p className="text-sm text-gray-600">{doctor.clinic}</p>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 truncate">{doctor.name}</h3>
+                  <p className="text-sm text-gray-600 truncate">{doctor.title}</p>
+                  <p className="text-sm text-gray-600 truncate">{doctor.clinic}</p>
                   <div className="mt-2 flex items-center">
                     <span className="text-yellow-400">★</span>
                     <span className="ml-1 text-sm">{doctor.rating}</span>

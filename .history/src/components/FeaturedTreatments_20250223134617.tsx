@@ -1,11 +1,10 @@
 import React from 'react';
-import Image from 'next/image';
 
 const treatments = [
   {
     id: 1,
     title: 'Jawline Contouring Injections',
-    image: 'https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EC%9D%98%EC%82%AC%EC%97%90%EA%B2%8E-%EC%B9%98%EC%95%84-%EA%B2%80%EC%82%AC%EB%A5%BC-%EB%B0%9B%EB%8A%94-%EC%97%AC%EC%84%B1-5mUpfUhwkvg',
+    image: 'https://unsplash.com/ko/%EC%82%AC%EC%A7%84/%EC%9D%98%EC%82%AC%EC%97%90%EA%B2%8C-%EC%B9%98%EC%95%84-%EA%B2%80%EC%82%AC%EB%A5%BC-%EB%B0%9B%EB%8A%94-%EC%97%AC%EC%84%B1-5mUpfUhwkvg',
     description: 'Achieve a sharp, defined jawline with our contouring solutions'
   },
   {
@@ -45,14 +44,13 @@ const FeaturedTreatments = () => {
         <div className="mt-10">
           <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
             {treatments.map((treatment) => (
-              <div key={treatment.id} className="rounded-lg overflow-hidden border border-gray-200">
-                <Image
-                  src={treatment.image}
-                  alt={treatment.title}
-                  width={400}
-                  height={300}
-                  className="w-full h-48 object-cover"
-                />
+              <div key={treatment.id} className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
+                <div 
+                  className="relative h-48 bg-gray-200 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${treatment.image})` }}
+                >
+                  {/* Image via Unsplash API */}
+                </div>
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-gray-900">{treatment.title}</h3>
                   <p className="mt-2 text-base text-gray-600">{treatment.description}</p>

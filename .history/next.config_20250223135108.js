@@ -15,7 +15,7 @@ const nextConfig = {
       'maps.gstatic.com',
       'images.unsplash.com',
       'plus.unsplash.com',
-      'lh3.googleusercontent.com',
+      'lh3.googleusercontent.com'
       'unsplash.com'
     ]
   },
