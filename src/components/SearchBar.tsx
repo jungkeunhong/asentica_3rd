@@ -1,35 +1,53 @@
 'use client';
 
+import { useState } from 'react';
+import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
-const SearchBar = () => {
+interface SearchBarProps {
+  initialValue?: string;
+  className?: string;
+}
+
+const SearchBar = ({ initialValue = '', className = '' }: SearchBarProps) => {
+  const [searchTerm, setSearchTerm] = useState(initialValue);
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchTerm)}`);
+      router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
     }
   };
 
+  const handleClear = () => {
+    setSearchTerm('');
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="relative w-full">
-      <div className="flex items-center bg-white rounded-lg border overflow-hidden">
+    <form onSubmit={handleSubmit} className={`relative mx-4 ${className}`}>
+      <div className="relative flex items-center">
         <input
           type="text"
-          placeholder="Search doctors, treatments, or locations"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-4 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          style={{ fontSize: '16px' }}  // iOS에서 16px 이상이면 자동 확대 방지
-          inputMode="search"
-          enterKeyHint="search"
+          placeholder="Search for treatments, clinics, or doctors"
+          className="w-full h-12 pl-4 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:border-primary-500 text-base"
+          style={{ fontSize: '16px' }}
         />
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-          <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+        <div className="absolute right-0 flex items-center pr-3 space-x-2">
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="p-1 text-gray-400 hover:text-gray-600"
+            >
+              <XMarkIcon className="w-5 h-5" />
+            </button>
+          )}
+          {!searchTerm && (
+            <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
+          )}
         </div>
       </div>
     </form>
