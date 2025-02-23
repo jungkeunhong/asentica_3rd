@@ -19,7 +19,7 @@ export interface Doctor {
   highlights: string[];
 }
 
-export const doctors: { [key: string]: Doctor[] } = {
+export const doctors = {
   botox: [
     {
       id: 'dr-marotta',
@@ -55,7 +55,7 @@ export const doctors: { [key: string]: Doctor[] } = {
       title: "Board-Certified Expert in Minimally Invasive Cosmetic & Laser Medicine",
       clinic: "Skinly Aesthetics",
       rating: 4.6,
-      reviews: 'https://www.google.com/maps/search/?api=1&query=Skinly+Aesthetics+New+York',
+      reviews: ['https://www.google.com/maps/search/?api=1&query=Skinly+Aesthetics+New+York'],
       image: "https://skinlyaesthetics.com/wp-content/uploads/2024/03/Dr.-Schwarzburg-MD-best-cosmetic-dermatologist.jpg",
       expertise: ["Botox", "Juvederm", "Active FX"],
       intro: "Dr. Schwarzburg is a top cosmetic expert in NYC, specializing in minimally invasive treatments to enhance natural beauty.",
@@ -83,7 +83,7 @@ export const doctors: { [key: string]: Doctor[] } = {
       title: "Board-Certified Dermatologist",
       clinic: "Tribeca MedSpa",
       rating: 4.8,
-      reviews: 'https://www.google.com/maps/search/?api=1&query=Tribeca+MedSpa+New+York',
+      reviews: ['https://www.google.com/maps/search/?api=1&query=Tribeca+MedSpa+New+York'],
       image: "https://www.tribecamedspa.com/wp-content/uploads/2023/12/Dr-Georgina-Ferzli-MD-MS-FAAD-Director-of-Cosmetic-Dermatology.jpeg",
       expertise: ["Botox", "Laser Resurfacing", "Acne Scar Treatment", "Skin Tightening"],
       intro: "Dr. Ferzli is a top dermatologist in NYC, specializing in cosmetic and laser dermatology.",
@@ -113,7 +113,7 @@ export const doctors: { [key: string]: Doctor[] } = {
       title: "Authorized Vampire Facelift® Professional, Injectable Expert & Certified Galderma Trainer",
       clinic: "James Christian Cosmetics",
       rating: 4.8,
-      reviews: 'https://www.google.com/maps/search/?api=1&query=James+Christian+Cosmetics',
+      reviews: ['https://www.google.com/maps/search/?api=1&query=James+Christian+Cosmetics'],
       image: "https://jameschristiancosmetics.com/wp-content/uploads/jcc-img-profile.jpg",
       expertise: ["Injections", "Botox", "Filler"],
       intro: "James Christian is the Director of Operations and founder of James Christian Cosmetics, specializing in injectable fillers, muscle relaxants, and advanced aesthetic techniques.",
@@ -142,7 +142,7 @@ export const doctors: { [key: string]: Doctor[] } = {
       title: "Founder & CEO of Diamond Advanced Aesthetics, Board-Certified Registered Nurse",
       clinic: "Diamond Advanced Aesthetics",
       rating: 5.0,
-      reviews: 'https://www.google.com/maps/search/?api=1&query=Diamond+Advanced+Aesthetics',
+      reviews: ['https://www.google.com/maps/search/?api=1&query=Diamond+Advanced+Aesthetics'],
       image: "https://diamondadvancedaesthetics.com/storage/2024/04/julija-dimante-by-diamond-advanced-aesthetics-in-new-york-ny.webp",
       expertise: ["Injectable Fillers", "Botox", "Natural Aesthetic Enhancements", "Skin Rejuvenation"],
       intro: "Julija DiMante is a skilled injector and aesthetic expert, known for delivering natural and transformative results. She is the founder of Diamond Advanced Aesthetics and an educator in the aesthetics industry.",
@@ -171,7 +171,7 @@ export const doctors: { [key: string]: Doctor[] } = {
       title: "Cosmetic Physician, Skin & Wellness Expert",
       clinic: "Vivian Chin MD",
       rating: 4.9,
-      reviews: 'https://www.google.com/maps/search/?api=1&query=Vivian+Chin+MD',
+      reviews: ['https://www.google.com/maps/search/?api=1&query=Vivian+Chin+MD'],
       image: "https://korunyc.com/wp-content/uploads/2017/06/chin.jpg",
       expertise: ["Skin Rejuvenation", "Holistic Medicine", "Personalized Skincare"],
       intro: "Dr. Vivian Chin is a cosmetic physician specializing in skin care, wellness aesthetics, and holistic beauty. She combines medical expertise with aesthetic training to provide personalized skin care regimens.",
@@ -201,7 +201,7 @@ export const doctors: { [key: string]: Doctor[] } = {
       title: "Certified Physician Assistant (RPA-C)",
       clinic: "Samantha Danesi Aesthetics",
       rating: 4.7,
-      reviews: 'https://www.google.com/maps/search/?api=1&query=Samantha+Danesi+Aesthetics',
+      reviews: ['https://www.google.com/maps/search/?api=1&query=Samantha+Danesi+Aesthetics'],
       image: "https://www.beyondbeautifulaesthetics.com/assets/silver_websites/beyond-beautiful-aesthetics/staff/samantha-danesi.jpg",
       expertise: ["Advanced cosmetic injectables", "Tear trough treatments", "Liquid facelifts"],
       intro: "Samantha Danesi is a certified Physician Assistant and Licensed Massage Therapist with over a decade of experience in aesthetics and plastic surgery. She specializes in advanced cosmetic injectables, including tear trough treatments, liquid facelifts, and non-surgical Brazilian Butt Lifts (BBL).",
@@ -228,7 +228,7 @@ export const doctors: { [key: string]: Doctor[] } = {
       title: "Founder & Lead Esthetician of Shannon Lee Esthetics",
       clinic: "Shannon Lee Esthetics",
       rating: 4.6,
-      reviews: 'https://www.google.com/maps/search/?api=1&query=Shannon+Lee+Esthetics',
+      reviews: ['https://www.google.com/maps/search/?api=1&query=Shannon+Lee+Esthetics'],
       image: "https://images.squarespace-cdn.com/content/v1/63e146735db8872a79265dc0/6fb7b053-086c-4c8f-be26-916f52f77749/Untitled+design+%282%29.jpg",
       expertise: ["Acne Treatments", "Hyperpigmentation Correction", "Skin Rejuvenation", "Custom Facials"],
       intro: "Shannon Lee is a skincare expert specializing in acne and hyperpigmentation treatments. Her journey began with her own skin struggles, leading her to build a thriving esthetics business in New York City.",
@@ -252,7 +252,7 @@ export const doctors: { [key: string]: Doctor[] } = {
       title: "Founder & President of Collagen Bar",
       clinic: "Collagen Bar",
       rating: 4.9,
-      reviews: 'https://www.google.com/maps/search/?api=1&query=Collagen+Bar',
+      reviews: ['https://www.google.com/maps/search/?api=1&query=Collagen+Bar'],
       image: "https://collagenbar.nyc/cdn/shop/files/dianacc.jpg?v=1658939997&width=1500",
       expertise: ["Medical Aesthetics", "Skin Rejuvenation", "Facial Electrical Treatments", "Collagen Stimulation"],
       intro: "Diana Seo is the founder of Collagen Bar, a premier medical aesthetic and skincare clinic with locations in Westchester and NYC. With over 15 years of experience in health, medical, and beauty fields, she specializes in advanced skincare solutions.",

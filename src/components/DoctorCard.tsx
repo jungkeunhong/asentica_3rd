@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { StarIcon, MapPinIcon } from '@heroicons/react/24/solid';
 import type { Doctor } from '@/data/doctors';
 
 interface DoctorCardProps {
@@ -31,9 +32,15 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
               <p className="text-gray-500 text-sm mt-1">{doctor.clinic}</p>
             </div>
             <div className="flex items-center">
-              <span className="text-yellow-400 mr-1">★</span>
+              <StarIcon className="h-4 w-4 text-yellow-400 mr-1" />
               <span className="font-medium">{doctor.rating}</span>
+              <span className="text-sm text-gray-600">({doctor.reviews.length} reviews)</span>
             </div>
+          </div>
+
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            <MapPinIcon className="h-4 w-4" />
+            <span>{doctor.distance.toFixed(1)} miles</span>
           </div>
 
           {/* Expertise tags */}
@@ -44,6 +51,18 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
                 className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
               >
                 {skill}
+              </span>
+            ))}
+          </div>
+
+          {/* Key Highlights */}
+          <div className="flex flex-wrap gap-2 mt-3">
+            {doctor.highlights.map((highlight, index) => (
+              <span 
+                key={index}
+                className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+              >
+                {highlight}
               </span>
             ))}
           </div>

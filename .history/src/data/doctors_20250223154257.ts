@@ -19,7 +19,7 @@ export interface Doctor {
   highlights: string[];
 }
 
-export const doctors: { [key: string]: Doctor[] } = {
+export const doctors = {
   botox: [
     {
       id: 'dr-marotta',
