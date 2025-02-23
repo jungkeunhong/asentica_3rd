@@ -15,9 +15,6 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
   const startY = useRef(0);
   const currentY = useRef(0);
   const isDragging = useRef(false);
-  const lastVelocity = useRef(0);
-  const lastTime = useRef(0);
-  const animationFrame = useRef<number>();
   const sheetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,107 +30,52 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
     isDragging.current = true;
     startY.current = e.touches[0].clientY;
     currentY.current = startY.current;
-    lastTime.current = Date.now();
-    lastVelocity.current = 0;
-
-    if (animationFrame.current) {
-      cancelAnimationFrame(animationFrame.current);
-    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging.current) return;
     
-    const now = Date.now();
-    const dt = now - lastTime.current;
-    const newY = e.touches[0].clientY;
-    const dy = newY - currentY.current;
+    currentY.current = e.touches[0].clientY;
     
-    // Calculate velocity (pixels per millisecond)
-    if (dt > 0) {
-      lastVelocity.current = dy / dt;
-    }
-    
-    currentY.current = newY;
-    lastTime.current = now;
-    
-    // Calculate new position with smooth interpolation
+    // Calculate new position
     const windowHeight = window.innerHeight;
-    const currentPosition = parseInt(sheetPosition);
-    const targetPosition = Math.max(
+    const newPosition = Math.max(
       Math.min(90, (windowHeight - currentY.current) / windowHeight * 100),
       20
     );
-    
-    const smoothPosition = currentPosition + (targetPosition - currentPosition) * 0.5;
-    setSheetPosition(`${smoothPosition}vh`);
+    setSheetPosition(`${newPosition}vh`);
 
     // Prevent page scrolling while dragging
     e.preventDefault();
-  };
-
-  const animateToPosition = (targetPosition: number) => {
-    const startPosition = parseInt(sheetPosition);
-    const startTime = Date.now();
-    const duration = 300; // Animation duration in ms
-
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      // Ease out cubic function
-      const easing = 1 - Math.pow(1 - progress, 3);
-      
-      const current = startPosition + (targetPosition - startPosition) * easing;
-      setSheetPosition(`${current}vh`);
-
-      if (progress < 1) {
-        animationFrame.current = requestAnimationFrame(animate);
-      }
-    };
-
-    if (animationFrame.current) {
-      cancelAnimationFrame(animationFrame.current);
-    }
-    animationFrame.current = requestAnimationFrame(animate);
   };
 
   const handleTouchEnd = () => {
     if (!isDragging.current) return;
     isDragging.current = false;
     
-    const velocity = lastVelocity.current;
-    const currentPos = parseInt(sheetPosition);
+    const deltaY = currentY.current - startY.current;
+    const threshold = window.innerHeight * 0.2;
     
-    // Use velocity to determine target position
-    if (Math.abs(velocity) > 0.5) {
-      if (velocity > 0) {
-        // Swiping down
-        if (currentPos <= 30) {
-          onClose();
-        } else {
-          animateToPosition(20);
-        }
-      } else {
-        // Swiping up
-        animateToPosition(90);
-      }
-    } else {
-      // Snap to closest position based on current position
-      if (currentPos < 30) {
+    if (deltaY > threshold) {
+      // Drag down - minimize or close
+      if (sheetPosition === '40vh') {
         onClose();
-      } else if (currentPos < 55) {
-        animateToPosition(20);
       } else {
-        animateToPosition(90);
+        setSheetPosition('40vh');
       }
+    } else if (deltaY < -threshold) {
+      // Drag up - maximize
+      setSheetPosition('90vh');
+    } else {
+      // Return to previous position
+      setSheetPosition('40vh');
     }
   };
 
   return (
     <div 
       ref={sheetRef}
-      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-[20px] shadow-lg transform transition-all duration-300 ease-out ${
+      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-[20px] shadow-lg transform transition-transform duration-300 ease-in-out ${
         isOpen ? 'translate-y-0' : 'translate-y-full'
       }`}
       style={{ 
@@ -153,7 +95,9 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
       </div>
 
       {/* Doctor list */}
-      <div className="overflow-y-auto h-[calc(100%-3rem)] overscroll-contain pb-safe">
+      <div 
+        className="overflow-y-auto h-[calc(100%-3rem)] overscroll-contain pb-safe"
+      >
         <div className="p-4 space-y-4">
           {doctors.map((doctor) => (
             <div key={doctor.id} className="flex items-start space-x-4 p-4 bg-white rounded-lg border">
