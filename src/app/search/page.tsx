@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import Script from 'next/script';
 import SearchBar from '@/components/SearchBar';
 import { doctors } from '@/data/doctors';
 import DoctorModalSheet from '@/components/DoctorModalSheet';
@@ -10,10 +11,6 @@ import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import type { Libraries } from '@react-google-maps/api';
 
 const libraries: Libraries = ['places'];
-
-const GoogleMap = dynamic(() => import('@react-google-maps/api').then(mod => mod.GoogleMap));
-const LoadScript = dynamic(() => import('@react-google-maps/api').then(mod => mod.LoadScript));
-const Marker = dynamic(() => import('@react-google-maps/api').then(mod => mod.Marker));
 
 const defaultCenter = {
   lat: 40.7831,
@@ -28,12 +25,56 @@ const manhattanLocations = [
   { lat: 40.7484, lng: -73.9857 }  // Murray Hill
 ];
 
+const MapComponent = () => {
+  const { GoogleMap, LoadScript, Marker } = require('@react-google-maps/api');
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return (
+    <LoadScript 
+      id="google-map-script"
+      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
+      libraries={libraries}
+      onLoad={() => setIsMapLoaded(true)}
+    >
+      {isMapLoaded && (
+        <GoogleMap
+          mapContainerStyle={{ width: '100%', height: '100%' }}
+          center={userLocation}
+          zoom={13}
+          options={mapOptions}
+        >
+          {filteredDoctors.map((doctor) => {
+            const coords = getCoordinatesFromMapsUrl(doctor.reviews);
+            if (coords) {
+              return (
+                <Marker
+                  key={doctor.id}
+                  position={coords}
+                  title={doctor.name}
+                />
+              );
+            }
+            return null;
+          })}
+        </GoogleMap>
+      )}
+    </LoadScript>
+  );
+};
+
+const DynamicMap = dynamic(() => Promise.resolve(MapComponent), {
+  ssr: false
+});
+
 // Search content component that uses useSearchParams
 const SearchContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(true);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number }>(defaultCenter);
 
@@ -114,6 +155,10 @@ const SearchContent = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <Script
+        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+        strategy="beforeInteractive"
+      />
       {/* Fixed header */}
       <div className="fixed top-0 left-0 right-0 bg-white z-50 border-b">
         <div className="max-w-7xl mx-auto py-4 px-4 flex items-center gap-4">
@@ -132,35 +177,7 @@ const SearchContent = () => {
       <div className="pt-16">
         {/* Map Section */}
         <div className="h-[45vh] relative z-10">
-          <LoadScript 
-            id="google-map-script"
-            googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
-            libraries={libraries}
-            onLoad={() => setIsMapLoaded(true)}
-          >
-            {isMapLoaded && (
-              <GoogleMap
-                mapContainerStyle={{ width: '100%', height: '100%' }}
-                center={userLocation}
-                zoom={13}
-                options={mapOptions}
-              >
-                {filteredDoctors.map((doctor) => {
-                  const coords = getCoordinatesFromMapsUrl(doctor.reviews);
-                  if (coords) {
-                    return (
-                      <Marker
-                        key={doctor.id}
-                        position={coords}
-                        title={doctor.name}
-                      />
-                    );
-                  }
-                  return null;
-                })}
-              </GoogleMap>
-            )}
-          </LoadScript>
+          <DynamicMap />
         </div>
 
         {/* Modal Sheet */}
