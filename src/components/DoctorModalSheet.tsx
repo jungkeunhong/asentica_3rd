@@ -145,30 +145,41 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
   return (
     <div 
       ref={sheetRef}
-      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-[20px] shadow-lg transform transition-all duration-300 ease-out ${
+      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-[20px] shadow-lg transform transition-all duration-300 ease-out overscroll-none ${
         isOpen ? 'translate-y-0' : 'translate-y-full'
       }`}
       style={{ 
         height: sheetPosition,
         zIndex: 100,
-        touchAction: isDragging.current ? 'none' : 'auto'
+        touchAction: 'none'
       }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
       {/* Drag handle */}
-      <div className="sticky top-0 bg-white z-10 drag-handle rounded-t-[20px]">
+      <div className="sticky top-0 bg-white z-10 drag-handle rounded-t-[20px] cursor-grab active:cursor-grabbing">
         <div className="w-full h-12 flex items-center justify-center">
           <div className="w-20 h-1 bg-gray-300 rounded-full" />
         </div>
       </div>
 
       {/* Doctor list */}
-      <div className="overflow-y-auto h-[calc(100%-3rem)] overscroll-contain pb-safe">
+      <div 
+        className="overflow-y-auto h-[calc(100%-3rem)] pb-safe"
+        style={{ 
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="p-4 space-y-4">
           {doctors.map((doctor) => (
-            <div key={doctor.id} className="flex items-start space-x-4 p-4 bg-white rounded-lg border">
+            <div 
+              key={doctor.id} 
+              className="flex items-start space-x-4 p-4 bg-white rounded-lg border"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="relative w-24 h-24 flex-shrink-0">
                 <Image
                   src={doctor.image}
