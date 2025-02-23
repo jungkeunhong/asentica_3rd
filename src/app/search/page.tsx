@@ -36,7 +36,10 @@ export default function SearchContent() {
               <span>Back</span>
             </Link>
             <div className="w-[480px]">
-              <SearchBar initialValue={query} />
+              <SearchBar 
+                initialValue={query} 
+                onSearch={(value) => setQuery(value)}
+              />
             </div>
             <button
               onClick={() => setView(view === 'map' ? 'list' : 'map')}
