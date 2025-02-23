@@ -11,17 +11,11 @@ interface DoctorModalSheetProps {
 }
 
 export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorModalSheetProps) {
-  const [mounted, setMounted] = useState(false);
   const [sheetPosition, setSheetPosition] = useState('40vh');
   const startY = useRef(0);
   const currentY = useRef(0);
   const isDragging = useRef(false);
   const sheetRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -42,7 +36,6 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
     if (!isDragging.current) return;
     
     currentY.current = e.touches[0].clientY;
-    const deltaY = currentY.current - startY.current;
     
     // Calculate new position
     const windowHeight = window.innerHeight;
@@ -64,8 +57,12 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
     const threshold = window.innerHeight * 0.2;
     
     if (deltaY > threshold) {
-      // Drag down - minimize
-      setSheetPosition('40vh');
+      // Drag down - minimize or close
+      if (sheetPosition === '40vh') {
+        onClose();
+      } else {
+        setSheetPosition('40vh');
+      }
     } else if (deltaY < -threshold) {
       // Drag up - maximize
       setSheetPosition('90vh');
@@ -74,8 +71,6 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
       setSheetPosition('40vh');
     }
   };
-
-  if (!mounted) return null;
 
   return (
     <div 
@@ -101,7 +96,6 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
 
       {/* Doctor list */}
       <div 
-        ref={contentRef}
         className="overflow-y-auto h-[calc(100%-3rem)] overscroll-contain pb-safe"
       >
         <div className="p-4 space-y-4">
