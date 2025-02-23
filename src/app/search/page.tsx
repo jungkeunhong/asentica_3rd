@@ -7,6 +7,9 @@ import SearchBar from '@/components/SearchBar';
 import { doctors } from '@/data/doctors';
 import DoctorModalSheet from '@/components/DoctorModalSheet';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
+import type { Libraries } from '@react-google-maps/api';
+
+const libraries: Libraries = ['places'];
 
 const GoogleMap = dynamic(() => import('@react-google-maps/api').then(mod => mod.GoogleMap));
 const LoadScript = dynamic(() => import('@react-google-maps/api').then(mod => mod.LoadScript));
@@ -131,7 +134,9 @@ const SearchResults = () => {
         {/* Map Section */}
         <div className="h-[45vh] relative z-10">
           <LoadScript 
+            id="google-map-script"
             googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
+            libraries={libraries}
             onLoad={() => setIsMapLoaded(true)}
           >
             {isMapLoaded && (
