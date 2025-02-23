@@ -1,13 +1,17 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Gotu } from 'next/font/google';
-import "./globals.css";
 
 const gotu = Gotu({
   subsets: ['latin'],
   weight: '400',
   variable: '--font-gotu',
 });
+
+// Add the font class to your root layout
+<html lang="en" className={`${gotu.variable}`}>
+  
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased ${gotu.variable}`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
       </body>
