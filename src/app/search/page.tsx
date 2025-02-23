@@ -38,7 +38,7 @@ function SearchContent() {
           <SearchBar initialValue={query} className="flex-1" />
           <button
             onClick={() => setView(view === 'map' ? 'list' : 'map')}
-            className="mr-4 px-3 py-2 rounded-lg bg-primary-50 text-primary-600 flex items-center space-x-1"
+            className="mr-4 px-3 py-2 rounded-lg bg-[#6f3d2e]/10 text-[#6f3d2e] flex items-center space-x-1 hover:bg-[#6f3d2e]/20 transition-colors"
           >
             {view === 'map' ? (
               <>
