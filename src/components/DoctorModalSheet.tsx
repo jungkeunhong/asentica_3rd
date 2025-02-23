@@ -12,19 +12,28 @@ interface DoctorModalSheetProps {
 
 export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorModalSheetProps) {
   const [sheetPosition, setSheetPosition] = useState('20vh');
-  const startY = useRef(0);
-  const currentY = useRef(0);
-  const isDragging = useRef(false);
-  const lastVelocity = useRef(0);
-  const lastTime = useRef(0);
-  const animationFrame = useRef<number>();
-  const sheetRef = useRef<HTMLDivElement>(null);
+  const startY = useRef<number>(0);
+  const currentY = useRef<number>(0);
+  const isDragging = useRef<boolean>(false);
+  const lastVelocity = useRef<number>(0);
+  const lastTime = useRef<number>(0);
+  const animationFrame = useRef<number | null>(null);
+  const sheetRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setSheetPosition('20vh');
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    // Cleanup animation frame on unmount
+    return () => {
+      if (animationFrame.current !== null) {
+        cancelAnimationFrame(animationFrame.current);
+      }
+    };
+  }, []);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     const target = e.target as HTMLElement;
@@ -36,8 +45,9 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
     lastTime.current = Date.now();
     lastVelocity.current = 0;
 
-    if (animationFrame.current) {
+    if (animationFrame.current !== null) {
       cancelAnimationFrame(animationFrame.current);
+      animationFrame.current = null;
     }
   };
 
@@ -89,10 +99,12 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
 
       if (progress < 1) {
         animationFrame.current = requestAnimationFrame(animate);
+      } else {
+        animationFrame.current = null;
       }
     };
 
-    if (animationFrame.current) {
+    if (animationFrame.current !== null) {
       cancelAnimationFrame(animationFrame.current);
     }
     animationFrame.current = requestAnimationFrame(animate);
