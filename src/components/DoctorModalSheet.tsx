@@ -12,18 +12,24 @@ interface DoctorModalSheetProps {
 
 export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorModalSheetProps) {
   const [mounted, setMounted] = useState(false);
-  const [sheetHeight, setSheetHeight] = useState('55vh');
+  const [sheetPosition, setSheetPosition] = useState('40vh');
   const startY = useRef(0);
   const currentY = useRef(0);
   const isDragging = useRef(false);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (isOpen) {
+      setSheetPosition('40vh');
+    }
+  }, [isOpen]);
+
   const handleTouchStart = (e: React.TouchEvent) => {
-    // Only allow dragging from the handle
     const target = e.target as HTMLElement;
     if (!target.closest('.drag-handle')) return;
 
@@ -38,17 +44,13 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
     currentY.current = e.touches[0].clientY;
     const deltaY = currentY.current - startY.current;
     
-    // Prevent pulling up beyond 90vh
-    if (deltaY < 0 && sheetHeight === '90vh') {
-      return;
-    }
-    
-    // Update sheet height based on drag
-    const newHeight = Math.max(
-      Math.min(window.innerHeight * 0.9, window.innerHeight - currentY.current),
-      window.innerHeight * 0.2
+    // Calculate new position
+    const windowHeight = window.innerHeight;
+    const newPosition = Math.max(
+      Math.min(90, (windowHeight - currentY.current) / windowHeight * 100),
+      20
     );
-    setSheetHeight(`${newHeight}px`);
+    setSheetPosition(`${newPosition}vh`);
 
     // Prevent page scrolling while dragging
     e.preventDefault();
@@ -62,11 +64,14 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
     const threshold = window.innerHeight * 0.2;
     
     if (deltaY > threshold) {
-      onClose();
+      // Drag down - minimize
+      setSheetPosition('40vh');
     } else if (deltaY < -threshold) {
-      setSheetHeight('90vh');
+      // Drag up - maximize
+      setSheetPosition('90vh');
     } else {
-      setSheetHeight('55vh');
+      // Return to previous position
+      setSheetPosition('40vh');
     }
   };
 
@@ -75,11 +80,11 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
   return (
     <div 
       ref={sheetRef}
-      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-lg transform transition-transform duration-300 ease-in-out ${
+      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-[20px] shadow-lg transform transition-transform duration-300 ease-in-out ${
         isOpen ? 'translate-y-0' : 'translate-y-full'
       }`}
       style={{ 
-        height: sheetHeight,
+        height: sheetPosition,
         zIndex: 100,
         touchAction: isDragging.current ? 'none' : 'auto'
       }}
@@ -88,23 +93,17 @@ export default function DoctorModalSheet({ doctors, isOpen, onClose }: DoctorMod
       onTouchEnd={handleTouchEnd}
     >
       {/* Drag handle */}
-      <div className="sticky top-0 bg-white z-10 drag-handle">
-        <div className="w-full h-12 flex items-center justify-between px-4">
-          <div className="w-12"></div>
-          <div className="w-20 h-1 bg-gray-300 rounded-full"></div>
-          <button 
-            onClick={onClose}
-            className="w-12 h-12 flex items-center justify-center text-gray-500 hover:text-gray-700"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+      <div className="sticky top-0 bg-white z-10 drag-handle rounded-t-[20px]">
+        <div className="w-full h-12 flex items-center justify-center">
+          <div className="w-20 h-1 bg-gray-300 rounded-full" />
         </div>
       </div>
 
       {/* Doctor list */}
-      <div className="overflow-y-auto h-[calc(100%-3rem)] overscroll-contain">
+      <div 
+        ref={contentRef}
+        className="overflow-y-auto h-[calc(100%-3rem)] overscroll-contain pb-safe"
+      >
         <div className="p-4 space-y-4">
           {doctors.map((doctor) => (
             <div key={doctor.id} className="flex items-start space-x-4 p-4 bg-white rounded-lg border">

@@ -181,27 +181,28 @@ const SearchContent = () => {
         </div>
       </div>
 
-      <div className="pt-16">
-        {/* Map Section */}
-        <div className="fixed top-16 left-0 right-0 h-[45vh] z-[50]">
-          <DynamicMap
-            userLocation={userLocation}
-            mapOptions={mapOptions}
-            doctors={filteredDoctors}
-            getCoordinatesFromMapsUrl={getCoordinatesFromMapsUrl}
-          />
-        </div>
-
-        {/* Spacer for map */}
-        <div className="h-[45vh]" />
-
-        {/* Modal Sheet */}
-        <DoctorModalSheet
+      {/* Map Section - Takes full height minus navbar and safe areas */}
+      <div className="fixed top-[72px] left-0 right-0 bottom-0 z-[50]">
+        <DynamicMap
+          userLocation={userLocation}
+          mapOptions={{
+            ...mapOptions,
+            fullscreenControl: false,
+            streetViewControl: false,
+            mapTypeControl: false,
+            zoomControl: false,
+          }}
           doctors={filteredDoctors}
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
+          getCoordinatesFromMapsUrl={getCoordinatesFromMapsUrl}
         />
       </div>
+
+      {/* Modal Sheet */}
+      <DoctorModalSheet
+        doctors={filteredDoctors}
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 };
