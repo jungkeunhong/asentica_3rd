@@ -3,16 +3,15 @@
 import { useSearchParams } from 'next/navigation';
 import { useState, Suspense } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import SearchBar from '@/components/SearchBar';
 import DynamicMap from '@/components/DynamicMap';
-import DoctorModalSheet from '@/components/DoctorModalSheet';
 import { doctors } from '@/data/doctors';
-import { MapIcon, ListBulletIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 
 function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [isModalOpen, setIsModalOpen] = useState(true);
   const [view, setView] = useState<'map' | 'list'>('map');
 
   // Combine all doctors into a single array
@@ -34,37 +33,34 @@ function SearchContent() {
     <div className="h-screen flex flex-col">
       {/* Fixed header with search bar and toggle */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
-        <div className="flex items-center justify-between py-3">
-          <SearchBar initialValue={query} className="flex-1" />
-          <button
-            onClick={() => setView(view === 'map' ? 'list' : 'map')}
-            className="mr-4 px-3 py-2 rounded-lg bg-[#6f3d2e]/10 text-[#6f3d2e] flex items-center space-x-1 hover:bg-[#6f3d2e]/20 transition-colors"
-          >
-            {view === 'map' ? (
-              <>
-                <ListBulletIcon className="w-5 h-5" />
-                <span>List</span>
-              </>
-            ) : (
-              <>
-                <MapIcon className="w-5 h-5" />
-                <span>Map</span>
-              </>
-            )}
-          </button>
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center py-3">
+            <Link href="/" className="flex-shrink-0 mr-4">
+              <ChevronLeftIcon className="h-6 w-6 text-gray-600" />
+            </Link>
+            <div className="w-[480px]">
+              <SearchBar initialValue={query} />
+            </div>
+            <button
+              onClick={() => setView(view === 'map' ? 'list' : 'map')}
+              className="ml-4 text-[#6f3d2e] hover:underline whitespace-nowrap"
+            >
+              {view === 'map' ? 'List' : 'Map'}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Content area */}
       <div className="flex-1 mt-[72px]">
         {/* Map View */}
-        <div className={view === 'map' ? 'block h-full' : 'hidden'}>
+        <div className={`h-full ${view === 'map' ? 'block' : 'hidden'}`}>
           <DynamicMap doctors={filteredDoctors} />
         </div>
 
         {/* List View */}
-        <div className={view === 'list' ? 'block h-full bg-gray-50' : 'hidden'}>
-          <div className="p-4 space-y-4">
+        <div className={`h-full bg-gray-50 overflow-auto ${view === 'list' ? 'block' : 'hidden'}`}>
+          <div className="max-w-7xl mx-auto px-4 py-4 space-y-4">
             {filteredDoctors.map((doctor) => (
               <div 
                 key={doctor.id} 
@@ -92,15 +88,6 @@ function SearchContent() {
           </div>
         </div>
       </div>
-
-      {/* Modal Sheet (only visible in map view) */}
-      {view === 'map' && (
-        <DoctorModalSheet
-          doctors={filteredDoctors}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
     </div>
   );
 }

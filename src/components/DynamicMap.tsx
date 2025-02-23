@@ -1,117 +1,132 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { GoogleMap, useLoadScript, MarkerF } from '@react-google-maps/api';
-import type { Libraries } from '@react-google-maps/api';
-import { Doctor } from '@/data/doctors';
+import { Loader } from '@googlemaps/js-api-loader';
 
-const libraries: Libraries = ['places'];
-
-const defaultCenter = {
-  lat: 40.7831,
-  lng: -73.9712 // Manhattan coordinates
-};
+interface Doctor {
+  id: string;
+  name: string;
+  image: string;
+  location: string;
+  clinic: string;
+  title: string;
+  rating: number;
+}
 
 interface DynamicMapProps {
   doctors: Doctor[];
 }
 
-const manhattanLocations = [
-  { lat: 40.7831, lng: -73.9712 }, // Upper East Side
-  { lat: 40.7505, lng: -73.9934 }, // Chelsea
-  { lat: 40.7589, lng: -73.9851 }, // Midtown
-  { lat: 40.7308, lng: -73.9973 }, // East Village
-  { lat: 40.7484, lng: -73.9857 }  // Murray Hill
-];
+const defaultCenter = { lat: 40.7831, lng: -73.9712 }; // Manhattan coordinates
 
-export default function DynamicMap({ doctors }: DynamicMapProps) {
-  const [userLocation, setUserLocation] = useState(defaultCenter);
-  const mapRef = useRef<google.maps.Map | null>(null);
+const DynamicMap = ({ doctors }: DynamicMapProps) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [infoWindow, setInfoWindow] = useState<google.maps.InfoWindow | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
 
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
-    libraries
-  });
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        () => {
-          console.log('Using default Manhattan location');
-        }
-      );
+  const getCoordinates = (location: string): google.maps.LatLngLiteral => {
+    try {
+      // Try to parse coordinates in format "lat,lng"
+      const [lat, lng] = location.split(',').map(coord => parseFloat(coord.trim()));
+      if (!isNaN(lat) && !isNaN(lng)) {
+        return { lat, lng };
+      }
+    } catch (error) {
+      console.error('Error parsing coordinates:', error);
     }
-  }, []);
-
-  const getCoordinatesFromLocation = (location: string): google.maps.LatLngLiteral => {
-    // If location contains coordinates in the format "lat,lng"
-    const coordMatch = location.match(/-?\d+\.\d+/g);
-    if (coordMatch && coordMatch.length >= 2) {
-      return {
-        lat: parseFloat(coordMatch[0]),
-        lng: parseFloat(coordMatch[1])
-      };
-    }
-
-    // If location contains "NY" or "New York", use a random Manhattan location
-    if (location.includes('NY') || location.includes('New York')) {
-      const index = Math.abs(location.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % manhattanLocations.length;
-      return manhattanLocations[index];
-    }
-
-    // Default to Manhattan center
+    
+    // Return default coordinates if parsing fails
     return defaultCenter;
   };
 
-  if (!isLoaded) {
-    return <div className="h-full w-full bg-gray-100 animate-pulse" />;
-  }
+  useEffect(() => {
+    const loader = new Loader({
+      apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+      version: 'weekly',
+      libraries: ['places']
+    });
 
-  return (
-    <GoogleMap
-      mapContainerClassName="w-full h-full"
-      center={userLocation}
-      zoom={13}
-      options={{
-        disableDefaultUI: true,
-        zoomControl: true,
-        fullscreenControl: false,
-        streetViewControl: false,
-        mapTypeControl: false,
+    loader.load().then(() => {
+      if (!mapRef.current) return;
+
+      const mapInstance = new google.maps.Map(mapRef.current, {
+        center: defaultCenter,
+        zoom: 12,
+        disableDefaultUI: true, // Disable all default controls
+        zoomControl: true, // Only enable zoom control
+        mapTypeId: 'roadmap', // Force roadmap view
         styles: [
           {
-            featureType: "poi",
-            elementType: "labels",
-            stylers: [{ visibility: "off" }]
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }]
           }
         ]
-      }}
-      onLoad={map => {
-        mapRef.current = map;
-      }}
-    >
-      {doctors.map((doctor) => {
-        const position = getCoordinatesFromLocation(doctor.location);
-        return (
-          <MarkerF
-            key={doctor.id}
-            position={position}
-            title={doctor.name}
-            onClick={() => {
-              if (mapRef.current) {
-                mapRef.current.panTo(position);
-                mapRef.current.setZoom(15);
-              }
-            }}
-          />
-        );
-      })}
-    </GoogleMap>
-  );
-}
+      });
+
+      setMap(mapInstance);
+      setInfoWindow(new google.maps.InfoWindow());
+    }).catch(error => {
+      console.error('Error loading Google Maps:', error);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!map || !infoWindow) return;
+
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.setMap(null));
+    markersRef.current = [];
+
+    const bounds = new google.maps.LatLngBounds();
+
+    doctors.forEach(doctor => {
+      const position = getCoordinates(doctor.location);
+
+      const marker = new google.maps.Marker({
+        position,
+        map,
+        title: doctor.name
+      });
+
+      const content = `
+        <div class="p-2 max-w-[200px]">
+          <div class="relative w-full h-[150px] mb-2">
+            <img
+              src="${doctor.image}"
+              alt="${doctor.name}"
+              class="w-full h-full object-cover rounded"
+            />
+          </div>
+          <h3 class="font-semibold">${doctor.name}</h3>
+          <p class="text-sm text-gray-600">${doctor.title}</p>
+          <p class="text-sm text-gray-600">${doctor.clinic}</p>
+          <div class="mt-1">
+            <span class="text-yellow-400">★</span>
+            <span class="ml-1 text-sm">${doctor.rating}</span>
+          </div>
+        </div>
+      `;
+
+      marker.addListener('click', () => {
+        infoWindow.setContent(content);
+        infoWindow.open(map, marker);
+      });
+
+      markersRef.current.push(marker);
+      bounds.extend(position);
+    });
+
+    if (doctors.length > 0) {
+      map.fitBounds(bounds);
+    } else {
+      map.setCenter(defaultCenter);
+      map.setZoom(12);
+    }
+  }, [doctors, map, infoWindow]);
+
+  return <div ref={mapRef} className="w-full h-full" />;
+};
+
+export default DynamicMap;

@@ -12,7 +12,10 @@ const nextConfig = {
       'images.squarespace-cdn.com',
       'collagenbar.nyc',
       'maps.googleapis.com',
-      'maps.gstatic.com'
+      'maps.gstatic.com',
+      'images.unsplash.com',
+      'plus.unsplash.com',
+      'lh3.googleusercontent.com'
     ]
   },
   env: {

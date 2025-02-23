@@ -29,7 +29,7 @@ export const doctors = {
       name: "Dr. James C. Marotta, MD",
       title: "Board Certified Facial Plastic Surgeon",
       clinic: "Marotta Facial Plastic Surgery",
-    rating: 4.9,
+      rating: 4.9,
       reviews: 'https://www.google.com/maps/search/?api=1&query=Marotta+Facial+Plastic+Surgery+Smithtown+NY',
       image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREofNWqHa3Yj0_h_FE7O1PkVdYTNIwd3u8cw&s",
       expertise: ["Botox", "Active FX", "Laser"],
@@ -40,7 +40,7 @@ export const doctors = {
       ],
       intro: "Expertise. Innovation. Compassionate care. The primary reasons Dr. Marotta has been consistently named Best Cosmetic Surgeon on Long Island can be found in his commitment to his patients. Combined with his dual-board certification, his Ivy League education and his impeccable credentials.",
       languages: ["English"],
-      location: "895 W. Jericho Tpke., Smithtown, NY",
+      location: "40.8503,-73.2157", // Smithtown, NY
       website: "https://marottamd.com/",
       treatments: [
         {
@@ -67,7 +67,7 @@ export const doctors = {
         "Surgical Training, North Shore LIJ Hospital, New York"
       ],
       languages: ["English"],
-      location: "157 E 64th St 2nd floor, New York, NY 10065",
+      location: "40.7684,-73.9615", // 1st Ave, New York
       website: "https://skinlyaesthetics.com/",
       treatments: [
         {
@@ -94,7 +94,7 @@ export const doctors = {
         "M.D., SUNY Downstate Medical Center (2013)"
       ],
       languages: ["English"],
-      location: "114 Hudson St, New York, NY 10013",
+      location: "40.7197,-74.0066", // Tribeca, Manhattan
       website: "https://www.tribecamedspa.com/",
       treatments: [
         {
@@ -112,7 +112,7 @@ export const doctors = {
       name: "James Christian",
       title: "Authorized Vampire Facelift® Professional, Injectable Expert & Certified Galderma Trainer",
       clinic: "James Christian Cosmetics",
-    rating: 4.8,
+      rating: 4.8,
       reviews: 'https://www.google.com/maps/search/?api=1&query=James+Christian+Cosmetics',
       image: "https://jameschristiancosmetics.com/wp-content/uploads/jcc-img-profile.jpg",
       expertise: ["Injections", "Botox", "Filler"],
@@ -124,7 +124,7 @@ export const doctors = {
         "Advanced training under top plastic surgeons in NYC"
       ],
       languages: ["English"],
-      location: "New York, NY",
+      location: "40.7505,-73.9764", // Manhattan
       website: "https://jameschristiancosmetics.com/",
       treatments: [
         {
@@ -152,7 +152,7 @@ export const doctors = {
         "Speaker for Candela"
       ],
       languages: ["English"],
-      location: "New York, NY",
+      location: "40.7128,-74.0060", // Lower Manhattan
       website: "https://diamondadvancedaesthetics.com/",
       treatments: [
         {
@@ -179,7 +179,7 @@ export const doctors = {
         "M.D., New York University School of Medicine"
       ],
       languages: ["English"],
-      location: "New York, NY",
+      location: "40.7549,-73.9840", // Midtown Manhattan
       website: "https://vivianchinmd.com/",
       treatments: [
         {
@@ -197,7 +197,7 @@ export const doctors = {
       name: "Samantha Danesi, RPA-C, LMT",
       title: "Certified Physician Assistant (RPA-C)",
       clinic: "Samantha Danesi Aesthetics",
-    rating: 4.7,
+      rating: 4.7,
       reviews: 'https://www.google.com/maps/search/?api=1&query=Samantha+Danesi+Aesthetics',
       image: "https://www.beyondbeautifulaesthetics.com/assets/silver_websites/beyond-beautiful-aesthetics/staff/samantha-danesi.jpg",
       expertise: ["Advanced cosmetic injectables", "Tear trough treatments", "Liquid facelifts"],
@@ -207,7 +207,7 @@ export const doctors = {
         "Licensed Massage Therapist (LMT)"
       ],
       languages: ["English"],
-      location: "New York, NY",
+      location: "40.7831,-73.9712", // Upper East Side
       website: "https://samanthadanesiaesthetics.com/",
       treatments: [
         {
@@ -230,7 +230,7 @@ export const doctors = {
       intro: "Shannon Lee is a skincare expert specializing in acne and hyperpigmentation treatments. Her journey began with her own skin struggles, leading her to build a thriving esthetics business in New York City.",
       education: ["Licensed Esthetician"],
       languages: ["English"],
-      location: "New York, NY",
+      location: "40.7589,-73.9851", // Midtown
       website: "https://shannonleeesthetics.com/",
       treatments: [
         {
@@ -256,7 +256,7 @@ export const doctors = {
         "Licensed Esthetician, Atelier Esthétique Institute of Esthetics"
       ],
       languages: ["English", "Korean"],
-      location: "New York, NY",
+      location: "40.7589,-73.9851", // Midtown
       website: "https://collagenbar.com/",
       treatments: [
         {
@@ -268,4 +268,4 @@ export const doctors = {
       ]
     }
   ]
-} 
+}
