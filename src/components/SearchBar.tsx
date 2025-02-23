@@ -7,21 +7,38 @@ import { useRouter } from 'next/navigation';
 interface SearchBarProps {
   initialValue?: string;
   className?: string;
+  onSearch?: (value: string) => void;
 }
 
-const SearchBar = ({ initialValue = '', className = '' }: SearchBarProps) => {
+const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState(initialValue);
   const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchTerm.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+    const trimmedTerm = searchTerm.trim();
+    if (trimmedTerm) {
+      if (onSearch) {
+        onSearch(trimmedTerm);
+      } else {
+        router.push(`/search?q=${encodeURIComponent(trimmedTerm)}`);
+      }
     }
   };
 
-  const handleClear = () => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (onSearch) {
+      onSearch(value);
+    }
+  };
+
+  const clearSearch = () => {
     setSearchTerm('');
+    if (onSearch) {
+      onSearch('');
+    }
   };
 
   return (
@@ -30,7 +47,7 @@ const SearchBar = ({ initialValue = '', className = '' }: SearchBarProps) => {
         <input
           type="text"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={handleChange}
           placeholder="Search for treatments, clinics, or doctors"
           className="w-full h-12 pl-4 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:border-primary-500 text-base"
           style={{ fontSize: '16px' }}
@@ -39,7 +56,7 @@ const SearchBar = ({ initialValue = '', className = '' }: SearchBarProps) => {
           {searchTerm && (
             <button
               type="button"
-              onClick={handleClear}
+              onClick={clearSearch}
               className="p-1 text-gray-400 hover:text-gray-600"
             >
               <XMarkIcon className="w-5 h-5" />
