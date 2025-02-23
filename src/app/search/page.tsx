@@ -21,7 +21,7 @@ const SearchResults = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [center, setCenter] = useState(defaultCenter);
+  const [center] = useState(defaultCenter);
   const [userLocation, setUserLocation] = useState<null | { lat: number; lng: number }>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(true);
@@ -78,7 +78,7 @@ const SearchResults = () => {
       const parts = query.split(',');
       
       // Try to find coordinates in the address
-      for (let part of parts) {
+      for (const part of parts) {
         const coords = part.trim().match(/-?\d+\.\d+/g);
         if (coords && coords.length >= 2) {
           return {
