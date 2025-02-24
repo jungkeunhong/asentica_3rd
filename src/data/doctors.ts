@@ -8,36 +8,38 @@ export interface Treatment {
 export interface Doctor {
   id: string;
   name: string;
-  clinic: string;
   title: string;
-  image: string;
+  clinic: string;
   rating: number;
-  reviews: string[];
-  location: string;
+  reviews: string;
+  image: string;
   expertise: string[];
-  treatments: Treatment[];
-  highlights: string[];
+  location: string;
+  highlights?: string[];
+  intro?: string;
+  education?: string[];
+  treatments?: Treatment[];
 }
 
 export const doctors: { [key: string]: Doctor[] } = {
   botox: [
     {
       id: 'dr-marotta',
-      name: "Dr. James C. Marotta, MD",
+      name: "Dr. James C. Marotta",
       title: "Board Certified Facial Plastic Surgeon",
       clinic: "Marotta Facial Plastic Surgery",
       rating: 4.9,
       reviews: 'https://www.google.com/maps/search/?api=1&query=Marotta+Facial+Plastic+Surgery+Smithtown+NY',
       image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREofNWqHa3Yj0_h_FE7O1PkVdYTNIwd3u8cw&s",
       expertise: ["Botox", "Active FX", "Laser"],
+      location: "Upper East Side",
+      intro: "Expertise. Innovation. Compassionate care. The primary reasons Dr. Marotta has been consistently named Best Cosmetic Surgeon on Long Island can be found in his commitment to his patients. Combined with his dual-board certification, his Ivy League education and his impeccable credentials.",
       education: [
         "BA, Columbia University, New York, NY",
         "MD, SUNY Stony Brook, School of Medicine",
         "Fellowship: Facial Plastic and Reconstructive Surgery, Quatela Center"
       ],
-      intro: "Expertise. Innovation. Compassionate care. The primary reasons Dr. Marotta has been consistently named Best Cosmetic Surgeon on Long Island can be found in his commitment to his patients. Combined with his dual-board certification, his Ivy League education and his impeccable credentials.",
       languages: ["English"],
-      location: "Smithtown, NY",
       website: "https://marottamd.com/",
       treatments: [
         {

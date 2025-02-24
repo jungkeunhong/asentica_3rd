@@ -3,103 +3,57 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { StarIcon, MapPinIcon } from '@heroicons/react/24/solid';
-import type { Doctor } from '@/data/doctors';
+import { Doctor } from '@/data/doctors';
 
 interface DoctorCardProps {
   doctor: Doctor;
+  onClick?: () => void;
 }
 
-export default function DoctorCard({ doctor }: DoctorCardProps) {
+export default function DoctorCard({ doctor, onClick }: DoctorCardProps) {
   return (
-    <div className="bg-white rounded-lg p-6">
-      <div className="flex gap-6">
-        {/* Image section */}
-        <div className="relative w-32 h-32 flex-shrink-0">
-          <Image
-            src={doctor.image}
-            alt={doctor.name}
-            fill
-            className="rounded-lg object-cover"
-          />
+    <div 
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="relative h-48">
+        <Image
+          src={doctor.image}
+          alt={doctor.name}
+          fill
+          className="object-cover"
+        />
+      </div>
+      <div className="p-4">
+        <h3 className="font-semibold text-lg">{doctor.name}</h3>
+        <p className="text-gray-600 text-sm">{doctor.title}</p>
+        <p className="text-gray-600 text-sm">{doctor.clinic}</p>
+
+        <div className="mt-2 flex items-center gap-2">
+          <div className="flex items-center">
+            <StarIcon className="h-4 w-4 text-yellow-400" />
+            <span className="ml-1 font-medium">{doctor.rating}</span>
+            <span className="text-gray-600 ml-1">(Google Reviews)</span>
+          </div>
         </div>
 
-        {/* Content section */}
-        <div className="flex-grow">
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="text-xl font-semibold">{doctor.name}</h3>
-              <p className="text-gray-600 text-sm">{doctor.title}</p>
-              <p className="text-gray-500 text-sm mt-1">{doctor.clinic}</p>
-            </div>
-            <div className="flex items-center">
-              <StarIcon className="h-4 w-4 text-yellow-400 mr-1" />
-              <span className="font-medium">{doctor.rating}</span>
-              <span className="text-sm text-gray-600">({doctor.reviews.length} reviews)</span>
-            </div>
-          </div>
+        <div className="mt-2 flex items-center text-gray-600">
+          <MapPinIcon className="h-4 w-4" />
+          <span className="ml-1">{doctor.location}</span>
+        </div>
 
-          <div className="flex items-center gap-1 text-sm text-gray-600">
-            <MapPinIcon className="h-4 w-4" />
-            <span>{doctor.distance.toFixed(1)} miles</span>
-          </div>
-
-          {/* Expertise tags */}
-          <div className="flex flex-wrap gap-2 mt-3">
-            {doctor.expertise.map((skill, index) => (
-              <span 
-                key={index}
-                className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-
-          {/* Key Highlights */}
-          <div className="flex flex-wrap gap-2 mt-3">
-            {doctor.highlights.map((highlight, index) => (
-              <span 
+        {doctor.expertise && doctor.expertise.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {doctor.expertise.slice(0, 3).map((item, index) => (
+              <span
                 key={index}
                 className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
               >
-                {highlight}
+                {item}
               </span>
             ))}
           </div>
-
-          {/* Treatment preview */}
-          {doctor.treatments[0] && (
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-medium text-sm">{doctor.treatments[0].name}</p>
-                  <p className="text-gray-600 text-xs mt-1">{doctor.treatments[0].time}</p>
-                </div>
-                <p className="text-sm font-medium">
-                  {doctor.treatments[0].price.split('\n')[0]}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Links */}
-          <div className="flex gap-4 mt-4">
-            <Link 
-              href={doctor.website} 
-              target="_blank"
-              className="text-blue-600 hover:text-blue-800 text-sm"
-            >
-              Visit Website
-            </Link>
-            <Link 
-              href={doctor.reviews} 
-              target="_blank"
-              className="text-blue-600 hover:text-blue-800 text-sm"
-            >
-              Read Reviews
-            </Link>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
