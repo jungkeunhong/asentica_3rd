@@ -82,7 +82,7 @@ const BotoxTreatment = ({ onBackToMain }: TreatmentProps) => {
           <h2 className="text-xl font-bold text-luxe-900 mb-4">TLDR;</h2>
           <p className="text-luxe-600">
             Botox is a neurotoxin that temporarily relaxes muscles to reduce wrinkles. 
-            Perfect for dynamic wrinkles like forehead lines and crow's feet, with results lasting 3-4 months.
+            Perfect for dynamic wrinkles like forehead lines and crow&amp;#39;s feet, with results lasting 3-4 months.
           </p>
         </div>
 
