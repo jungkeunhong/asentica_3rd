@@ -2,26 +2,21 @@
 
 import React from 'react';
 
-const SearchFilters = () => {
+const filters = ['Price', 'Rating', 'Location', 'Treatment Type', 'Availability'];
+
+export default function SearchFilters() {
   return (
-    <div className="px-4 py-2 flex gap-2 overflow-x-auto">
-      <button className="px-4 py-2 bg-gray-100 rounded-full text-sm whitespace-nowrap">
-        Price
-      </button>
-      <button className="px-4 py-2 bg-gray-100 rounded-full text-sm whitespace-nowrap">
-        Rating
-      </button>
-      <button className="px-4 py-2 bg-gray-100 rounded-full text-sm whitespace-nowrap">
-        Location
-      </button>
-      <button className="px-4 py-2 bg-gray-100 rounded-full text-sm whitespace-nowrap">
-        Treatment Type
-      </button>
-      <button className="px-4 py-2 bg-gray-100 rounded-full text-sm whitespace-nowrap">
-        Availability
-      </button>
+    <div className="py-4 px-4">
+      <div className="flex space-x-4 overflow-x-auto">
+        {filters.map((filter) => (
+          <button
+            key={filter}
+            className="px-4 py-2 border rounded-full text-black hover:bg-gray-50 whitespace-nowrap"
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
     </div>
   );
-};
-
-export default SearchFilters;
+}

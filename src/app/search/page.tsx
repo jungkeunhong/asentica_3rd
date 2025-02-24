@@ -31,7 +31,7 @@ export default function SearchContent() {
         <div className="sticky top-0 z-40 bg-white border-b">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between">
                 {/* Back Button (왼쪽) */}
-                <Link href="/" className="flex items-center text-brown-600">
+                <Link href="/" className="flex items-center text-black">
                 <ChevronLeftIcon className="h-6 w-6" />
                 </Link>
 
@@ -46,7 +46,7 @@ export default function SearchContent() {
                 {/* Map/List Toggle Button (오른쪽) */}
                 <button
                 onClick={() => setView(view === 'map' ? 'list' : 'map')}
-                className="text-brown-600"
+                className="text-black"
                 >
                 {view === 'map' ? 'List' : 'Map'}
                 </button>
