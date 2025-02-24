@@ -5,11 +5,6 @@ export interface Treatment {
   price: string;
 }
 
-export interface Coordinates {
-  lat: number;
-  lng: number;
-}
-
 export interface Doctor {
   id: string;
   name: string;
@@ -20,12 +15,10 @@ export interface Doctor {
   image: string;
   expertise: string[];
   location: string;
-  coordinates: Coordinates;
   highlights?: string[];
   intro?: string;
   education?: string[];
-  treatments: Treatment[];
-  website?: string;
+  treatments?: Treatment[];
 }
 
 export const doctors: { [key: string]: Doctor[] } = {
@@ -40,10 +33,6 @@ export const doctors: { [key: string]: Doctor[] } = {
       image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREofNWqHa3Yj0_h_FE7O1PkVdYTNIwd3u8cw&s",
       expertise: ["Botox", "Active FX", "Laser"],
       location: "Upper East Side",
-      coordinates: {
-        lat: 40.7749,
-        lng: -73.9654
-      },
       intro: "Expertise. Innovation. Compassionate care. The primary reasons Dr. Marotta has been consistently named Best Cosmetic Surgeon on Long Island can be found in his commitment to his patients. Combined with his dual-board certification, his Ivy League education and his impeccable credentials.",
       education: [
         "BA, Columbia University, New York, NY",
@@ -70,17 +59,14 @@ export const doctors: { [key: string]: Doctor[] } = {
       reviews: 'https://www.google.com/maps/search/?api=1&query=Skinly+Aesthetics+New+York',
       image: "https://skinlyaesthetics.com/wp-content/uploads/2024/03/Dr.-Schwarzburg-MD-best-cosmetic-dermatologist.jpg",
       expertise: ["Botox", "Juvederm", "Active FX"],
-      location: "Midtown Manhattan",
-      coordinates: {
-        lat: 40.7589,
-        lng: -73.9851
-      },
       intro: "Dr. Schwarzburg is a top cosmetic expert in NYC, specializing in minimally invasive treatments to enhance natural beauty.",
       education: [
         "Bachelor's in Molecular Biology, Magna Cum Laude, University of Texas at Dallas",
         "Medical Degree, McGovern Medical School, Houston",
         "Surgical Training, North Shore LIJ Hospital, New York"
       ],      
+      location: "Midtown Manhattan",
+      website: "https://skinlyaesthetics.com/",
       treatments: [
         {
           name: "Botox",
@@ -100,17 +86,14 @@ export const doctors: { [key: string]: Doctor[] } = {
       reviews: 'https://www.google.com/maps/search/?api=1&query=Tribeca+MedSpa+New+York',
       image: "https://www.tribecamedspa.com/wp-content/uploads/2023/12/Dr-Georgina-Ferzli-MD-MS-FAAD-Director-of-Cosmetic-Dermatology.jpeg",
       expertise: ["Botox", "Laser Resurfacing", "Acne Scar Treatment", "Skin Tightening"],
-      location: "Tribeca, Manhattan",
-      coordinates: {
-        lat: 40.7164,
-        lng: -74.0059
-      },
       intro: "Dr. Ferzli is a top dermatologist in NYC, specializing in cosmetic and laser dermatology.",
       education: [
         "B.S., Georgetown University (2008)",
         "M.S., Georgetown University (2009)",
         "M.D., SUNY Downstate Medical Center (2013)"
       ],
+      location: "Tribeca, Manhattan",
+      website: "https://www.tribecamedspa.com/",
       treatments: [
         {
           name: "Botox",
@@ -132,11 +115,6 @@ export const doctors: { [key: string]: Doctor[] } = {
       reviews: 'https://www.google.com/maps/search/?api=1&query=James+Christian+Cosmetics',
       image: "https://jameschristiancosmetics.com/wp-content/uploads/jcc-img-profile.jpg",
       expertise: ["Injections", "Botox", "Filler"],
-      location: "Manhattan",
-      coordinates: {
-        lat: 40.7831,
-        lng: -73.9712
-      },
       intro: "James Christian is the Director of Operations and founder of James Christian Cosmetics, specializing in injectable fillers, muscle relaxants, and advanced aesthetic techniques.",
       education: [
         "B.S., Florida Atlantic University",
@@ -144,6 +122,8 @@ export const doctors: { [key: string]: Doctor[] } = {
         "Physician Assistant License",
         "Advanced training under top plastic surgeons in NYC"
       ],
+      location: "Manhattan",
+      website: "https://jameschristiancosmetics.com/",
       treatments: [
         {
           name: "Sculptra Filler",
@@ -163,11 +143,6 @@ export const doctors: { [key: string]: Doctor[] } = {
       reviews: 'https://www.google.com/maps/search/?api=1&query=Diamond+Advanced+Aesthetics',
       image: "https://diamondadvancedaesthetics.com/storage/2024/04/julija-dimante-by-diamond-advanced-aesthetics-in-new-york-ny.webp",
       expertise: ["Injectable Fillers", "Botox", "Natural Aesthetic Enhancements", "Skin Rejuvenation"],
-      location: "Lower Manhattan",
-      coordinates: {
-        lat: 40.7128,
-        lng: -74.0060
-      },
       intro: "Julija DiMante is a skilled injector and aesthetic expert, known for delivering natural and transformative results. She is the founder of Diamond Advanced Aesthetics and an educator in the aesthetics industry.",
       education: [
         "Board-Certified Registered Nurse (RN, BSN)",
@@ -175,6 +150,8 @@ export const doctors: { [key: string]: Doctor[] } = {
         "Master Trainer for Suneva Medical",
         "Speaker for Candela"
       ],
+      location: "Lower Manhattan",
+      website: "https://diamondadvancedaesthetics.com/",
       treatments: [
         {
           name: "Restylane Contour",
@@ -192,19 +169,16 @@ export const doctors: { [key: string]: Doctor[] } = {
       clinic: "Vivian Chin MD",
       rating: 4.9,
       reviews: 'https://www.google.com/maps/search/?api=1&query=Vivian+Chin+MD',
-      image: "/images/doctor.png",
+      image: "https://korunyc.com/wp-content/uploads/2017/06/chin.jpg",
       expertise: ["Skin Rejuvenation", "Holistic Medicine", "Personalized Skincare"],
-      location: "Midtown Manhattan",
-      coordinates: {
-        lat: 40.7589,
-        lng: -73.9851
-      },
       intro: "Dr. Vivian Chin is a cosmetic physician specializing in skin care, wellness aesthetics, and holistic beauty. She combines medical expertise with aesthetic training to provide personalized skin care regimens.",
       education: [
         "B.A., Vassar College",
         "MPH, Columbia University Mailman School of Public Health",
         "M.D., New York University School of Medicine"
       ],
+      location: "Midtown Manhattan",
+      website: "https://vivianchinmd.com/",
       treatments: [
         {
           name: "Dermal Filler",
@@ -226,16 +200,13 @@ export const doctors: { [key: string]: Doctor[] } = {
       reviews: 'https://www.google.com/maps/search/?api=1&query=Samantha+Danesi+Aesthetics',
       image: "https://www.beyondbeautifulaesthetics.com/assets/silver_websites/beyond-beautiful-aesthetics/staff/samantha-danesi.jpg",
       expertise: ["Advanced cosmetic injectables", "Tear trough treatments", "Liquid facelifts"],
-      location: "Upper East Side",
-      coordinates: {
-        lat: 40.7749,
-        lng: -73.9654
-      },
       intro: "Samantha Danesi is a certified Physician Assistant and Licensed Massage Therapist with over a decade of experience in aesthetics and plastic surgery. She specializes in advanced cosmetic injectables, including tear trough treatments, liquid facelifts, and non-surgical Brazilian Butt Lifts (BBL).",
       education: [
         "Certified Physician Assistant (RPA-C)",
         "Licensed Massage Therapist (LMT)"
       ],
+      location: "Upper East Side",
+      website: "https://samanthadanesiaesthetics.com/",
       treatments: [
         {
           name: "SkinFix: Microneedling",
@@ -255,13 +226,10 @@ export const doctors: { [key: string]: Doctor[] } = {
       reviews: 'https://www.google.com/maps/search/?api=1&query=Shannon+Lee+Esthetics',
       image: "https://images.squarespace-cdn.com/content/v1/63e146735db8872a79265dc0/6fb7b053-086c-4c8f-be26-916f52f77749/Untitled+design+%282%29.jpg",
       expertise: ["Acne Treatments", "Hyperpigmentation Correction", "Skin Rejuvenation", "Custom Facials"],
-      location: "Midtown",
-      coordinates: {
-        lat: 40.7589,
-        lng: -73.9851
-      },
       intro: "Shannon Lee is a skincare expert specializing in acne and hyperpigmentation treatments. Her journey began with her own skin struggles, leading her to build a thriving esthetics business in New York City.",
       education: ["Licensed Esthetician"],
+      location: "Midtown",
+      website: "https://shannonleeesthetics.com/",
       treatments: [
         {
           name: "MD Pen MicroNeedling",
@@ -281,16 +249,13 @@ export const doctors: { [key: string]: Doctor[] } = {
       reviews: 'https://www.google.com/maps/search/?api=1&query=Collagen+Bar',
       image: "https://collagenbar.nyc/cdn/shop/files/dianacc.jpg?v=1658939997&width=1500",
       expertise: ["Medical Aesthetics", "Skin Rejuvenation", "Facial Electrical Treatments", "Collagen Stimulation"],
-      location: "Midtown",
-      coordinates: {
-        lat: 40.7589,
-        lng: -73.9851
-      },
       intro: "Diana Seo is the founder of Collagen Bar, a premier medical aesthetic and skincare clinic with locations in Westchester and NYC. With over 15 years of experience in health, medical, and beauty fields, she specializes in advanced skincare solutions.",
       education: [
         "B.S. in Biophysics, Minor in Chemistry & Mathematics, University of Connecticut",
         "Licensed Esthetician, Atelier Esthétique Institute of Esthetics"
       ],
+      location: "Midtown",
+      website: "https://collagenbar.com/",
       treatments: [
         {
           name: "Morpheus8 RF Microneedling",

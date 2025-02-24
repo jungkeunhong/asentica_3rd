@@ -19,9 +19,7 @@ const nextConfig = {
       'unsplash.com',
       'images.unsplash.com',
       'media.istockphoto.com',
-      'istockphoto.com',
-      'www.flaticon.com',
-      'www.drdayan.com'
+      'istockphoto.com'
     ]
   },
   env: {

@@ -21,7 +21,7 @@ const nextConfig = {
       'media.istockphoto.com',
       'istockphoto.com',
       'www.flaticon.com',
-      'www.drdayan.com'
+      'https://www.drdayan.com'
     ]
   },
   env: {

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { StarIcon, MapPinIcon } from '@heroicons/react/24/solid';
 import { Doctor } from '@/data/doctors';
 

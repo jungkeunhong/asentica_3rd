@@ -17,11 +17,9 @@ const nextConfig = {
       'plus.unsplash.com',
       'lh3.googleusercontent.com',
       'unsplash.com',
-      'images.unsplash.com',
+      'images.unsplash.com'
       'media.istockphoto.com',
-      'istockphoto.com',
-      'www.flaticon.com',
-      'www.drdayan.com'
+      
     ]
   },
   env: {

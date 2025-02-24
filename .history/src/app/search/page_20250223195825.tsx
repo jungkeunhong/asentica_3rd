@@ -51,12 +51,13 @@ export default function SearchContent() {
                 {view === 'map' ? 'List' : 'Map'}
                 </button>
             </div>
-        </div>
+    </div>    
         <div className="border-b">
           <div className="container mx-auto">
             <SearchFilters />
           </div>
         </div>
+      </div>
 
       {/* Content */}
       {view === 'map' ? (

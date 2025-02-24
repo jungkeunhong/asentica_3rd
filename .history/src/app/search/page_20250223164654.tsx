@@ -28,35 +28,37 @@ export default function SearchContent() {
 
   return (
     <div className="min-h-screen bg-white">
-        <div className="sticky top-0 z-40 bg-white border-b">
-            <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-                {/* Back Button (왼쪽) */}
-                <Link href="/" className="flex items-center text-brown-600">
-                <ChevronLeftIcon className="h-6 w-6" />
-                </Link>
-
-                {/* Search Bar (가운데) */}
-                <div className="w-[480px] flex-1 mx-4">
-                <SearchBar 
-                    initialValue={query} 
-                    onSearch={(value) => setQuery(value)}
-                />
-                </div>
-
-                {/* Map/List Toggle Button (오른쪽) */}
-                <button
-                onClick={() => setView(view === 'map' ? 'list' : 'map')}
-                className="text-brown-600"
-                >
-                {view === 'map' ? 'List' : 'Map'}
-                </button>
+      {/* Search Header */}
+      <div className="sticky top-0 z-40 bg-white"> 
+        <div className="border-b">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <Link href="/" className="flex items-center text-brown-600">
+              <ChevronLeftIcon className="h-6 w-6" />
+            </Link>
+            <button
+              onClick={() => setView(view === 'map' ? 'list' : 'map')}
+              className="text-brown-600"
+            >
+              {view === 'map' ? 'List' : 'Map'}
+            </button>
+          </div>
+        </div>
+        <div className="border-b">
+          <div className="container mx-auto">
+            <div className="w-[480px]">
+              <SearchBar 
+                initialValue={query} 
+                onSearch={(value) => setQuery(value)}
+              />
             </div>
+          </div>
         </div>
         <div className="border-b">
           <div className="container mx-auto">
             <SearchFilters />
           </div>
         </div>
+      </div>
 
       {/* Content */}
       {view === 'map' ? (

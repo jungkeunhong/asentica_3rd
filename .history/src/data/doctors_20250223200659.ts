@@ -192,7 +192,7 @@ export const doctors: { [key: string]: Doctor[] } = {
       clinic: "Vivian Chin MD",
       rating: 4.9,
       reviews: 'https://www.google.com/maps/search/?api=1&query=Vivian+Chin+MD',
-      image: "/images/doctor.png",
+      image: "https://www.flaticon.com/free-icons/doctor",
       expertise: ["Skin Rejuvenation", "Holistic Medicine", "Personalized Skincare"],
       location: "Midtown Manhattan",
       coordinates: {
