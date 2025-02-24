@@ -3,6 +3,7 @@
 import { ChevronLeft, AlertCircle, Clock, Star } from 'lucide-react';
 import { TreatmentProps, Benefit, KeyArea } from '@/types/treatment';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const BotoxTreatment = ({ onBackToMain }: TreatmentProps) => {
   const benefits: Benefit[] = [
@@ -115,11 +116,12 @@ const BotoxTreatment = ({ onBackToMain }: TreatmentProps) => {
           <div className="grid grid-cols-3 gap-4">
             {keyAreas.map((area, index) => (
               <div key={index} className="space-y-2">
-                <div className="aspect-square rounded-xl overflow-hidden">
-                  <img 
+                <div className="aspect-square rounded-xl overflow-hidden relative">
+                  <Image 
                     src={area.image} 
                     alt={area.area}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
                 <p className="text-sm text-center text-luxe-600">{area.area}</p>
