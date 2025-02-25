@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
-import SearchContent from './SearchContent';
+import SearchContent from '@/components/SearchContent'; // ✅ SearchContent 컴포넌트 불러오기
 
 interface SearchParams {
   q?: string;
@@ -9,14 +9,12 @@ interface SearchParams {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>
+  searchParams: { q?: string };
 }) {
   try {
     console.log("🔍 Starting search page...");
 
-    // Await searchParams according to Next.js 15 guidelines
-    const { q } = await searchParams;
-    const searchQuery = (q || '').toLowerCase().trim();
+    const searchQuery = (searchParams.q || '').toLowerCase().trim();
     console.log(`🔍 Received search query: ${searchQuery}`);
 
     const cookieStore = cookies();
@@ -36,7 +34,7 @@ export default async function Page({
         yelp_review,
         best_treatment
       `)
-      .or(`best_treatment.ilike.%${searchQuery}%,medspa_name.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`);
+      .ilike('best_treatment', `%${searchQuery}%`);
 
     console.log("✅ Query executed:", searchQuery);
     console.log("✅ Supabase data:", medspaData);
@@ -47,9 +45,10 @@ export default async function Page({
       return <div>Failed to load Medspa data: {error.message}</div>;
     }
 
-    // Pass both the data and searchQuery to SearchContent component
-    return <SearchContent initialMedspas={medspaData || []} searchQuery={searchQuery} />;
+    console.log("✅ Medspa data successfully fetched:", medspaData);
 
+    // ✅ 데이터를 `SearchContent` 컴포넌트로 전달
+    return <SearchContent initialMedspas={medspaData || []} />;
   } catch (err) {
     console.error("❌ Unexpected error in search page:", err);
     return <div>Unexpected error occurred. Please try again.</div>;
