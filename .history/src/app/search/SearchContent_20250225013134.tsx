@@ -159,7 +159,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                       <Image src="/images/google-logo.png" alt="Google" width={36} height={36} />
                       <Star className="w-4 h-4 fill-current text-yellow-400" />
                       <span className="text-black">{medspa.google_star || 'N/A'}</span>
-                      <span className="text-gray-500">({medspa.google_review || 0})</span>
+                      <span className="text-gray-500">({medspa.good_review || 0})</span>
                     </div>
 
                     {/* Yelp rating */}
@@ -167,7 +167,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                       <Image src="/images/yelp-logo.png" alt="Yelp" width={36} height={36} />
                       <Star className="w-4 h-4 fill-current text-red-500" />
                       <span className="text-black">{medspa.yelp_star || 'N/A'}</span>
-                      <span className="text-gray-500">({medspa.yelp_review || 0})</span>
+                      <span className="text-gray-500">({medspa.bad_review || 0})</span>
                     </div>
                   </div>
 

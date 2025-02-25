@@ -24,20 +24,7 @@ interface Medspa {
   yelp_review: number;
   free_consultation: string;
   good_review_short: string;
-  good_review_deepdive1: string;
-  good_review_deepdive2: string;
-  good_review_deepdive3: string;
   bad_review_short: string;
-  bad_review_deepdive: string;
-  bad_review_deepdive1: string;
-  bad_review_deepdive2: string;
-  bad_review_deepdive3: string;
-  recommended_practitioner1_name: string;
-  recommended_practitioner1_reason: string;
-  recommended_practitioner2_name: string;
-  recommended_practitioner2_reason: string;
-  recommended_practitioner3_name: string;
-  recommended_practitioner3_reason: string;
   treatment1: string;
   price1: string;
   treatment2: string;
@@ -158,16 +145,16 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                     <div className="flex items-center gap-1">
                       <Image src="/images/google-logo.png" alt="Google" width={36} height={36} />
                       <Star className="w-4 h-4 fill-current text-yellow-400" />
-                      <span className="text-black">{medspa.google_star || 'N/A'}</span>
-                      <span className="text-gray-500">({medspa.google_review || 0})</span>
+                      <span className="text-black">{medspa.google_rating || 'N/A'}</span>
+                      <span className="text-gray-500">({medspa.good_reviews || 0})</span>
                     </div>
 
                     {/* Yelp rating */}
                     <div className="flex items-center gap-1">
                       <Image src="/images/yelp-logo.png" alt="Yelp" width={36} height={36} />
                       <Star className="w-4 h-4 fill-current text-red-500" />
-                      <span className="text-black">{medspa.yelp_star || 'N/A'}</span>
-                      <span className="text-gray-500">({medspa.yelp_review || 0})</span>
+                      <span className="text-black">{medspa.yelp_rating || 'N/A'}</span>
+                      <span className="text-gray-500">({medspa.bad_reviews || 0})</span>
                     </div>
                   </div>
 
