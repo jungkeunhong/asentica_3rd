@@ -6,6 +6,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-cormorant: 'Cormorant', serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,6 +23,10 @@
 
   p, button, input, span {
     font-family: system-ui, sans-serif;
+  }
+
+  .cormorant {
+    font-family: var(--font-cormorant);
   }
 }
 
