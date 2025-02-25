@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import SearchContent from './SearchContent';
