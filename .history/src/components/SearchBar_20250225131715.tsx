@@ -42,14 +42,14 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`relative mx-4 mt-4 ${className}`}>
+    <form onSubmit={handleSubmit} className={`relative mx-4 ${className}`}>
       <div className="relative flex items-center">
         <input
           type="text"
           value={searchTerm}
           onChange={handleChange}
           placeholder="Treatments, clinics, or doctors"
-          className="w-full h-10 pl-4 pr-12 bg-white rounded-3xl border border-gray-400 focus:outline-none focus:border-primary-500 text-base"
+          className="w-full h-12 pl-4 pr-12 bg-white rounded-3xl border border-gray-400 focus:outline-none focus:border-primary-500 text-base"
           style={{ fontSize: '16px' }}
         />
         <div className="absolute right-0 flex items-center pr-3 space-x-2">

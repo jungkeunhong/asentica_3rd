@@ -42,7 +42,7 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`relative mx-4 mt-4 ${className}`}>
+    <form onSubmit={handleSubmit} className={`relative mx-4 mt-6 ${className}`}>
       <div className="relative flex items-center">
         <input
           type="text"
