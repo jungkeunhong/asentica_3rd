@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import SearchBar from '@/components/SearchBar';
 import SearchFilters from '@/components/SearchFilters';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
-import { Check } from 'lucide-react';
 
 interface Medspa {
   id: string;
@@ -136,11 +135,11 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                   <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                     <span className="text-gray-400">Image</span>
                   </div>
-                  {medspa.verified && (
+                  {/* {medspa.verified && (
                     <div className="absolute bottom-2 right-2 bg-blue-500 rounded-full p-1">
                       <Check className="w-4 h-4 text-white" />
                     </div>
-                  )}
+                  )} */}
                 </div>
 
                 {/* Right side - Content */}
@@ -149,12 +148,12 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                   <h3 className="text-xl font-semibold text-black">
                     {medspa.medspa_name}
                   </h3>
-                  <p className="text-xm text-gray-400 mt-1">
+                  <p className="text-xs text-gray-400 mt-1">
                     {medspa.village}
                   </p>
 
                   {/* Ratings */}
-                  <div className="flex flex-col gap-2 mt-2">
+                  <div className="flex items-center gap-4 mt-3">
                     {/* Google rating */}
                     <div className="flex items-center gap-1">
                       <Image src="/images/google-logo.png" alt="Google" width={36} height={36} />
@@ -182,28 +181,28 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                   {/* Reviews */}
                   <div className="mt-3 space-y-2">
                     <div className="flex items-center gap-2">
-                      <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center">
+                      <div className="">
                         <Image 
                           src="/icons/smile.png" 
                           alt="Positive" 
                           width={24} 
                           height={24}
-                          className="w-6 h-6 object-contain flex-shrink-0"
+                          className="w-4 h-4"
                         />
                       </div>
-                      <span className="text-sm text-black">{medspa.good_review_short || ""}</span>
+                      <span className="text-base text-black">{medspa.good_review_short || ""}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center">
+                      <div className="">
                         <Image 
                           src="/icons/sad.png" 
                           alt="Negative" 
                           width={24} 
                           height={24}
-                          className="w-6 h-6 object-contain flex-shrink-0"
+                          className="w-4 h-4"
                         />
                       </div>
-                      <span className="text-sm text-black">{medspa.bad_review_short || ""}</span>
+                      <span className="text-base text-black">{medspa.bad_review_short || ""}</span>
                     </div>
                   </div>
 
