@@ -15,7 +15,7 @@ export default async function Page({
     const searchQuery = (q || '').toLowerCase().trim();
     console.log(`🔍 Received search query: ${searchQuery}`);
 
-
+    const cookieStore = cookies();
     const supabase = await createClient();
     console.log("✅ Supabase client initialized");
 
