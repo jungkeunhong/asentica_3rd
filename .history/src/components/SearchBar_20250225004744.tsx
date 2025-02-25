@@ -49,7 +49,7 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
           value={searchTerm}
           onChange={handleChange}
           placeholder="Search for treatments, clinics, or doctors"
-          className="w-full h-12 pl-4 pr-12 bg-white rounded-lg border border-gray-300 focus:outline-none focus:border-primary-500 text-base"
+          className="w-full h-12 pl-4 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:border-primary-500 text-base"
           style={{ fontSize: '16px' }}
         />
         <div className="absolute right-0 flex items-center pr-3 space-x-2">

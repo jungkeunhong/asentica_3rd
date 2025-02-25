@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Metadata } from 'next';
 import { createClient } from '@/utils/supabase/server';
 import SearchContent from './SearchContent';
@@ -9,15 +10,18 @@ export const metadata: Metadata = {
 
 // Configure the page for dynamic rendering
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>;
-}) {
-  // Await searchParams
-  const params = await searchParams;
-  const searchQuery = params.q || '';
+interface SearchParams {
+  q?: string;
+}
+
+interface PageProps {
+  searchParams: SearchParams;
+}
+
+export default async function Page({ searchParams }: PageProps) {
+  const searchQuery = searchParams.q || '';
   console.log("🔍 Starting search page...");
 
   try {
@@ -54,12 +58,12 @@ export default async function Page({
     console.log("✅ Supabase data:", medspaData);
     
     if (error) {
-      throw new Error(error.message);
+      throw error;
     }
 
-    return <SearchContent initialMedspas={medspaData || []} searchQuery={searchQuery} />;
+    return <SearchContent initialData={medspaData || []} searchQuery={searchQuery} />;
   } catch (error) {
     console.error("❌ Unexpected error in search page:", error);
-    return <SearchContent initialMedspas={[]} searchQuery={searchQuery} />;
+    return <SearchContent initialData={[]} searchQuery={searchQuery} error={error} />;
   }
 }

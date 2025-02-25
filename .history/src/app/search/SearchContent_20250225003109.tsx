@@ -1,48 +1,64 @@
 'use client';
 
 import { useState } from 'react';
-import { Star } from 'lucide-react';
+import { Check, Star, Plus, Minus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import SearchBar from '@/components/SearchBar';
 import SearchFilters from '@/components/SearchFilters';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
+import { MapPinIcon, PlusCircleIcon, MinusCircleIcon } from '@heroicons/react/24/solid';
 
 interface Medspa {
   id: string;
   medspa_name: string;
   location: string;
-  google_rating?: number;
-  yelp_rating?: number;
-  good_reviews?: number;
-  bad_reviews?: number;
-  best_treatment?: string;
-  price1?: string;
-  treatment1?: string;
-  price2?: string;
-  treatment2?: string;
-  price3?: string;
-  treatment3?: string;
-  price4?: string;
-  treatment4?: string;
-  price5?: string;
-  treatment5?: string;
-  price6?: string;
-  treatment6?: string;
+  village: string;
+  number: number;
+  website: string;
+  verified: string;
+  best_treatment: string;
+  google_star: number;
+  google_review: number;
+  yelp_star: number;
+  yelp_review: number;
+  free_consultation: string;
+  good_review_short: string;
+  good_review_deepdive1: string;
+  good_review_deepdive2: string;
+  good_review_deepdive3: string;
+  bad_review_short: string;
+  bad_review_deepdive: string;
+  bad_review_deepdive1: string;
+  bad_review_deepdive2: string;
+  bad_review_deepdive3: string;
+  recommended_practitioner1_name: string;
+  recommended_practitioner1_reason: string;
+  recommended_practitioner2_name: string;
+  recommended_practitioner2_reason: string;
+  recommended_practitioner3_name: string;
+  recommended_practitioner3_reason: string;
+  treatment1: string;
+  price1: string;
+  treatment2: string;
+  price2: string;
+  treatment3: string;
+  price3: string;
+  treatment4: string;
+  price4: string;
+  treatment5: string;
+  price5: string;
+  treatment6: string;
+  price6: string;
 }
 
 interface SearchContentProps {
   initialMedspas: Medspa[];
   searchQuery: string;
-  error?: Error;
 }
 
-export default function SearchContent({ initialMedspas, searchQuery, error }: SearchContentProps) {
-  if (error) {
-    throw error;
-  }
-
+export default function SearchContent({ initialMedspas, searchQuery }: SearchContentProps) {
   const [medspas] = useState<Medspa[]>(initialMedspas);
   
   console.log('Initial Medspas:', initialMedspas); // 디버깅용 로그
@@ -63,7 +79,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
     );
 
     console.log('Matching treatment:', matchingTreatment); // 디버깅용 로그
-    return matchingTreatment?.price || '';
+    return matchingTreatment?.price || 'Price not available';
   };
 
   const router = useRouter();
@@ -108,28 +124,28 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
               <div 
                 key={medspa.id}
                 onClick={() => handleMedspaClick(medspa.id)}
-                className="flex gap-4 bg-white border-b p-4 cursor-pointer hover:border-b"
+                className="flex gap-4 bg-white shadow-md p-4 cursor-pointer hover:bg-gray-50 border-b"
               >
                 {/* Left side - Image with verification badge */}
                 <div className="relative w-32 h-32">
                   <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                     <span className="text-gray-400">Image</span>
                   </div>
-                  {/* {medspa.verified && (
+                  {medspa.verified && (
                     <div className="absolute bottom-2 right-2 bg-blue-500 rounded-full p-1">
                       <Check className="w-4 h-4 text-white" />
                     </div>
-                  )} */}
+                  )}
                 </div>
 
                 {/* Right side - Content */}
                 <div className="flex-1">
-                  {/* Medspa name and village */}
+                  {/* Medspa name and location */}
                   <h3 className="text-xl font-semibold text-black">
                     {medspa.medspa_name}
                   </h3>
                   <p className="text-xs text-gray-400 mt-1">
-                    {medspa.location}
+                    {medspa.village}
                   </p>
 
                   {/* Ratings */}
@@ -138,21 +154,21 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                     <div className="flex items-center gap-1">
                       <Image src="/images/google-logo.png" alt="Google" width={36} height={36} />
                       <Star className="w-4 h-4 fill-current text-yellow-400" />
-                      <span className="text-black">{medspa.google_rating || 'N/A'}</span>
-                      <span className="text-gray-500">({medspa.good_reviews || 0})</span>
+                      <span className="text-black">{medspa.google_star || 'N/A'}</span>
+                      <span className="text-gray-500">({medspa.google_review || 0})</span>
                     </div>
 
                     {/* Yelp rating */}
                     <div className="flex items-center gap-1">
                       <Image src="/images/yelp-logo.png" alt="Yelp" width={36} height={36} />
                       <Star className="w-4 h-4 fill-current text-red-500" />
-                      <span className="text-black">{medspa.yelp_rating || 'N/A'}</span>
-                      <span className="text-gray-500">({medspa.bad_reviews || 0})</span>
+                      <span className="text-black">{medspa.yelp_star || 'N/A'}</span>
+                      <span className="text-gray-500">({medspa.yelp_review || 0})</span>
                     </div>
                   </div>
 
                   {/* Treatment Price */}
-                  <div className="text-right mt-8 mb-8">
+                  <div className="text-right mt-2">
                     <span className="text-2xl font-bold text-black">
                       {findTreatmentPrice(medspa, searchQuery)}
                     </span>
@@ -161,37 +177,25 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                   {/* Reviews */}
                   <div className="mt-3 space-y-2">
                     <div className="flex items-center gap-2">
-                      <div className="">
-                        <Image 
-                          src="/icons/smile.png" 
-                          alt="Positive" 
-                          width={24} 
-                          height={24}
-                          className="w-4 h-4"
-                        />
+                      <div className="badge badge-success gap-2 p-3">
+                        <PlusCircleIcon className="w-4 h-4" />
                       </div>
-                      <span className="text-base text-black">{medspa.best_treatment || "No positive reviews"}</span>
+                      <span className="text-base text-black">{medspa.good_review_short || "No positive reviews"}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="">
-                        <Image 
-                          src="/icons/sad.png" 
-                          alt="Negative" 
-                          width={24} 
-                          height={24}
-                          className="w-4 h-4"
-                        />
+                      <div className="badge badge-error gap-2 p-3">
+                        <MinusCircleIcon className="w-4 h-4" />
                       </div>
-                      <span className="text-base text-black">No negative reviews</span>
+                      <span className="text-base text-black">{medspa.bad_review_short || "No negative reviews"}</span>
                     </div>
                   </div>
 
                   {/* Free Consultation Button */}
-                  {/* {medspa.free_consultation === 'yes' && (
+                  {medspa.free_consultation === 'yes' && (
                     <button className="mt-3 bg-blue-500 text-white px-4 py-2 rounded-lg text-sm">
                       Free Consultation Available
                     </button>
-                  )} */}
+                  )}
                 </div>
               </div>
             );
