@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-const filters = ['Price', 'Rating', 'Reviewed', 'Distance', 'Free consultation'];
+const filters = ['Price', 'Rating', 'Location', 'Treatment Type', 'Availability'];
 
 export default function SearchFilters() {
   return (
@@ -11,7 +11,7 @@ export default function SearchFilters() {
         {filters.map((filter) => (
           <button
             key={filter}
-            className="px-1.5 py-1 border border-gray-400 rounded-full text-black hover:bg-gray-300 whitespace-nowrap"
+            className="px-4 py-2 border border-gray-400rounded-full text-black hover:bg-gray-300 whitespace-nowrap"
           >
             {filter}
           </button>

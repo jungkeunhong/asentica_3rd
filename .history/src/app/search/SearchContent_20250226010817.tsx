@@ -199,10 +199,10 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                   {/* Right side - Content */}
                   <div className="flex-1 flex flex-col">
                     {/* Medspa name and village */}
-                    <h3 className="cormorant text-xl font-semibold text-black">
+                    <h3 className="text-xl font-semibold text-black">
                       {medspa.medspa_name}
                     </h3>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xm text-gray-400 mt-1">
                       {medspa.village}
                     </p>
 

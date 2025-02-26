@@ -202,7 +202,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                     <h3 className="cormorant text-xl font-semibold text-black">
                       {medspa.medspa_name}
                     </h3>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xm text-gray-400 mt-1">
                       {medspa.village}
                     </p>
 

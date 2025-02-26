@@ -159,115 +159,111 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
               <div 
                 key={medspa.id}
                 onClick={() => handleMedspaClick(medspa.id)}
-                className="flex flex-col gap-4 bg-white border-b p-4 cursor-pointer hover:border-b"
+                className="flex gap-4 bg-white border-b p-4 cursor-pointer hover:border-b"
               >
-                <div className="flex gap-4">
-                  <div className="flex flex-col w-32 gap-2">
-                    {/* 이미지 슬라이더 구현 */}
-                    <div className="relative w-32 h-32 overflow-hidden rounded-md">
-                      {imageUrls.length > 0 ? (
-                        <AnimatePresence>
-                          <motion.div 
-                            key={currentIndex}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="absolute w-full h-full"
-                          >
-                            <Image 
-                              src={imageUrls[currentIndex]} 
-                              alt={`${medspa.medspa_name} image ${currentIndex + 1}`}
-                              width={128}
-                              height={128}
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                objectPosition: 'center'
-                              }}
-                              priority={currentIndex === 0}
-                            />
-                          </motion.div>
-                        </AnimatePresence>
-                      ) : (
-                        <div className="text-gray-400">No Image</div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Right side - Content */}
-                  <div className="flex-1 flex flex-col">
-                    {/* Medspa name and village */}
-                    <h3 className="cormorant text-xl font-semibold text-black">
-                      {medspa.medspa_name}
-                    </h3>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {medspa.village}
-                    </p>
-
-                    {/* Ratings */}
-                    <div className="flex flex-col gap-2 mt-2">
-                      {/* Google rating */}
-                      <div className="flex items-center gap-1">
-                        <Image src="/images/google-logo.png" alt="Google" width={36} height={36} />
-                        <Star className="w-4 h-4 fill-current text-yellow-400" />
-                        <span className="text-black">{medspa.google_star || 'N/A'}</span>
-                        <span className="text-gray-500">({medspa.google_review || 0})</span>
-                      </div>
-
-                      {/* Yelp rating */}
-                      <div className="flex items-center gap-1">
-                        <Image src="/images/yelp-logo.png" alt="Yelp" width={36} height={36} />
-                        <Star className="w-4 h-4 fill-current text-red-500" />
-                        <span className="text-black">{medspa.yelp_star || ''}</span>
-                        <span className="text-gray-500">({medspa.yelp_review || ''})</span>
-                      </div>
-                    </div>
-
-                    {/* Treatment Price */}
-                    <div className="text-right mt-8 mb-8">
-                      <span className="text-2xl font-bold text-black">
-                        {findTreatmentPrice(medspa, searchQuery)}
-                      </span>
-                    </div>
-
-                    {/* Free consultation button */}
-                    <div className="flex gap-2 mt-4">
-                      {medspa.free_consultation && medspa.free_consultation.trim() !== '' && (
-                        <button className="cormorant bg-black text-white px-4 py-2 rounded-full text-sm">
-                          {medspa.free_consultation}
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                 {/* 이미지 슬라이더 구현 */}
+                 <div className="relative w-32 h-32 overflow-hidden rounded-md">
+                  {imageUrls.length > 0 ? (
+                    <AnimatePresence>
+                      <motion.div 
+                        key={currentIndex}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="absolute w-full h-full"
+                      >
+                        <Image 
+                          src={imageUrls[currentIndex]} 
+                          alt={`${medspa.medspa_name} image ${currentIndex + 1}`}
+                          width={128}
+                          height={128}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            objectPosition: 'center'
+                          }}
+                          priority={currentIndex === 0}
+                        />
+                      </motion.div>
+                    </AnimatePresence>
+                  ) : (
+                    <div className="text-gray-400">No Image</div>
+                  )}
                 </div>
-                
-                {/* Reviews - 이미지와 왼쪽 정렬 */}
-                <div className="mt-2 space-y-2">
-                  <div className="flex items-start gap-2">
-                    <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center">
-                      <Image 
-                        src="/icons/heart.png" 
-                        alt="Positive" 
-                        width={24} 
-                        height={24}
-                        className="w-6 h-6 object-contain flex-shrink-0"
-                      />
+
+                {/* Right side - Content */}
+                <div className="flex-1">
+                  {/* Medspa name and village */}
+                  <h3 className="text-xl font-semibold text-black">
+                    {medspa.medspa_name}
+                  </h3>
+                  <p className="text-xm text-gray-400 mt-1">
+                    {medspa.village}
+                  </p>
+
+                  {/* Ratings */}
+                  <div className="flex flex-col gap-2 mt-2">
+                    {/* Google rating */}
+                    <div className="flex items-center gap-1">
+                      <Image src="/images/google-logo.png" alt="Google" width={36} height={36} />
+                      <Star className="w-4 h-4 fill-current text-yellow-400" />
+                      <span className="text-black">{medspa.google_star || 'N/A'}</span>
+                      <span className="text-gray-500">({medspa.google_review || 0})</span>
                     </div>
-                    <span className="text-sm text-black">{medspa.good_review_short || ""}</span>
+
+                    {/* Yelp rating */}
+                    <div className="flex items-center gap-1">
+                      <Image src="/images/yelp-logo.png" alt="Yelp" width={36} height={36} />
+                      <Star className="w-4 h-4 fill-current text-red-500" />
+                      <span className="text-black">{medspa.yelp_star || ''}</span>
+                      <span className="text-gray-500">({medspa.yelp_review || ''})</span>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center">
-                      <Image 
-                        src="/icons/breakheart.png" 
-                        alt="Negative" 
-                        width={24} 
-                        height={24}
-                        className="w-6 h-6 object-contain flex-shrink-0"
-                      />
+
+                  {/* Treatment Price */}
+                  <div className="text-right mt-8 mb-8">
+                    <span className="text-2xl font-bold text-black">
+                      {findTreatmentPrice(medspa, searchQuery)}
+                    </span>
+                  </div>
+
+                  {/* Free consultation button */}
+                  <div className="flex gap-2 mt-4">
+                    {medspa.free_consultation && medspa.free_consultation.trim() !== '' && (
+                      <button className="cormorant bg-black text-white px-4 py-2 rounded-full text-sm">
+                        {medspa.free_consultation}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Reviews */}
+                  <div className="mt-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center">
+                        <Image 
+                          src="/icons/smile.png" 
+                          alt="Positive" 
+                          width={24} 
+                          height={24}
+                          className="w-6 h-6 object-contain flex-shrink-0"
+                        />
+                      </div>
+                      <span className="text-sm text-black">{medspa.good_review_short || ""}</span>
                     </div>
-                    <span className="text-sm text-black">{medspa.bad_review_short || ""}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center">
+                        <Image 
+                          src="/icons/sad.png" 
+                          alt="Negative" 
+                          width={24} 
+                          height={24}
+                          className="w-6 h-6 object-contain flex-shrink-0"
+                        />
+                      </div>
+                      <span className="text-sm text-black">{medspa.bad_review_short || ""}</span>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -246,12 +246,12 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                 {/* Reviews - 이미지와 왼쪽 정렬 */}
                 <div className="mt-2 space-y-2">
                   <div className="flex items-start gap-2">
-                    <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center">
+                    <div className="min-w-[24px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
                       <Image 
                         src="/icons/heart.png" 
                         alt="Positive" 
-                        width={24} 
-                        height={24}
+                        width={20} 
+                        height={20}
                         className="w-6 h-6 object-contain flex-shrink-0"
                       />
                     </div>

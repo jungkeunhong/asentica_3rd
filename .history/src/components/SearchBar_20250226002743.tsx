@@ -58,7 +58,6 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
               type="button"
               onClick={clearSearch}
               className="p-1 text-gray-400 hover:text-gray-600"
-              aria-label="Clear search"
             >
               <XMarkIcon className="w-5 h-5" />
             </button>

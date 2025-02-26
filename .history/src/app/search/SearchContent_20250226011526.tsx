@@ -250,7 +250,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                       <Image 
                         src="/icons/heart.png" 
                         alt="Positive" 
-                        width={24} 
+                        width={2} 
                         height={24}
                         className="w-6 h-6 object-contain flex-shrink-0"
                       />
