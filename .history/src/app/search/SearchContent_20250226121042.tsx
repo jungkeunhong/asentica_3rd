@@ -246,11 +246,11 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                   <div className="flex items-start gap-2">
                     <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center">
                       <Image 
-                        src="/icons/thumbup.png" 
+                        src="/icons/heart.png" 
                         alt="Positive" 
                         width={24} 
                         height={24}
-                        className="w-6 h-6 text-black object-contain flex-shrink-0"
+                        className="w-6 h-6 object-contain flex-shrink-0"
                       />
                     </div>
                     <span className="gotu text-sm text-black">{medspa.good_review_short || ""}</span>
@@ -258,7 +258,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                   <div className="flex items-start gap-2">
                     <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center">
                       <Image 
-                        src="/icons/thumbdown.png" 
+                        src="/icons/breakheart.png" 
                         alt="Negative" 
                         width={24} 
                         height={24}

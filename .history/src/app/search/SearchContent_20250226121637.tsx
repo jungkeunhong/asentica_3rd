@@ -250,7 +250,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                         alt="Positive" 
                         width={24} 
                         height={24}
-                        className="w-6 h-6 text-black object-contain flex-shrink-0"
+                        className="w-6 h-6 font-black object-contain flex-shrink-0"
                       />
                     </div>
                     <span className="gotu text-sm text-black">{medspa.good_review_short || ""}</span>

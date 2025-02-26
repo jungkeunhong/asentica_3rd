@@ -202,7 +202,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                     <h3 className="cormorant text-xl font-semibold text-black">
                       {medspa.medspa_name}
                     </h3>
-                    <p className="gotu text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-400 mt-1">
                       {medspa.village}
                     </p>
  
@@ -213,7 +213,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                         <Image src="/images/google-logo.png" alt="Google" width={24} height={24} />
                         <Star className="w-4 h-4 fill-current text-yellow-400" />
                         <span className="text-xs text-black">{medspa.google_star || ''}</span>
-                        <span className="text-xs text-gray-500">({medspa.google_review || 0})</span>
+                        <span className="gotu text-xs text-gray-500">({medspa.google_review || 0})</span>
                       </div>
 
                       {/* Yelp rating - 데이터가 있을 때만 표시 */}
@@ -246,11 +246,11 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                   <div className="flex items-start gap-2">
                     <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center">
                       <Image 
-                        src="/icons/thumbup.png" 
+                        src="/icons/heart.png" 
                         alt="Positive" 
                         width={24} 
                         height={24}
-                        className="w-6 h-6 text-black object-contain flex-shrink-0"
+                        className="w-6 h-6 object-contain flex-shrink-0"
                       />
                     </div>
                     <span className="gotu text-sm text-black">{medspa.good_review_short || ""}</span>
@@ -258,7 +258,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                   <div className="flex items-start gap-2">
                     <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center">
                       <Image 
-                        src="/icons/thumbdown.png" 
+                        src="/icons/breakheart.png" 
                         alt="Negative" 
                         width={24} 
                         height={24}
@@ -270,7 +270,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                 </div>
                 {/* Treatment Price */}
                 <div className="text-left">
-                  <span className="gotu text-lg font-bold text-black">
+                  <span className="cormorant text-lg font-bold text-black">
                     {findTreatmentPrice(medspa, searchQuery)}
                   </span>
                 </div>
