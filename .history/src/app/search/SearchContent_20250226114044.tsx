@@ -205,7 +205,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                     <p className="text-xs text-gray-400 mt-1">
                       {medspa.village}
                     </p>
- 
+
                     {/* Ratings */}
                     <div className="flex flex-col gap-2 mt-2">
                       {/* Google rating */}
@@ -227,13 +227,9 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                       )}
                       {/* Free consultation button */}
                       <div className="flex gap-2">
-                        {medspa.free_consultation && medspa.free_consultation.trim() !== '' ? (
+                        {medspa.free_consultation && medspa.free_consultation.trim() !== '' && (
                           <button className="cormorant text-3xl bg-black text-white px-4 py-1 rounded-full text-sm">
                             {medspa.free_consultation}
-                          </button>
-                        ) : (
-                          <button className="cormorant text-3xl bg-gray-200 text-gray-500 px-4 py-1 rounded-full text-sm">
-                            Free Consultation
                           </button>
                         )}
                       </div>

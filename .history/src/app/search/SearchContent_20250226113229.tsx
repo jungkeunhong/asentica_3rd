@@ -148,7 +148,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
       </div>
 
       {/* List View */}
-      <div className="container mx-auto px-4 py-2">
+      <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col gap-4">
           {medspas.map((medspa) => {
             console.log('Processing medspa:', medspa); // 디버깅용 로그
@@ -205,7 +205,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                     <p className="text-xs text-gray-400 mt-1">
                       {medspa.village}
                     </p>
- 
+
                     {/* Ratings */}
                     <div className="flex flex-col gap-2 mt-2">
                       {/* Google rating */}
@@ -216,26 +216,12 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                         <span className="text-xs text-gray-500">({medspa.google_review || 0})</span>
                       </div>
 
-                      {/* Yelp rating - 데이터가 있을 때만 표시 */}
-                      {medspa.yelp_star && medspa.yelp_review && (
-                        <div className="flex items-center gap-1">
-                          <Image src="/images/yelp-logo.png" alt="Yelp" width={24} height={24} />
-                          <Star className="w-4 h-4 fill-current text-red-500" />
-                          <span className="text-xs text-black">{medspa.yelp_star}</span>
-                          <span className="text-xs text-gray-500">({medspa.yelp_review})</span>
-                        </div>
-                      )}
-                      {/* Free consultation button */}
-                      <div className="flex gap-2">
-                        {medspa.free_consultation && medspa.free_consultation.trim() !== '' ? (
-                          <button className="cormorant text-3xl bg-black text-white px-4 py-1 rounded-full text-sm">
-                            {medspa.free_consultation}
-                          </button>
-                        ) : (
-                          <button className="cormorant text-3xl bg-gray-200 text-gray-500 px-4 py-1 rounded-full text-sm">
-                            Free Consultation
-                          </button>
-                        )}
+                      {/* Yelp rating */}
+                      <div className="flex items-center gap-1">
+                        <Image src="/images/yelp-logo.png" alt="Yelp" width={24} height={24} />
+                        <Star className="w-4 h-4 fill-current text-red-500" />
+                        <span className="text-xs text-black">{medspa.yelp_star || ''}</span>
+                        <span className="text-xs text-gray-500">({medspa.yelp_review || ''})</span>
                       </div>
                     </div>
                   </div>
@@ -269,10 +255,19 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                   </div>
                 </div>
                 {/* Treatment Price */}
-                <div className="text-left">
-                  <span className="text-lg font-bold text-black">
+                <div className="text-right mb-2">
+                  <span className="text-2xl font-bold text-black">
                     {findTreatmentPrice(medspa, searchQuery)}
                   </span>
+                </div>
+
+                {/* Free consultation button */}
+                <div className="flex gap-2 mt-2">
+                  {medspa.free_consultation && medspa.free_consultation.trim() !== '' && (
+                    <button className="cormorant text-4xl bg-black text-white px-4 py-2 rounded-full text-sm">
+                      {medspa.free_consultation}
+                    </button>
+                  )}
                 </div>
               </div>
             );

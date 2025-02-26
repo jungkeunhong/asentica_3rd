@@ -208,11 +208,15 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
  
                     {/* Ratings */}
                     <div className="flex flex-col gap-2 mt-2">
-                      {/* Google rating */}
-                      <div className="flex items-center gap-1">
-                        <Image src="/images/google-logo.png" alt="Google" width={24} height={24} />
-                        <Star className="w-4 h-4 fill-current text-yellow-400" />
-                        <span className="text-xs text-black">{medspa.google_star || ''}</span>
+                      {/* Google rating - 데이터가 있을 때만 표시 */}
+                      {medspa.google_star && medspa.google_review && (
+                        <div className="flex items-center gap-1">
+                          <Image src="/images/google-logo.png" alt="Google" width={24} height={24} />
+                          <Star className="w-4 h-4 fill-current text-yellow-400" />
+                          <span className="text-xs text-black">{medspa.google_star}</span>
+                          <span className="text-xs text-gray-500">({medspa.google_review})</span>
+                        </div>
+                      )}
                         <span className="text-xs text-gray-500">({medspa.google_review || 0})</span>
                       </div>
 
@@ -227,13 +231,9 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                       )}
                       {/* Free consultation button */}
                       <div className="flex gap-2">
-                        {medspa.free_consultation && medspa.free_consultation.trim() !== '' ? (
+                        {medspa.free_consultation && medspa.free_consultation.trim() !== '' && (
                           <button className="cormorant text-3xl bg-black text-white px-4 py-1 rounded-full text-sm">
                             {medspa.free_consultation}
-                          </button>
-                        ) : (
-                          <button className="cormorant text-3xl bg-gray-200 text-gray-500 px-4 py-1 rounded-full text-sm">
-                            Free Consultation
                           </button>
                         )}
                       </div>
