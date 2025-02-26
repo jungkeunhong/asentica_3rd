@@ -212,16 +212,16 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                       <div className="flex items-center gap-1">
                         <Image src="/images/google-logo.png" alt="Google" width={24} height={24} />
                         <Star className="w-4 h-4 fill-current text-yellow-400" />
-                        <span className="text-xs text-black">{medspa.google_star || ''}</span>
-                        <span className="text-xs text-gray-500">({medspa.google_review || 0})</span>
+                        <span className="text-black">{medspa.google_star || ''}</span>
+                        <span className="text-gray-500">({medspa.google_review || 0})</span>
                       </div>
 
                       {/* Yelp rating */}
                       <div className="flex items-center gap-1">
                         <Image src="/images/yelp-logo.png" alt="Yelp" width={24} height={24} />
                         <Star className="w-4 h-4 fill-current text-red-500" />
-                        <span className="text-xs text-black">{medspa.yelp_star || ''}</span>
-                        <span className="text-xs text-gray-500">({medspa.yelp_review || ''})</span>
+                        <span className="text-black">{medspa.yelp_star || ''}</span>
+                        <span className="text-gray-500">({medspa.yelp_review || ''})</span>
                       </div>
                     </div>
 
@@ -235,7 +235,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                     {/* Free consultation button */}
                     <div className="flex gap-2 mt-2">
                       {medspa.free_consultation && medspa.free_consultation.trim() !== '' && (
-                        <button className="cormorant text-3xl bg-black text-white px-4 py-2 rounded-full text-sm">
+                        <button className="cormorant bg-black text-white px-4 py-2 rounded-full text-sm">
                           {medspa.free_consultation}
                         </button>
                       )}

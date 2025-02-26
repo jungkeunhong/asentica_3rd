@@ -235,7 +235,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                     {/* Free consultation button */}
                     <div className="flex gap-2 mt-2">
                       {medspa.free_consultation && medspa.free_consultation.trim() !== '' && (
-                        <button className="cormorant text-3xl bg-black text-white px-4 py-2 rounded-full text-sm">
+                        <button className="cormorant bg-black text-white px-4 py-2 rounded-full text-sm">
                           {medspa.free_consultation}
                         </button>
                       )}
