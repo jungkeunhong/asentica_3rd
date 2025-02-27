@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeftIcon} from '@heroicons/react/24/outline';
@@ -23,7 +23,7 @@ interface MedspaDetailProps {
 }
 
 export default function MedspaDetail({ medspa }: MedspaDetailProps) {
-  const [currentImageIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const images = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
   
   // Treatments and prices
@@ -55,6 +55,15 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
     { name: medspa.recommended_practitioner2_name, reason: medspa.recommended_practitioner2_reason },
     { name: medspa.recommended_practitioner3_name, reason: medspa.recommended_practitioner3_reason },
   ].filter(p => p.name && p.reason);
+
+  // Image slider navigation
+  const nextImage = useCallback(() => {
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  }, [images.length]);
+
+  const prevImage = useCallback(() => {
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  }, [images.length]);
 
   return (
     <div className="max-w-4xl mx-auto pb-20 bg-white">
@@ -172,7 +181,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         {/* Recommended Practitioners */}
         {recommendedPractitioners.length > 0 && (
           <div className="mt-8">
-            <h3 className="text-lg font-medium text-black mb-4">People&apos;s Choice</h3>
+            <h3 className="text-lg font-medium text-black mb-4">People's Choice</h3>
             <div className="flex flex-wrap">
               {recommendedPractitioners.map((practitioner, index) => (
                 <div 

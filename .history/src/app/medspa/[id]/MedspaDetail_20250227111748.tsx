@@ -172,7 +172,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         {/* Recommended Practitioners */}
         {recommendedPractitioners.length > 0 && (
           <div className="mt-8">
-            <h3 className="text-lg font-medium text-black mb-4">People&apos;s Choice</h3>
+            <h3 className="text-lg font-medium text-black mb-4">People's Choice</h3>
             <div className="flex flex-wrap">
               {recommendedPractitioners.map((practitioner, index) => (
                 <div 
