@@ -16,10 +16,8 @@ type PageParams = {
   params: Promise<{ id: string }>;
 };
 
-export default async function Page({ params }: PageParams) {
-  // First await the params object, then access the id property
-  const resolvedParams = await params;
-  const id = resolvedParams.id;
+export default async function Page({ params }: { params: { id: string } }) {
+  const id = params.id;
   console.log(`🔍 Loading MedSpa details for ID: ${id}`);
 
   try {

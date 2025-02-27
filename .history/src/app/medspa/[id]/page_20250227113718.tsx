@@ -17,7 +17,7 @@ type PageParams = {
 };
 
 export default async function Page({ params }: PageParams) {
-  // First await the params object, then access the id property
+  // Properly await the params in Next.js 15
   const resolvedParams = await params;
   const id = resolvedParams.id;
   console.log(`🔍 Loading MedSpa details for ID: ${id}`);
