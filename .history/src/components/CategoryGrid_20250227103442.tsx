@@ -91,7 +91,7 @@ const CategoryGrid = () => {
           return (
             <div 
               key={category.id} 
-              className={`relative rounded-md overflow-hidden mb-2 inline-block w-full ${heightClass} transition-all duration-300 ease-in-out hover:brightness-90 cursor-pointer`}
+              className={`relative rounded-md overflow-hidden mb-2 inline-block w-full ${heightClass transition-all duration-300 ease-in-out hover:brightness-90 cursor-pointer`}
               onClick={() => handleCategoryClick(category.name)}
             >
               {/* 이미지 */}

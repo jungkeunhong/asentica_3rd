@@ -41,10 +41,10 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased ${gotu.variable} ${cormorant.variable}`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased ${gotu.variable} ${cormorant.variable} bg-white`}
       >
-        <div className="min-h-screen flex flex-col">
-          <main className="flex-grow">{children}</main>
+        <div className="min-h-screen flex flex-col bg-white">
+          <main className="flex-grow bg-white">{children}</main>
         </div>
       </body>
     </html>

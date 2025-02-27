@@ -74,7 +74,7 @@ const CategoryGrid = () => {
   };
 
   return (
-    <div className="py-6">
+    <div className="py-3">
       <h2 className="cormorant text-3xl font-extrabold mb-4 text-gray-900 pl-5">Find the best medspa for you</h2>
       
       <div className="columns-2 gap-2 px-2">
@@ -91,7 +91,7 @@ const CategoryGrid = () => {
           return (
             <div 
               key={category.id} 
-              className={`relative rounded-md overflow-hidden mb-2 inline-block w-full ${heightClass} transition-all duration-300 ease-in-out hover:brightness-90 cursor-pointer`}
+              className={`relative rounded-md overflow-hidden mb-2 inline-block w-full ${heightClass}`}
               onClick={() => handleCategoryClick(category.name)}
             >
               {/* 이미지 */}

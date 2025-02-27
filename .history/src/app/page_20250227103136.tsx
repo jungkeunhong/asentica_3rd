@@ -12,7 +12,7 @@ export default function Home() {
           <div className="bg-white py-8">
             <div className="max-w-md mx-auto mt-4 px-4">
               <SearchBar />
-            </div>
+            </div className= "mt-spacing" >
             <CategoryGrid />
           </div>
         </div>
