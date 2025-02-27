@@ -214,24 +214,14 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
   }
   
   // 사용자 위치 마커 아이콘
-  const userLocationIcon = isLoaded ? {
+  const userLocationIcon = {
     path: google.maps.SymbolPath.CIRCLE,
     fillColor: "#4285F4",
     fillOpacity: 1,
     strokeWeight: 1,
     strokeColor: "#FFFFFF",
     scale: 8
-  } : undefined;
-  
-  // 메드스파 마커 아이콘
-  const medspaIcon = isLoaded ? {
-    path: google.maps.SymbolPath.CIRCLE,
-    fillColor: "#FF5A5F",
-    fillOpacity: 1,
-    strokeWeight: 1,
-    strokeColor: "#FFFFFF",
-    scale: 8
-  } : undefined;
+  };
   
   return (
     <div className="relative h-full w-full">

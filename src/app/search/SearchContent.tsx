@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Star, MapPin, Navigation } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -190,7 +190,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
   };
   
   // Helper function to find treatment price as a number for sorting
-  const findTreatmentPriceNumber = (medspa: Medspa, query: string): number => {
+  const findTreatmentPriceNumber = useCallback((medspa: Medspa, query: string): number => {
     try {
       const priceStr = findTreatmentPrice(medspa, query);
       if (!priceStr) return Infinity; // 가격 정보가 없으면 맨 뒤로
@@ -202,7 +202,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
       console.error('Error converting price to number:', error);
       return Infinity;
     }
-  };
+  }, []);
 
   // 필터링된 MedSpa 목록
   const filteredMedspas = useMemo(() => {
@@ -303,7 +303,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
       default:
         return medspasCopy;
     }
-  }, [medspas, selectedFilter, searchQuery, userLocation, findTreatmentPriceNumber]);
+  }, [medspas, selectedFilter, searchQuery, userLocation]);
 
   // 드래그 핸들러
   const handleDragEnd = (medspaId: string, info: PanInfo, imageCount: number) => {
