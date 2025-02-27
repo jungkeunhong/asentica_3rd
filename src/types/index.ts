@@ -3,7 +3,7 @@ export interface Medspa {
   medspa_name: string;
   village: string;
   location: string;
-  address?: string;
+  address?: string; // 데이터베이스에 없는 필드이므로 선택적으로 변경
   number?: string;
   website?: string;
   verified?: boolean;

@@ -26,7 +26,7 @@ interface Medspa {
   medspa_name: string;
   village: string;
   location: string;
-  address: string;
+  address?: string;
   google_star?: number;
   google_review?: number;
   yelp_star?: number;

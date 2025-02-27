@@ -31,7 +31,6 @@ export default async function Page({
         medspa_name,
         location,
         village,
-        address,
         number,
         website,
         verified,
