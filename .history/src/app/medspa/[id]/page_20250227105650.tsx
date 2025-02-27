@@ -14,10 +14,11 @@ export const dynamic = 'force-dynamic';
 export default async function Page({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }> | { id: string };
 }) {
-  // Get the ID from params
-  const id = params.id;
+  // In Next.js 15, params is a Promise that needs to be awaited
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
   console.log(`🔍 Loading MedSpa details for ID: ${id}`);
 
   try {
