@@ -21,15 +21,13 @@ const nextConfig = {
       { protocol: 'https', hostname: 'placehold.co' },
       { protocol: 'https', hostname: 'charettecosmetics.com' },
       { protocol: 'https', hostname: 'encrypted-tbn0.gstatic.com' },
+      { protocol: 'https', hostname: 'encrypted-tbn0.gstatic.com' },
       { protocol: 'https', hostname: 'cdn-prod.medicalnewstoday.com' },
       { protocol: 'https', hostname: 'sa1s3optim.patientpop.com' },
     ],
   },
-  // For Google Maps API key, create a .env.local file in the root directory with:
-  // NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_actual_api_key_here
   env: {
-    // This is just a fallback - you should use .env.local for your actual API key
-    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   }
 };
 

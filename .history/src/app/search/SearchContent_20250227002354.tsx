@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Star, MapPin, Navigation } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,33 +24,48 @@ const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
 interface Medspa {
   id: string;
   medspa_name: string;
-  village: string;
   location: string;
-  address: string;
-  google_star?: number;
-  google_review?: number;
-  yelp_star?: number;
-  yelp_review?: number;
-  best_treatment?: string;
-  free_consultation?: string;
-  treatment1?: string;
-  treatment2?: string;
-  treatment3?: string;
-  treatment4?: string;
-  treatment5?: string;
-  treatment6?: string;
-  price1?: string;
-  price2?: string;
-  price3?: string;
-  price4?: string;
-  price5?: string;
-  price6?: string;
+  village: string;
+  number: string;
+  website: string;
+  verified: string;
+  best_treatment: string;
+  google_star: number;
+  google_review: number;
+  yelp_star: number;
+  yelp_review: number;
+  free_consultation: string;
+  good_review_short: string;
+  good_review_deepdive1: string;
+  good_review_deepdive2: string;
+  good_review_deepdive3: string;
+  bad_review_short: string;
+  bad_review_deepdive: string;
+  bad_review_deepdive1: string;
+  bad_review_deepdive2: string;
+  bad_review_deepdive3: string;
+  recommended_practitioner1_name: string;
+  recommended_practitioner1_reason: string;
+  recommended_practitioner2_name: string;
+  recommended_practitioner2_reason: string;
+  recommended_practitioner3_name: string;
+  recommended_practitioner3_reason: string;
+  treatment1: string;
+  price1: string;
+  treatment2: string;
+  price2: string;
+  treatment3: string;
+  price3: string;
+  treatment4: string;
+  price4: string;
+  treatment5: string;
+  price5: string;
+  treatment6: string;
+  price6: string;
   image_url1: string;
   image_url2: string; 
   image_url3: string;
-  lat?: number;
-  lng?: number;
-  coordinates?: {
+  coordinates: {
     lat: number;
     lng: number;
   };
@@ -67,7 +82,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
     throw error;
   }
 
-  const [medspas, setMedspas] = useState<Medspa[]>(initialMedspas);
+  const [medspas] = useState<Medspa[]>(initialMedspas);
   
   // 지도 표시 상태 관리
   const [showMap, setShowMap] = useState(false);
@@ -104,53 +119,131 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
     }
   }, []);
   
-  // 메드스파 좌표 설정
-  const coordinatesProcessed = useRef(false);
-  
-  useEffect(() => {
-    // 이미 처리했으면 다시 처리하지 않음
-    if (coordinatesProcessed.current) {
-      return;
+  // 드래그 핸들러
+  const handleDragEnd = (medspaId: string, info: PanInfo, imageCount: number) => {
+    // 이미지가 1개 이하면 슬라이드 처리 안함
+    if (imageCount <= 1) return;
+    
+    const currentIndex = currentImageIndexes[medspaId] || 0;
+    
+    // 왼쪽으로 드래그하면 다음 이미지 (오른쪽으로 이동)
+    if (info.offset.x < -50) {
+      const newIndex = (currentIndex + 1) % imageCount;
+      setDirectionAndCount([1, count + 1]);
+      setCurrentImageIndexes({
+        ...currentImageIndexes,
+        [medspaId]: newIndex
+      });
     }
-    
-    console.log('Processing coordinates for medspas');
-    
-    // lat, lng 값을 coordinates 객체로 변환
-    const medspaWithCoordinates = medspas.map(medspa => {
-      // 좌표가 유효한지 확인 (null, undefined, NaN 체크)
-      const hasValidLat = medspa.lat !== null && medspa.lat !== undefined && !isNaN(medspa.lat);
-      const hasValidLng = medspa.lng !== null && medspa.lng !== undefined && !isNaN(medspa.lng);
-      
-      // 좌표가 유효한 경우에만 coordinates 객체 생성
-      const coords = (hasValidLat && hasValidLng) ? {
-        lat: medspa.lat,
-        lng: medspa.lng
-      } : undefined;
-      
-      // 좌표가 없는 경우 로그 출력
-      if (!coords) {
-        console.warn(`MedSpa ${medspa.id} (${medspa.medspa_name}) is missing valid coordinates`);
-      } else {
-        console.log(`MedSpa ${medspa.id} - lat: ${medspa.lat}, lng: ${medspa.lng}, coords:`, coords);
-      }
-      
-      return {
-        ...medspa,
-        coordinates: coords
-      };
-    });
-    
-    // 콘솔에 좌표가 있는 MedSpa 수 출력
-    const medspaWithValidCoords = medspaWithCoordinates.filter(m => m.coordinates);
-    console.log(`${medspaWithValidCoords.length} out of ${medspaWithCoordinates.length} MedSpas have valid coordinates`);
-    
-    // 상태 업데이트
-    setMedspas(medspaWithCoordinates);
-    
-    // 처리 완료 표시
-    coordinatesProcessed.current = true;
-  }, [medspas]);
+    // 오른쪽으로 드래그하면 이전 이미지 (왼쪽으로 이동)
+    else if (info.offset.x > 50) {
+      const newIndex = (currentIndex - 1 + imageCount) % imageCount;
+      setDirectionAndCount([-1, count - 1]);
+      setCurrentImageIndexes({
+        ...currentImageIndexes,
+        [medspaId]: newIndex
+      });
+    }
+  };
   
+  // 이미지 인덱스 변경 함수
+  const changeImageIndex = (medspaId: string, newIndex: number, imageCount: number) => {
+    const currentIndex = currentImageIndexes[medspaId] || 0;
+    const direction = newIndex > currentIndex ? 1 : -1;
+    
+    setDirectionAndCount([direction, newIndex > currentIndex ? count + 1 : count - 1]);
+    setCurrentImageIndexes({
+      ...currentImageIndexes,
+      [medspaId]: newIndex
+    });
+  };
+
+  console.log('Initial Medspas:', initialMedspas); // 디버깅용 로그
+
+  // 필터링된 MedSpa 목록
+  const filteredMedspas = useMemo(() => {
+    if (!selectedFilter) return medspas;
+    
+    const medspasCopy = [...medspas];
+    
+    switch (selectedFilter) {
+      case 'Rating':
+        // Yelp 평점 기준으로 정렬 (높은 순)
+        return medspasCopy.sort((a, b) => {
+          const ratingA = a.yelp_star || 0;
+          const ratingB = b.yelp_star || 0;
+          return ratingB - ratingA;
+        });
+        
+      case 'Review':
+        // 리뷰 수 기준으로 정렬 (많은 순)
+        return medspasCopy.sort((a, b) => {
+          const reviewsA = a.google_review || 0;
+          const reviewsB = b.google_review || 0;
+          return reviewsB - reviewsA;
+        });
+        
+      case 'Price':
+        // 가격 기준으로 정렬 (낮은 순)
+        return medspasCopy.sort((a, b) => {
+          try {
+            // 검색 쿼리에 맞는 트리트먼트 가격 찾기
+            const priceA = findTreatmentPriceNumber(a, searchQuery || '');
+            const priceB = findTreatmentPriceNumber(b, searchQuery || '');
+            return priceA - priceB;
+          } catch (error) {
+            console.error('Error sorting by price:', error);
+            return 0;
+          }
+        });
+        
+      case 'Distance':
+        // 거리 기준으로 정렬 (가까운 순)
+        if (!userLocation) return medspasCopy;
+        
+        return medspasCopy.sort((a, b) => {
+          try {
+            // 임시 좌표 생성 (실제로는 데이터에서 가져와야 함)
+            const coordsA = a.coordinates || {
+              lat: 40.7128 + (Math.random() * 0.05 - 0.025),
+              lng: -74.0060 + (Math.random() * 0.05 - 0.025)
+            };
+            
+            const coordsB = b.coordinates || {
+              lat: 40.7128 + (Math.random() * 0.05 - 0.025),
+              lng: -74.0060 + (Math.random() * 0.05 - 0.025)
+            };
+            
+            // 사용자 위치와의 거리 계산
+            const distanceA = calculateDistance(
+              userLocation.lat, userLocation.lng,
+              coordsA.lat, coordsA.lng
+            );
+            
+            const distanceB = calculateDistance(
+              userLocation.lat, userLocation.lng,
+              coordsB.lat, coordsB.lng
+            );
+            
+            return distanceA - distanceB;
+          } catch (error) {
+            console.error('Error sorting by distance:', error);
+            return 0;
+          }
+        });
+        
+      case 'Free consultation':
+        // 무료 상담 제공 여부로 필터링
+        return medspasCopy.filter(medspa => 
+          medspa.free_consultation && 
+          medspa.free_consultation.trim() !== ''
+        );
+        
+      default:
+        return medspasCopy;
+    }
+  }, [medspas, selectedFilter, searchQuery, userLocation]);
+
   // 거리 계산 함수 (Haversine formula)
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // 지구 반경 (km)
@@ -204,147 +297,25 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
     }
   };
 
-  // 필터링된 MedSpa 목록
-  const filteredMedspas = useMemo(() => {
-    if (!medspas.length) return [];
+  // Get distance between user and medspa
+  const getMedspaDistance = (medspa: Medspa): number | null => {
+    if (!userLocation) return null;
     
-    // 검색어가 없으면 모든 메드스파 반환
-    if (!searchQuery.trim()) {
-      return medspas;
-    }
-    
-    const medspasCopy = [...medspas].filter(medspa => {
-      const searchTerms = searchQuery.toLowerCase().split(' ');
+    try {
+      const coords = medspa.coordinates || {
+        lat: 40.7128 + (Math.random() * 0.05 - 0.025),
+        lng: -74.0060 + (Math.random() * 0.05 - 0.025)
+      };
       
-      // 각 검색어가 메드스파 정보에 포함되어 있는지 확인
-      return searchTerms.every(term => {
-        return (
-          (medspa.medspa_name && medspa.medspa_name.toLowerCase().includes(term)) ||
-          (medspa.village && medspa.village.toLowerCase().includes(term)) ||
-          (medspa.location && medspa.location.toLowerCase().includes(term)) ||
-          (medspa.best_treatment && medspa.best_treatment.toLowerCase().includes(term)) ||
-          (medspa.treatment1 && medspa.treatment1.toLowerCase().includes(term)) ||
-          (medspa.treatment2 && medspa.treatment2.toLowerCase().includes(term)) ||
-          (medspa.treatment3 && medspa.treatment3.toLowerCase().includes(term)) ||
-          (medspa.treatment4 && medspa.treatment4.toLowerCase().includes(term)) ||
-          (medspa.treatment5 && medspa.treatment5.toLowerCase().includes(term)) ||
-          (medspa.treatment6 && medspa.treatment6.toLowerCase().includes(term))
-        );
-      });
-    });
-    
-    switch (selectedFilter) {
-      case 'Price':
-        // 가격 기준 정렬 (낮은 가격순)
-        return medspasCopy.sort((a, b) => {
-          const priceA = findTreatmentPriceNumber(a, searchQuery);
-          const priceB = findTreatmentPriceNumber(b, searchQuery);
-          return priceA - priceB;
-        });
-        
-      case 'Rating':
-        // 평점 기준 정렬 (높은 평점순)
-        return medspasCopy.sort((a, b) => {
-          const ratingA = a.yelp_star || a.google_star || 0;
-          const ratingB = b.yelp_star || b.google_star || 0;
-          return ratingB - ratingA;
-        });
-        
-      case 'Review':
-        // 리뷰 수 기준 정렬 (많은 리뷰순)
-        return medspasCopy.sort((a, b) => {
-          const reviewsA = a.yelp_review || a.google_review || 0;
-          const reviewsB = b.yelp_review || b.google_review || 0;
-          return reviewsB - reviewsA;
-        });
-        
-      case 'Distance':
-        // 거리 기준 정렬 (가까운 순)
-        if (!userLocation) return medspasCopy;
-        
-        return medspasCopy.sort((a, b) => {
-          try {
-            // 실제 좌표 사용
-            const coordsA = a.coordinates || (a.lat && a.lng ? { lat: a.lat, lng: a.lng } : {
-              lat: 40.7128 + (Math.random() * 0.05 - 0.025),
-              lng: -74.0060 + (Math.random() * 0.05 - 0.025)
-            });
-            
-            const coordsB = b.coordinates || (b.lat && b.lng ? { lat: b.lat, lng: b.lng } : {
-              lat: 40.7128 + (Math.random() * 0.05 - 0.025),
-              lng: -74.0060 + (Math.random() * 0.05 - 0.025)
-            });
-            
-            // 사용자 위치와의 거리 계산
-            const distanceA = calculateDistance(
-              userLocation.lat, userLocation.lng,
-              coordsA.lat, coordsA.lng
-            );
-            
-            const distanceB = calculateDistance(
-              userLocation.lat, userLocation.lng,
-              coordsB.lat, coordsB.lng
-            );
-            
-            return distanceA - distanceB;
-          } catch (error) {
-            console.error('Error sorting by distance:', error);
-            return 0;
-          }
-        });
-        
-      case 'Free consultation':
-        // 무료 상담 제공 여부로 필터링
-        return medspasCopy.filter(medspa => 
-          medspa.free_consultation && 
-          medspa.free_consultation.trim() !== ''
-        );
-        
-      default:
-        return medspasCopy;
-    }
-  }, [medspas, selectedFilter, searchQuery, userLocation, findTreatmentPriceNumber]);
-
-  // 드래그 핸들러
-  const handleDragEnd = (medspaId: string, info: PanInfo, imageCount: number) => {
-    // 이미지가 1개 이하면 슬라이드 처리 안함
-    if (imageCount <= 1) return;
-    
-    const currentIndex = currentImageIndexes[medspaId] || 0;
-    
-    // 왼쪽으로 드래그하면 다음 이미지 (오른쪽으로 이동)
-    if (info.offset.x < -50) {
-      const newIndex = (currentIndex + 1) % imageCount;
-      setDirectionAndCount([1, count + 1]);
-      setCurrentImageIndexes({
-        ...currentImageIndexes,
-        [medspaId]: newIndex
-      });
-    }
-    // 오른쪽으로 드래그하면 이전 이미지 (왼쪽으로 이동)
-    else if (info.offset.x > 50) {
-      const newIndex = (currentIndex - 1 + imageCount) % imageCount;
-      setDirectionAndCount([-1, count - 1]);
-      setCurrentImageIndexes({
-        ...currentImageIndexes,
-        [medspaId]: newIndex
-      });
+      return calculateDistance(
+        userLocation.lat, userLocation.lng,
+        coords.lat, coords.lng
+      );
+    } catch (error) {
+      console.error('Error calculating distance:', error);
+      return null;
     }
   };
-  
-  // 이미지 인덱스 변경 함수
-  const changeImageIndex = (medspaId: string, newIndex: number) => {
-    const currentIndex = currentImageIndexes[medspaId] || 0;
-    const direction = newIndex > currentIndex ? 1 : -1;
-    
-    setDirectionAndCount([direction, newIndex > currentIndex ? count + 1 : count - 1]);
-    setCurrentImageIndexes({
-      ...currentImageIndexes,
-      [medspaId]: newIndex
-    });
-  };
-
-  console.log('Initial Medspas:', initialMedspas); // 디버깅용 로그
 
   const router = useRouter();
 
@@ -358,60 +329,6 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
     setShowMap(!showMap);
     // 지도 로딩 상태 해제 (지도가 로드되면 DynamicMap 컴포넌트에서 처리됨)
     setTimeout(() => setMapLoading(false), 1000);
-  };
-
-  // Get distance between user and medspa
-  const getMedspaDistance = (medspa: Medspa): number | null => {
-    if (!userLocation) return null;
-    
-    try {
-      // 좌표 유효성 검사
-      let coords;
-      
-      if (medspa.coordinates) {
-        // coordinates 객체 사용
-        coords = medspa.coordinates;
-        console.log(`Using coordinates object for distance calculation (MedSpa ${medspa.id})`);
-      } else if (medspa.lat !== undefined && medspa.lng !== undefined) {
-        // lat, lng 값 유효성 검사
-        const isValidLat = !isNaN(medspa.lat) && medspa.lat >= -90 && medspa.lat <= 90;
-        const isValidLng = !isNaN(medspa.lng) && medspa.lng >= -180 && medspa.lng <= 180;
-        
-        if (isValidLat && isValidLng) {
-          coords = { lat: medspa.lat, lng: medspa.lng };
-          console.log(`Using lat/lng properties for distance calculation (MedSpa ${medspa.id})`);
-        } else {
-          console.warn(`Invalid lat/lng values for MedSpa ${medspa.id}: lat=${medspa.lat}, lng=${medspa.lng}`);
-          // 뉴욕 기준 랜덤 좌표 생성 (fallback)
-          coords = {
-            lat: 40.7128 + (Math.random() * 0.05 - 0.025),
-            lng: -74.0060 + (Math.random() * 0.05 - 0.025)
-          };
-          console.log(`Using fallback coordinates for distance calculation (MedSpa ${medspa.id})`);
-        }
-      } else {
-        // 좌표가 없는 경우 뉴욕 기준 랜덤 좌표 생성 (fallback)
-        coords = {
-          lat: 40.7128 + (Math.random() * 0.05 - 0.025),
-          lng: -74.0060 + (Math.random() * 0.05 - 0.025)
-        };
-        console.log(`No coordinates available, using fallback for distance calculation (MedSpa ${medspa.id})`);
-      }
-      
-      // 사용자 위치 좌표 유효성 검사
-      if (isNaN(userLocation.lat) || isNaN(userLocation.lng)) {
-        console.error('Invalid user location coordinates:', userLocation);
-        return null;
-      }
-      
-      return calculateDistance(
-        userLocation.lat, userLocation.lng,
-        coords.lat, coords.lng
-      );
-    } catch (error) {
-      console.error(`Error calculating distance for MedSpa ${medspa.id}:`, error);
-      return null;
-    }
   };
 
   return (
@@ -448,7 +365,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
             </span>
           </button>
         </div>
-        <div className="container mx-auto pl-3 pb-2">
+        <div className="container mx-auto pb-2">
           <SearchFilters 
             selectedFilter={selectedFilter}
             onFilterChange={setSelectedFilter}
@@ -543,7 +460,7 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
                                     key={index}
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      changeImageIndex(medspa.id, index);
+                                      changeImageIndex(medspa.id, index, imageUrls.length);
                                     }}
                                     className={`w-1.5 h-1.5 rounded-full ${
                                       currentIndex === index 

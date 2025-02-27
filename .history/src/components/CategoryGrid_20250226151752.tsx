@@ -46,7 +46,7 @@ const categories = [
     id: 7, 
     name: 'Hair Removal', 
     image: 'https://cdn-prod.medicalnewstoday.com/content/images/articles/322/322090/woman-having-laser-hair-removal-on-her-armpit.jpg',
-    size: 'medium' 
+    size: 'small' 
   },
   { 
     id: 8, 
@@ -107,8 +107,6 @@ const CategoryGrid = () => {
                 <button 
                   className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md z-10"
                   onClick={(e) => toggleFavorite(category.id, e)}
-                  title="Toggle favorite"
-                  aria-label="Toggle favorite"
                 >
                   <svg 
                     xmlns="http://www.w3.org/2000/svg" 

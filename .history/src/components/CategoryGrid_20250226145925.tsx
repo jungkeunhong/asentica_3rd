@@ -27,31 +27,43 @@ const categories = [
   { 
     id: 4, 
     name: 'PRP', 
-    image: 'https://charettecosmetics.com/wp-content/uploads/2024/02/AdobeStock_458058116-scaled.jpeg',
-    size: 'small' 
+    image: 'https://placehold.co/600x400/png?text=PRP',
+    size: 'medium' 
   },
   { 
     id: 5, 
-    name: 'Facial', 
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAtU1NB5Pxk2skTajkU6OssPSYsd3DK1UuNg&s',
-    size: 'small' 
+    name: 'Cool Peeling', 
+    image: 'https://placehold.co/400x600/png?text=Cool+Peeling',
+    size: 'medium' 
   },
   { 
     id: 6, 
-    name: 'Lifting', 
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSRtviVmg0XF1zWzbLdRClpO43y28t1tSliQ&s',
+    name: 'Facial', 
+    image: 'https://placehold.co/400x400/png?text=Facial',
     size: 'small' 
   },
   { 
     id: 7, 
-    name: 'Hair Removal', 
-    image: 'https://cdn-prod.medicalnewstoday.com/content/images/articles/322/322090/woman-having-laser-hair-removal-on-her-armpit.jpg',
-    size: 'medium' 
+    name: 'Lifting', 
+    image: 'https://placehold.co/600x600/png?text=Lifting',
+    size: 'small' 
   },
   { 
     id: 8, 
+    name: 'Hair Removal', 
+    image: 'https://placehold.co/400x400/png?text=Hair+Removal',
+    size: 'small' 
+  },
+  { 
+    id: 9, 
+    name: 'Chemical Peel', 
+    image: 'https://placehold.co/600x400/png?text=Chemical+Peel',
+    size: 'medium' 
+  },
+  { 
+    id: 10, 
     name: 'LED Therapy', 
-    image: 'https://sa1s3optim.patientpop.com/assets/images/provider/photos/2620529.jpg',
+    image: 'https://placehold.co/400x400/png?text=LED+Therapy',
     size: 'small' 
   },
 ];
@@ -107,8 +119,6 @@ const CategoryGrid = () => {
                 <button 
                   className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md z-10"
                   onClick={(e) => toggleFavorite(category.id, e)}
-                  title="Toggle favorite"
-                  aria-label="Toggle favorite"
                 >
                   <svg 
                     xmlns="http://www.w3.org/2000/svg" 

@@ -76,12 +76,7 @@ export default async function Page({
       .filter('best_treatment', 'ilike', `%${searchQuery}%`)
       .limit(20);
       
-    console.log("✅ Supabase data:", medspaData?.map(m => ({
-      id: m.id,
-      name: m.medspa_name,
-      lat: m.lat,
-      lng: m.lng
-    })));
+    console.log("✅ Supabase data:", medspaData);
     
     if (error) {
       throw new Error(error.message);

@@ -29,8 +29,8 @@ interface DynamicMapProps {
 
 // 지도 옵션
 const mapOptions = {
-  disableDefaultUI: true,
-  zoomControl: false,
+  disableDefaultUI: false,
+  zoomControl: true,
   streetViewControl: false,
   mapTypeControl: false,
   fullscreenControl: false,
@@ -309,13 +309,12 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
       {/* 내 위치로 이동 버튼 */}
       {userLocation && (
         <Button
-          className="absolute bottom-4 right-4 bg-white text-black hover:bg-gray-100 shadow-md rounded-full w-10 h-10 p-0 flex items-center justify-center"
+          className="absolute bottom-4 right-4 bg-white text-black hover:bg-gray-100 shadow-md"
           onClick={handleGoToMyLocation}
           size="sm"
-          title="Go to my location"
-          aria-label="Go to my location"
         >
-          <Navigation className="h-5 w-5" />
+          <Navigation className="h-4 w-4 mr-1" />
+          My Location
         </Button>
       )}
     </div>

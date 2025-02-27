@@ -1,0 +1,53 @@
+export interface Medspa {
+  id: string;
+  medspa_name: string;
+  village: string;
+  location: string;
+  address: string;
+  number?: string;
+  website?: string;
+  verified?: boolean;
+  google_star?: number;
+  google_review?: number;
+  yelp_star?: number;
+  yelp_review?: number;
+  best_treatment?: string;
+  free_consultation?: string;
+  good_review_short?: string;
+  good_review_deepdive1?: string;
+  good_review_deepdive2?: string;
+  good_review_deepdive3?: string;
+  bad_review_short?: string;
+  bad_review_deepdive?: string;
+  bad_review_deepdive1?: string;
+  bad_review_deepdive2?: string;
+  bad_review_deepdive3?: string;
+  recommended_practitioner1_name?: string;
+  recommended_practitioner1_reason?: string;
+  recommended_practitioner2_name?: string;
+  recommended_practitioner2_reason?: string;
+  recommended_practitioner3_name?: string;
+  recommended_practitioner3_reason?: string;
+  treatment1?: string;
+  price1?: string;
+  treatment2?: string;
+  price2?: string;
+  treatment3?: string;
+  price3?: string;
+  treatment4?: string;
+  price4?: string;
+  treatment5?: string;
+  price5?: string;
+  treatment6?: string;
+  price6?: string;
+  image_url1: string;
+  image_url2: string; 
+  image_url3: string;
+  lat?: number;
+  lng?: number;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  name?: string; // 일부 코드에서 name 속성을 사용하는 것으로 보임
+}
