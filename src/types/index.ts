@@ -3,7 +3,7 @@ export interface Medspa {
   medspa_name: string;
   village: string;
   location: string;
-  address: string;
+  address?: string;
   number?: string;
   website?: string;
   verified?: boolean;
@@ -40,9 +40,9 @@ export interface Medspa {
   price5?: string;
   treatment6?: string;
   price6?: string;
-  image_url1: string;
-  image_url2: string; 
-  image_url3: string;
+  image_url1?: string;
+  image_url2?: string; 
+  image_url3?: string;
   lat?: number;
   lng?: number;
   coordinates?: {

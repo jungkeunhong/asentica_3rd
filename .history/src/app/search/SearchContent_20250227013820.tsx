@@ -33,7 +33,7 @@ interface Medspa {
   yelp_review?: number;
   best_treatment?: string;
   free_consultation?: string;
-  good_review_short?: string;
+  해ㅐㅇ_review_short?: string;
   bad_review_short?: string;
   treatment1?: string;
   treatment2?: string;
