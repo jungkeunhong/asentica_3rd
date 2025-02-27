@@ -11,14 +11,13 @@ export const metadata: Metadata = {
 // Configure the page for dynamic rendering
 export const dynamic = 'force-dynamic';
 
-// For Next.js 15, we're using the temporary synchronous access pattern
-// This will show warnings but will work until the next major version
-export default async function Page({
-  params,
-}: {
-  params: { id: string };
-}) {
-  // Get the ID from params directly
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function Page(props: PageProps) {
+  // In Next.js 15, params is a Promise that needs to be awaited
+  const params = await props.params;
   const id = params.id;
   console.log(`🔍 Loading MedSpa details for ID: ${id}`);
 
