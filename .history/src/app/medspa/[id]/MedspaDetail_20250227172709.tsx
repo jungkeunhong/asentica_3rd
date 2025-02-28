@@ -213,6 +213,8 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 >
                   <div 
                     className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity duration-300"
+                    style={{
+                    }}
                   ></div>
                   
                   <div className="relative z-10">

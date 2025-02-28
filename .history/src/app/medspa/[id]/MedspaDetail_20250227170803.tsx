@@ -168,60 +168,37 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         
         {/* Bad Reviews */}
         {badReviews.length > 0 && (
-        <div>
-          <div className="flex items-center mb-2">
-            <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center mr-2">
-              <Image 
-                src="/icons/thumbdown.png" 
-                alt="Negative" 
-                width={24} 
-                height={24}
-                className="w-6 h-6 object-contain flex-shrink-0"
-              />
-            </div>
-            <h3 className="text-lg font-medium text-red-700">Cons</h3>
+          <div>
+            <h3 className="text-lg font-medium text-red-700 mb-2">Cons</h3>
+            <ul className="space-y-3">
+              {badReviews.map((review, index) => (
+                <li key={`bad-${index}`} className="flex">
+                  <span className="font-medium mr-2">{index + 1}.</span>
+                  <p className="text-sm text-gray-700">{review}</p>
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="space-y-3">
-            {badReviews.map((review, index) => (
-              <li key={`bad-${index}`} className="flex">
-                <span className="font-medium mr-2">{index + 1}.</span>
-                <p className="text-sm text-gray-700">{review}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-        {/* Recommended Practitioners - Bento Grid Style */}
-        {/* Recommended Practitioners - Luxury Brown Bento Grid Style */}
+        )}
+        
+        {/* Recommended Practitioners */}
         {recommendedPractitioners.length > 0 && (
-          <div className="mt-12 mb-8">
-            <div className="flex items-center mb-6">
-              <div className="w-1.5 h-8 bg-amber-700 rounded-full mr-3"></div>
-              <h3 className="text-2xl font-bold text-gray-800">People&apos;s Choice</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="mt-8">
+            <h3 className="text-lg font-medium text-black mb-4">People&apos;s Choice</h3>
+            <div className="flex flex-wrap">
               {recommendedPractitioners.map((practitioner, index) => (
                 <div 
-                  key={`practitioner-${index}`}
-                  className="rounded-xl p-5 relative overflow-hidden group"
-                  style={{
-                    background: "linear-gradient(135deg, #8B6B4D 0%, #6D4C3D 100%)",
-                    boxShadow: "0 4px 20px rgba(107, 70, 49, 0.15)"
-                  }}
+                  key={`practitioner-${index}`} 
+                  className={`${
+                    recommendedPractitioners.length === 1 
+                      ? 'w-full' 
+                      : recommendedPractitioners.length === 2 
+                        ? 'w-1/2' 
+                        : 'w-1/3'
+                  } pr-4 mb-4`}
                 >
-                  <div 
-                    className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity duration-300"
-                  ></div>
-                  
-                  <div className="relative z-10">
-                    <div className="flex items-center mb-3">
-                      <h4 className="text-xl font-semibold text-amber-50">{practitioner.name}</h4>
-                    </div>
-                    
-                    <p className="text-sm text-amber-100/90">{practitioner.reason}</p>
-                  </div>
+                  <h4 className="cormorant text-xl font-medium mb-1 text-left">{practitioner.name}</h4>
+                  <p className="text-xs text-gray-600 text-left">{practitioner.reason}</p>
                 </div>
               ))}
             </div>

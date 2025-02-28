@@ -192,12 +192,13 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         </div>
       )}
 
+
+        {/* Recommended Practitioners */}
         {/* Recommended Practitioners - Bento Grid Style */}
-        {/* Recommended Practitioners - Luxury Brown Bento Grid Style */}
         {recommendedPractitioners.length > 0 && (
           <div className="mt-12 mb-8">
             <div className="flex items-center mb-6">
-              <div className="w-1.5 h-8 bg-amber-700 rounded-full mr-3"></div>
+              <div className="w-1.5 h-8 bg-indigo-600 rounded-full mr-3"></div>
               <h3 className="text-2xl font-bold text-gray-800">People&apos;s Choice</h3>
             </div>
             
@@ -205,22 +206,32 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               {recommendedPractitioners.map((practitioner, index) => (
                 <div 
                   key={`practitioner-${index}`}
-                  className="rounded-xl p-5 relative overflow-hidden group"
+                  className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group"
                   style={{
-                    background: "linear-gradient(135deg, #8B6B4D 0%, #6D4C3D 100%)",
-                    boxShadow: "0 4px 20px rgba(107, 70, 49, 0.15)"
+                    background: "rgba(255, 255, 255, 0.8)",
+                    backdropFilter: "blur(10px)"
                   }}
                 >
-                  <div 
-                    className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity duration-300"
-                  ></div>
+                  <div className="absolute -right-10 -top-10 w-20 h-20 rounded-full bg-gradient-to-br from-indigo-100 to-indigo-50 group-hover:scale-110 transition-transform duration-300"></div>
                   
                   <div className="relative z-10">
                     <div className="flex items-center mb-3">
-                      <h4 className="text-xl font-semibold text-amber-50">{practitioner.name}</h4>
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold mr-3">
+                        {practitioner.name.charAt(0)}
+                      </div>
+                      <h4 className="text-xl font-semibold text-gray-800">{practitioner.name}</h4>
                     </div>
                     
-                    <p className="text-sm text-amber-100/90">{practitioner.reason}</p>
+                    <p className="text-sm text-gray-600 pl-13 border-l-2 border-indigo-200 ml-5 py-1">{practitioner.reason}</p>
+                    
+                    <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
+                      <button className="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 flex items-center">
+                        View Profile
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

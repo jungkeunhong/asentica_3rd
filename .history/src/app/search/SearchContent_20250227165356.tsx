@@ -216,127 +216,122 @@ export default function SearchContent({ initialMedspas, searchQuery, error }: Se
   const filteredMedspas = useMemo(() => {
     if (!medspas.length) return [];
     
-    let medspasCopy = [...medspas];
-    
-    // 검색어가 있는 경우에만 검색어로 필터링
-    if (searchQuery.trim()) {
-      medspasCopy = medspasCopy.filter(medspa => {
-        const searchTerms = searchQuery.toLowerCase().split(' ');
-        
-        // 각 검색어가 메드스파 정보에 포함되어 있는지 확인
-        return searchTerms.every(term => {
-          return (
-            (medspa.medspa_name && medspa.medspa_name.toLowerCase().includes(term)) ||
-            (medspa.village && medspa.village.toLowerCase().includes(term)) ||
-            (medspa.location && medspa.location.toLowerCase().includes(term)) ||
-            (medspa.best_treatment && medspa.best_treatment.toLowerCase().includes(term)) ||
-            (medspa.treatment1 && medspa.treatment1.toLowerCase().includes(term)) ||
-            (medspa.treatment2 && medspa.treatment2.toLowerCase().includes(term)) ||
-            (medspa.treatment3 && medspa.treatment3.toLowerCase().includes(term)) ||
-            (medspa.treatment4 && medspa.treatment4.toLowerCase().includes(term)) ||
-            (medspa.treatment5 && medspa.treatment5.toLowerCase().includes(term)) ||
-            (medspa.treatment6 && medspa.treatment6.toLowerCase().includes(term))
-          );
-        });
-      });
+    // 검색어가 없으면 모든 메드스파 반환
+    if (!searchQuery.trim()) {
+      return medspas;
     }
     
-    // 필터 적용 (검색어 유무와 관계없이)
-    if (selectedFilter) {
-      console.log(`Applying filter: ${selectedFilter} to ${medspasCopy.length} medspas`);
+    const medspasCopy = [...medspas].filter(medspa => {
+      const searchTerms = searchQuery.toLowerCase().split(' ');
       
-      switch (selectedFilter) {
-        case 'Price':
-          // 가격 기준 정렬 (낮은 가격순)
-          return medspasCopy.sort((a, b) => {
-            const priceA = findTreatmentPriceNumber(a, searchQuery);
-            const priceB = findTreatmentPriceNumber(b, searchQuery);
-            return priceA - priceB;
-          });
-          
-        case 'google_star':
-          // Google 평점 기준 정렬 (높은 평점순)
-          return medspasCopy.sort((a, b) => {
-            const ratingA = a.google_star || 0;
-            const ratingB = b.google_star || 0;
-            return ratingB - ratingA;
-          });
-          
-        case 'google_review':
-          // Google 리뷰 수 기준 정렬 (많은 리뷰순)
-          return medspasCopy.sort((a, b) => {
-            const reviewsA = a.google_review || 0;
-            const reviewsB = b.google_review || 0;
-            return reviewsB - reviewsA;
-          });
-          
-        case 'yelp_star':
-          // Yelp 평점 기준 정렬 (높은 평점순)
-          return medspasCopy.sort((a, b) => {
-            const ratingA = a.yelp_star || 0;
-            const ratingB = b.yelp_star || 0;
-            return ratingB - ratingA;
-          });
-          
-        case 'yelp_review':
-          // Yelp 리뷰 수 기준 정렬 (많은 리뷰순)
-          return medspasCopy.sort((a, b) => {
-            const reviewsA = a.yelp_review || 0;
-            const reviewsB = b.yelp_review || 0;
-            return reviewsB - reviewsA;
-          });
-          
-        case 'Distance':
-          // 거리 기준 정렬 (가까운 순)
-          if (!userLocation) return medspasCopy;
-          
-          return medspasCopy.sort((a, b) => {
-            try {
-              // 실제 좌표 사용
-              const coordsA = a.coordinates || (a.lat && a.lng ? { lat: a.lat, lng: a.lng } : {
-                lat: 40.7128 + (Math.random() * 0.05 - 0.025),
-                lng: -74.0060 + (Math.random() * 0.05 - 0.025)
-              });
-              
-              const coordsB = b.coordinates || (b.lat && b.lng ? { lat: b.lat, lng: b.lng } : {
-                lat: 40.7128 + (Math.random() * 0.05 - 0.025),
-                lng: -74.0060 + (Math.random() * 0.05 - 0.025)
-              });
-              
-              // 사용자 위치와의 거리 계산
-              const distanceA = calculateDistance(
-                userLocation.lat, userLocation.lng,
-                coordsA.lat, coordsA.lng
-              );
-              
-              const distanceB = calculateDistance(
-                userLocation.lat, userLocation.lng,
-                coordsB.lat, coordsB.lng
-              );
-              
-              return distanceA - distanceB;
-            } catch (error) {
-              console.error('Error sorting by distance:', error);
-              return 0;
-            }
-          });
-          
-        case 'Free consultation':
-          // 무료 상담 제공 여부로 필터링 및 정렬
-          // 무료 상담 있는 MedSpa를 먼저 보여주고, 그 다음에 나머지를 보여줌
-          return medspasCopy.sort((a, b) => {
-            const hasConsultationA = a.free_consultation && a.free_consultation.trim() !== '';
-            const hasConsultationB = b.free_consultation && b.free_consultation.trim() !== '';
-            
-            if (hasConsultationA && !hasConsultationB) return -1;
-            if (!hasConsultationA && hasConsultationB) return 1;
-            return 0;
-          });
-      }
-    }
+      // 각 검색어가 메드스파 정보에 포함되어 있는지 확인
+      return searchTerms.every(term => {
+        return (
+          (medspa.medspa_name && medspa.medspa_name.toLowerCase().includes(term)) ||
+          (medspa.village && medspa.village.toLowerCase().includes(term)) ||
+          (medspa.location && medspa.location.toLowerCase().includes(term)) ||
+          (medspa.best_treatment && medspa.best_treatment.toLowerCase().includes(term)) ||
+          (medspa.treatment1 && medspa.treatment1.toLowerCase().includes(term)) ||
+          (medspa.treatment2 && medspa.treatment2.toLowerCase().includes(term)) ||
+          (medspa.treatment3 && medspa.treatment3.toLowerCase().includes(term)) ||
+          (medspa.treatment4 && medspa.treatment4.toLowerCase().includes(term)) ||
+          (medspa.treatment5 && medspa.treatment5.toLowerCase().includes(term)) ||
+          (medspa.treatment6 && medspa.treatment6.toLowerCase().includes(term))
+        );
+      });
+    });
     
-    // 필터가 없거나 기본 케이스
-    return medspasCopy;
+    switch (selectedFilter) {
+      case 'Price':
+        // 가격 기준 정렬 (낮은 가격순)
+        return medspasCopy.sort((a, b) => {
+          const priceA = findTreatmentPriceNumber(a, searchQuery);
+          const priceB = findTreatmentPriceNumber(b, searchQuery);
+          return priceA - priceB;
+        });
+        
+      case 'google_star':
+        // Google 평점 기준 정렬 (높은 평점순)
+        return medspasCopy.sort((a, b) => {
+          const ratingA = a.google_star || 0;
+          const ratingB = b.google_star || 0;
+          return ratingB - ratingA;
+        });
+        
+      case 'google_review':
+        // Google 리뷰 수 기준 정렬 (많은 리뷰순)
+        return medspasCopy.sort((a, b) => {
+          const reviewsA = a.google_review || 0;
+          const reviewsB = b.google_review || 0;
+          return reviewsB - reviewsA;
+        });
+        
+      case 'yelp_star':
+        // Yelp 평점 기준 정렬 (높은 평점순)
+        return medspasCopy.sort((a, b) => {
+          const ratingA = a.yelp_star || 0;
+          const ratingB = b.yelp_star || 0;
+          return ratingB - ratingA;
+        });
+        
+      case 'yelp_review':
+        // Yelp 리뷰 수 기준 정렬 (많은 리뷰순)
+        return medspasCopy.sort((a, b) => {
+          const reviewsA = a.yelp_review || 0;
+          const reviewsB = b.yelp_review || 0;
+          return reviewsB - reviewsA;
+        });
+        
+      case 'Distance':
+        // 거리 기준 정렬 (가까운 순)
+        if (!userLocation) return medspasCopy;
+        
+        return medspasCopy.sort((a, b) => {
+          try {
+            // 실제 좌표 사용
+            const coordsA = a.coordinates || (a.lat && a.lng ? { lat: a.lat, lng: a.lng } : {
+              lat: 40.7128 + (Math.random() * 0.05 - 0.025),
+              lng: -74.0060 + (Math.random() * 0.05 - 0.025)
+            });
+            
+            const coordsB = b.coordinates || (b.lat && b.lng ? { lat: b.lat, lng: b.lng } : {
+              lat: 40.7128 + (Math.random() * 0.05 - 0.025),
+              lng: -74.0060 + (Math.random() * 0.05 - 0.025)
+            });
+            
+            // 사용자 위치와의 거리 계산
+            const distanceA = calculateDistance(
+              userLocation.lat, userLocation.lng,
+              coordsA.lat, coordsA.lng
+            );
+            
+            const distanceB = calculateDistance(
+              userLocation.lat, userLocation.lng,
+              coordsB.lat, coordsB.lng
+            );
+            
+            return distanceA - distanceB;
+          } catch (error) {
+            console.error('Error sorting by distance:', error);
+            return 0;
+          }
+        });
+        
+      case 'Free consultation':
+        // 무료 상담 제공 여부로 필터링 및 정렬
+        // 무료 상담 있는 MedSpa를 먼저 보여주고, 그 다음에 나머지를 보여줌
+        return medspasCopy.sort((a, b) => {
+          const hasConsultationA = a.free_consultation && a.free_consultation.trim() !== '';
+          const hasConsultationB = b.free_consultation && b.free_consultation.trim() !== '';
+          
+          if (hasConsultationA && !hasConsultationB) return -1;
+          if (!hasConsultationA && hasConsultationB) return 1;
+          return 0;
+        });
+        
+      default:
+        return medspasCopy;
+    }
   }, [medspas, selectedFilter, searchQuery, userLocation, findTreatmentPriceNumber]);
 
   // 드래그 핸들러
