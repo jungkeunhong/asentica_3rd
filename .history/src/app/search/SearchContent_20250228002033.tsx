@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Star, MapPin, Navigation, Phone, Heart } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { Star, MapPin, Navigation, Phone } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -11,7 +11,6 @@ import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import ConsultationModal from '@/components/ConsultationModal';
-import { useFavorites } from '@/context/FavoritesContext';
 
 // 동적으로 DynamicMap 컴포넌트 로드 (클라이언트 사이드에서만 로드)
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
@@ -88,18 +87,6 @@ export default function SearchContent({
   const [mapLoading, setMapLoading] = useState(false);
   const [currentImageIndexes, setCurrentImageIndexes] = useState<{[key: string]: number}>({});
   const [selectedFilter, setSelectedFilter] = useState<FilterType>(null);
-
-  // Favorites context
-  const { isFavorite, addFavorite, removeFavorite } = useFavorites();
-  
-  // Toggle favorite status
-  const toggleFavorite = (medspa: Medspa) => {
-    if (isFavorite(medspa.id)) {
-      removeFavorite(medspa.id);
-    } else {
-      addFavorite(medspa);
-    }
-  };
 
   // 사용자 위치 상태
   useEffect(() => {
@@ -548,26 +535,6 @@ export default function SearchContent({
                               dragConstraints={{ left: 0, right: 0 }}
                               onDragEnd={(e, info) => handleDragEnd(medspa.id, info, imageUrls.length)}
                             >
-                              {/* Favorite heart icon */}
-                              <button 
-                                className={`absolute top-2 right-2 p-1 rounded-full z-10 ${
-                                  isFavorite(medspa.id) 
-                                    ? 'bg-white/80 text-red-500' 
-                                    : 'bg-white/60 text-gray-500 hover:bg-white/80'
-                                } transition-all duration-200`}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  toggleFavorite(medspa);
-                                }}
-                                aria-label={isFavorite(medspa.id) ? "Remove from favorites" : "Add to favorites"}
-                              >
-                                <Heart 
-                                  size={18} 
-                                  className={isFavorite(medspa.id) ? "fill-red-500" : ""} 
-                                />
-                              </button>
-                              
                               <AnimatePresence initial={false} custom={1}>
                                 <motion.div 
                                   key={currentIndex}

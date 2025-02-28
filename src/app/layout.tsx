@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Gotu, Geist, Geist_Mono } from "next/font/google";
 import { Cormorant } from 'next/font/google'
 import "./globals.css";
+import { FavoritesProvider } from "@/context/FavoritesContext";
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -43,9 +44,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased ${gotu.variable} ${cormorant.variable} bg-white`}
       >
-        <div className="min-h-screen flex flex-col bg-white">
-          <main className="flex-grow bg-white">{children}</main>
-        </div>
+        <FavoritesProvider>
+          <div className="min-h-screen flex flex-col bg-white">
+            <main className="flex-grow bg-white">{children}</main>
+          </div>
+        </FavoritesProvider>
       </body>
     </html>
   );

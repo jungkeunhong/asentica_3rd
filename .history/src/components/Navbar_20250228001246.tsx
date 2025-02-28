@@ -15,7 +15,7 @@ export default function Navbar() {
             href="/my-page" 
             className="flex items-center gap-2 px-4 py-2 hover:bg-amber-100 text-[#754731] transition-all duration-300"
           >
-            <User size={24} className="text-[#754731]" />
+            <User size={24} className="text-#754731" />
           </Link>
         </div>
       </div>
