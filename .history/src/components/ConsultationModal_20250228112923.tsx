@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { tv } from 'tailwind-variants';
 import confetti from 'canvas-confetti';
 
 // 버튼 스타일 정의
 const submitButton = tv({
-  base: "relative overflow-visible rounded-lg shadow-xl bg-amber-800 text-white border-none transition duration-300 transform hover:scale-95 active:scale-90 hover:bg-amber-900",
+  base: "relative overflow-visible rounded-lg hover:-translate-y-1 shadow-xl bg-amber-800 text-white border-none after:content-[''] after:absolute after:rounded-lg after:inset-0 after:bg-amber-700/40 after:z-[-1] after:transition after:!duration-500 hover:after:scale-150 hover:after:opacity-0",
   variants: {
     isSubmitting: {
       true: 'opacity-70 cursor-not-allowed',
@@ -34,7 +34,6 @@ interface ConsultationModalProps {
 
 export default function ConsultationModal({ isOpen, onClose, medspa }: ConsultationModalProps) {
   const supabase = createClient();
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
@@ -44,23 +43,7 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const triggerConfetti = () => {
-    // 버튼 위치 기준으로 폭죽 효과 생성
-    if (buttonRef.current) {
-      const buttonRect = buttonRef.current.getBoundingClientRect();
-      const x = (buttonRect.left + buttonRect.width / 2) / window.innerWidth;
-      const y = (buttonRect.top + buttonRect.height / 2) / window.innerHeight;
-      
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { x, y },
-        colors: ['#92400e', '#b45309', '#d97706', '#f59e0b', '#fbbf24'],
-        zIndex: 9999
-      });
-    }
-  };
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,10 +82,11 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
       console.log('Consultation request submitted successfully', data);
       
       // 성공 시 confetti 표시
-      triggerConfetti();
+      setShowConfetti(true);
       
-      // 3초 후 모달 닫기
+      // 3초 후 confetti 숨기고 모달 닫기
       setTimeout(() => {
+        setShowConfetti(false);
         // 폼 초기화
         setFormData({
           firstname: '',
@@ -134,6 +118,8 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
 
   return (
     <dialog id="consultation_modal" className={`modal ${isOpen ? 'modal-open' : ''}`}>
+      {showConfetti && <ReactConfetti recycle={false} numberOfPieces={500} />}
+      
       <div className="modal-box bg-white rounded-2xl shadow-xl p-6 max-w-md mx-auto">
         <form method="dialog">
           <button
@@ -233,7 +219,6 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
 
           <div className="form-control mt-6">
             <button
-              ref={buttonRef}
               type="submit"
               className={submitButton({ isSubmitting })}
               style={{
@@ -247,7 +232,6 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
           </div>
         </form>
       </div>
-      <div className="modal-backdrop" onClick={onClose}></div>
     </dialog>
   );
 }

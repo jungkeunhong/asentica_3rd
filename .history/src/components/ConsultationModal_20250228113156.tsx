@@ -7,7 +7,7 @@ import confetti from 'canvas-confetti';
 
 // 버튼 스타일 정의
 const submitButton = tv({
-  base: "relative overflow-visible rounded-lg shadow-xl bg-amber-800 text-white border-none transition duration-300 transform hover:scale-95 active:scale-90 hover:bg-amber-900",
+  base: "relative overflow-visible rounded-lg hover:-translate-y-1 shadow-xl bg-amber-800 text-white border-none after:content-[''] after:absolute after:rounded-lg after:inset-0 after:bg-amber-700/40 after:z-[-1] after:transition after:!duration-500 hover:after:scale-150 hover:after:opacity-0",
   variants: {
     isSubmitting: {
       true: 'opacity-70 cursor-not-allowed',
@@ -56,8 +56,7 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
         particleCount: 100,
         spread: 70,
         origin: { x, y },
-        colors: ['#92400e', '#b45309', '#d97706', '#f59e0b', '#fbbf24'],
-        zIndex: 9999
+        colors: ['#92400e', '#b45309', '#d97706', '#f59e0b', '#fbbf24']
       });
     }
   };

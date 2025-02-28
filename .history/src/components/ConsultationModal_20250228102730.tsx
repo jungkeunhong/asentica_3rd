@@ -1,29 +1,13 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import { tv } from 'tailwind-variants';
-import confetti from 'canvas-confetti';
-
-// 버튼 스타일 정의
-const submitButton = tv({
-  base: "relative overflow-visible rounded-lg shadow-xl bg-amber-800 text-white border-none transition duration-300 transform hover:scale-95 active:scale-90 hover:bg-amber-900",
-  variants: {
-    isSubmitting: {
-      true: 'opacity-70 cursor-not-allowed',
-      false: ''
-    }
-  },
-  defaultVariants: {
-    isSubmitting: false
-  }
-});
 
 interface Medspa {
   id: string;
-  name?: string;
-  medspa_name?: string;
-  image_url1?: string;
+  medspa_name: string;
+  number?: string;
+  // Add other fields as needed
 }
 
 interface ConsultationModalProps {
@@ -34,7 +18,6 @@ interface ConsultationModalProps {
 
 export default function ConsultationModal({ isOpen, onClose, medspa }: ConsultationModalProps) {
   const supabase = createClient();
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
@@ -44,23 +27,6 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const triggerConfetti = () => {
-    // 버튼 위치 기준으로 폭죽 효과 생성
-    if (buttonRef.current) {
-      const buttonRect = buttonRef.current.getBoundingClientRect();
-      const x = (buttonRect.left + buttonRect.width / 2) / window.innerWidth;
-      const y = (buttonRect.top + buttonRect.height / 2) / window.innerHeight;
-      
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { x, y },
-        colors: ['#92400e', '#b45309', '#d97706', '#f59e0b', '#fbbf24'],
-        zIndex: 9999
-      });
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,15 +39,14 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
         throw new Error('Please fill in all required fields');
       }
       
-      // UUID 생성 (브라우저에서 지원하는 경우)
-      const consultationId = crypto.randomUUID ? crypto.randomUUID() : 
-        'manual-' + Math.random().toString(36).substring(2, 15);
+    // UUID 생성 (브라우저에서 지원하는 경우)
+    const consultationId = crypto.randomUUID ? crypto.randomUUID() : 
+    'manual-' + Math.random().toString(36).substring(2, 15);
 
       // Supabase에 데이터 삽입
       const { data, error: insertError } = await supabase
-        .from('consultation_requests')
+        .from('consultation_requests') // Make sure this table exists in your Supabase
         .insert({
-          consultation_id: consultationId,
           first_name: formData.firstname,
           last_name: formData.lastname,
           email: formData.email,
@@ -89,7 +54,8 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
           message: formData.message,
           medspa_id: medspa?.id || null,
           created_at: new Date().toISOString()
-        });
+        })
+        .select();
 
       if (insertError) {
         console.error('Supabase error:', insertError);
@@ -97,22 +63,21 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
       }
 
       console.log('Consultation request submitted successfully', data);
-      
-      // 성공 시 confetti 표시
-      triggerConfetti();
-      
-      // 3초 후 모달 닫기
-      setTimeout(() => {
-        // 폼 초기화
-        setFormData({
-          firstname: '',
-          lastname: '',
-          email: '',
-          phone: '',
-          message: ''
-        });
-        onClose();
-      }, 3000);
+
+      // 폼 초기화 및 모달 닫기
+      setFormData({
+        firstname: '',
+        lastname: '',
+        email: '',
+        phone: '',
+        message: ''
+      });
+
+      // 성공 메시지 표시
+    alert('Your consultation request has been submitted successfully!');
+    
+      // Close the modal and return to search content
+      onClose();
 
     } catch (err) {
       console.error('Error submitting consultation request:', err);
@@ -129,8 +94,6 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
       [name]: value
     }));
   };
-
-  if (!isOpen) return null;
 
   return (
     <dialog id="consultation_modal" className={`modal ${isOpen ? 'modal-open' : ''}`}>
@@ -233,9 +196,8 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
 
           <div className="form-control mt-6">
             <button
-              ref={buttonRef}
               type="submit"
-              className={submitButton({ isSubmitting })}
+              className={`btn bg-amber-800 hover:bg-amber-900 text-white border-none shadow-md ${isSubmitting ? 'loading' : ''}`}
               style={{
                 borderRadius: '0.5rem',
                 boxShadow: '0 4px 6px -1px rgba(139, 69, 19, 0.3), 0 2px 4px -1px rgba(139, 69, 19, 0.2)'

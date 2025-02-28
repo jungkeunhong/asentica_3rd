@@ -56,8 +56,7 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
         particleCount: 100,
         spread: 70,
         origin: { x, y },
-        colors: ['#92400e', '#b45309', '#d97706', '#f59e0b', '#fbbf24'],
-        zIndex: 9999
+        colors: ['#92400e', '#b45309', '#d97706', '#f59e0b', '#fbbf24']
       });
     }
   };
