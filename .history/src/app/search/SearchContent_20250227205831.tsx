@@ -358,6 +358,9 @@ export default function SearchContent({
   
   // 이미지 인덱스 변경 함수
   const changeImageIndex = (medspaId: string, newIndex: number) => {
+    const currentIndex = currentImageIndexes[medspaId] || 0;
+    const direction = newIndex > currentIndex ? 1 : -1;
+    
     setCurrentImageIndexes({
       ...currentImageIndexes,
       [medspaId]: newIndex

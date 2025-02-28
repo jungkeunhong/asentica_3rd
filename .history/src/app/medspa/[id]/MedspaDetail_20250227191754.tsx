@@ -7,7 +7,6 @@ import { ChevronLeftIcon} from '@heroicons/react/24/outline';
 import { Star, MapPin, Globe } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { Medspa } from '@/types';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 
 // Dynamically import the map component (client-side only)
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
@@ -24,8 +23,7 @@ interface MedspaDetailProps {
 }
 
 export default function MedspaDetail({ medspa }: MedspaDetailProps) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+  const [currentImageIndex] = useState(0);
   const images = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
   
   // Treatments and prices
@@ -58,32 +56,6 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
     { name: medspa.recommended_practitioner3_name, reason: medspa.recommended_practitioner3_reason },
   ].filter(p => p.name && p.reason);
 
-  // Handle drag end for image slider
-  const handleDragEnd = (info: PanInfo) => {
-    // If there's only one image or none, don't do anything
-    if (images.length <= 1) return;
-    
-    // Swiped left (next image)
-    if (info.offset.x < -50) {
-      const newIndex = (currentImageIndex + 1) % images.length;
-      setDirection(1);
-      setCurrentImageIndex(newIndex);
-    }
-    // Swiped right (previous image)
-    else if (info.offset.x > 50) {
-      const newIndex = (currentImageIndex - 1 + images.length) % images.length;
-      setDirection(-1);
-      setCurrentImageIndex(newIndex);
-    }
-  };
-  
-  // Change image index directly (when clicking on dots)
-  const changeImageIndex = (newIndex: number) => {
-    const newDirection = newIndex > currentImageIndex ? 1 : -1;
-    setDirection(newDirection);
-    setCurrentImageIndex(newIndex);
-  };
-
   return (
     <div className="max-w-4xl mx-auto pb-20 bg-white">
       {/* Back button */}
@@ -96,95 +68,27 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
       {/* Image Slider */}
       <div className="relative h-[400px] w-full overflow-hidden">
         {images.length > 0 ? (
-          <motion.div
-            className="relative w-full h-full"
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            onDragEnd={(_, info) => handleDragEnd(info)}
-          >
-            <AnimatePresence initial={false} custom={direction}>
-              <motion.div
-                key={currentImageIndex}
-                custom={direction}
-                initial={{ 
-                  opacity: 0,
-                  x: direction > 0 ? 300 : -300 
-                }}
-                animate={{ 
-                  opacity: 1,
-                  x: 0,
-                  transition: { duration: 0.5 }
-                }}
-                exit={{ 
-                  opacity: 0,
-                  x: direction > 0 ? -300 : 300,
-                  transition: { duration: 0.5 }
-                }}
-                className="absolute w-full h-full"
-              >
-                <Image
-                  src={images[currentImageIndex]}
-                  alt={`${medspa.medspa_name} - Image ${currentImageIndex + 1}`}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </motion.div>
-            </AnimatePresence>
-            
-            {/* Image indicators (dots) */}
-            {images.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-3 z-10">
-                {images.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      changeImageIndex(idx);
-                    }}
-                    className={`w-3 h-3 rounded-full ${
-                      idx === currentImageIndex 
-                        ? 'bg-white' 
-                        : 'bg-white/50'
-                    }`}
-                    aria-label={`Go to image ${idx + 1}`}
-                  />
-                ))}
-              </div>
-            )}
-            
-            {/* Navigation arrows for larger screens */}
+          <>
+            <Image
+              src={images[currentImageIndex]}
+              alt={`${medspa.medspa_name} - Image ${currentImageIndex + 1}`}
+              fill
+              className="object-cover"
+              priority
+            />
             {images.length > 1 && (
               <>
-                <button 
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 z-10 hidden sm:block"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const newIndex = (currentImageIndex - 1 + images.length) % images.length;
-                    changeImageIndex(newIndex);
-                  }}
-                  aria-label="Previous image"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <button 
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 z-10 hidden sm:block"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const newIndex = (currentImageIndex + 1) % images.length;
-                    changeImageIndex(newIndex);
-                  }}
-                  aria-label="Next image"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+                  {images.map((_, idx) => (
+                    <div 
+                      key={idx} 
+                      className={`h-2 w-2 rounded-full ${idx === currentImageIndex ? 'bg-white' : 'bg-white/50'}`}
+                    />
+                  ))}
+                </div>
               </>
             )}
-          </motion.div>
+          </>
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
             <p className="text-gray-500">No image available</p>
@@ -288,21 +192,46 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         </div>
       )}
 
-        {/* Recommended Practitioners - Modern Skeuomorphic Style */}
+        {/* Recommended Practitioners - Bento Grid Style */}
         {recommendedPractitioners.length > 0 && (
           <div className="mt-12 mb-8">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6">People&apos;s Choice</h3>
+            <div className="flex items-center mb-6">
+              <div className="w-1.5 h-8 bg-amber-700 rounded-full mr-3"></div>
+              <h3 className="text-2xl font-bold text-gray-800">People&apos;s Choice</h3>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {recommendedPractitioners.map((practitioner, index) => (
                 <div 
                   key={`practitioner-${index}`}
-                  className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg"
+                  className="rounded-xl p-5 relative overflow-hidden group"
                   style={{
-                    background: "linear-gradient(135deg, #f8f6f4 0%, #f0ebe6 100%)",
-                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.05)"
+                    background: "linear-gradient(135deg, #8B6B4D 0%, #6D4C3D 100%)",
+                    boxShadow: "0 4px 20px rgba(107, 70, 49, 0.15)"
                   }}
                 >
+                  <div 
+                    className="absolute inset-0 opacity-10 group-hover:opacity-15 transition-opacity duration-300"
+                  ></div>
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-center mb-3">
+                      <h4 className="text-xl font-semibold text-amber-50">{practitioner.name}</h4>
+                    </div>
+                    
+                    <p className="text-sm text-amber-100/90">{practitioner.reason}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+        {/* Recommended Practitioners - Modern Skeuomorphic Style */}
+        {recommendedPractitioners.length > 0 && (
+          <div className="mt-12 mb-8">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6">People's Choice</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recommendedPractitioners.map((practitioner, index) => (
+
                   {/* Large Number Background with Blur Effect */}
                   <div 
                     className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none"
@@ -317,18 +246,39 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                   
                   {/* Content Container */}
                   <div className="relative z-10 p-6">
-                    {/* Title */}
+                    {/* Pill Label */}
+                    <div 
+                      className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4"
+                      style={{
+                        background: "linear-gradient(135deg, #d4bfb0 0%, #b38b75 100%)",
+                        color: "white",
+                        boxShadow: "0 2px 8px rgba(179, 139, 117, 0.3)"
+                      }}
+                    >
+                      {practitioner.name.split(' ')[0]}
+                    </div>
+                    
+                    {/* Title with Subtle Shadow */}
                     <h4 
                       className="text-xl font-semibold mb-3"
                       style={{
                         color: "#5a4738",
+                        textShadow: "0 1px 1px rgba(255, 255, 255, 0.8)"
                       }}
                     >
                       {practitioner.name}
                     </h4>
                     
-                    {/* Description */}
-                    <div className="text-sm">
+                    {/* Description with Subtle Gradient Background */}
+                    <div 
+                      className="p-3 rounded-lg text-sm"
+                      style={{
+                        background: "rgba(255, 255, 255, 0.5)",
+                        backdropFilter: "blur(8px)",
+                        color: "#6b584a",
+                        boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.05)"
+                      }}
+                    >
                       {practitioner.reason}
                     </div>
                   </div>
@@ -338,6 +288,8 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           </div>
         )}
 
+          </div>
+        )}
       </div>
 
       {/* Contact Links */}

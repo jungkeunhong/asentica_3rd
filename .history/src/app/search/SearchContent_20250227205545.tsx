@@ -358,6 +358,8 @@ export default function SearchContent({
   
   // 이미지 인덱스 변경 함수
   const changeImageIndex = (medspaId: string, newIndex: number) => {
+    const currentIndex = currentImageIndexes[medspaId] || 0;
+    
     setCurrentImageIndexes({
       ...currentImageIndexes,
       [medspaId]: newIndex
@@ -695,6 +697,7 @@ export default function SearchContent({
                       <button 
                         onClick={(e) => handleCall(medspa.number, e)}
                         className="btn bg-amber-800 hover:bg-amber-900 text-white border-none hover:shadow-lg transform flex items-center justify-center gap-2 w-12"
+                        aria-label="Call Now"
                       >
                         <Phone size={16} />
                       </button>

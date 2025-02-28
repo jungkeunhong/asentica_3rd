@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Star, MapPin, Navigation, Phone } from 'lucide-react';
+import { Star, MapPin, Navigation, Phone, Calendar } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -76,6 +76,15 @@ export default function SearchContent({
   }
 
   const [medspas, setMedspas] = useState<Medspa[]>(initialMedspas as Medspa[]);
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean | number | null>>({
+    Price: null,
+    google_star: null,
+    google_review: null,
+    yelp_star: null,
+    yelp_review: null,
+    Distance: null,
+    'Free consultation': false
+  });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(null);
@@ -358,6 +367,9 @@ export default function SearchContent({
   
   // 이미지 인덱스 변경 함수
   const changeImageIndex = (medspaId: string, newIndex: number) => {
+    const currentIndex = currentImageIndexes[medspaId] || 0;
+    const direction = newIndex > currentIndex ? 1 : -1;
+    
     setCurrentImageIndexes({
       ...currentImageIndexes,
       [medspaId]: newIndex
@@ -637,7 +649,7 @@ export default function SearchContent({
                           {/* Free consultation button */}
                           <div className="flex gap-2">
                             {medspa.free_consultation && medspa.free_consultation.trim() !== '' ? (
-                              <button className="gotu text-3xl bg-gray-200 text-gray-500 px-4 py-1 rounded-full text-sm">
+                              <button className="gotu text-3xl bg-gray-200 text-black px-4 py-1 rounded-full text-sm">
                                 {medspa.free_consultation}
                               </button>
                             ) : (
@@ -653,13 +665,10 @@ export default function SearchContent({
                     {/* Treatment Price */}
                     <div className="text-left">
                       <span className="gotu text-lg font-bold text-black">
-                        {findTreatmentPrice(medspa, searchQuery) && (
-                          <>
-                            {searchQuery} - {findTreatmentPrice(medspa, searchQuery)}
-                          </>
-                        )}
+                        {findTreatmentPrice(medspa, searchQuery)}
                       </span>
                     </div>
+                    
                     
                     
                     {/* Reviews - 이미지와 왼쪽 정렬 */}
@@ -691,21 +700,30 @@ export default function SearchContent({
                     </div>
 
                     {/* Call and Consultation CTA Buttons */}
-                    <div className="flex flex-row gap-3">
+                    <div className="mt-4 flex flex-col sm:flex-row gap-3">
                       <button 
                         onClick={(e) => handleCall(medspa.number, e)}
-                        className="btn bg-amber-800 hover:bg-amber-900 text-white border-none hover:shadow-lg transform flex items-center justify-center gap-2 w-12"
+                        className="btn bg-amber-800 hover:bg-amber-900 text-white border-none shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2"
+                        style={{ 
+                          borderRadius: '0.75rem',
+                          boxShadow: '0 4px 6px -1px rgba(139, 69, 19, 0.3), 0 2px 4px -1px rgba(139, 69, 19, 0.2)'
+                        }}
                       >
                         <Phone size={16} />
+                        <span>Call Now</span>
                       </button>
                       <button 
                         onClick={(e) => handleOpenModal(medspa, e)}
-                        className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
+                        className="btn bg-white hover:bg-gray-50 text-amber-800 border-2 border-amber-800 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2"
+                        style={{ 
+                          borderRadius: '0.75rem',
+                          boxShadow: '0 4px 6px -1px rgba(139, 69, 19, 0.1), 0 2px 4px -1px rgba(139, 69, 19, 0.06)'
+                        }}
                       >
+                        <Calendar size={16} />
                         <span>Get Consultation</span>
                       </button>
                     </div>
-
                     
                   </div>
                 );

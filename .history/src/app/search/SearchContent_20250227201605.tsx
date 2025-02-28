@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Star, MapPin, Navigation, Phone } from 'lucide-react';
+import { Star, MapPin, Navigation, Phone, Calendar } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -66,23 +66,29 @@ interface SearchContentProps {
   error?: Error;
 }
 
-export default function SearchContent({
-  initialMedspas,
-  searchQuery,
-  error,
-}: SearchContentProps) {
+export default function SearchContent({ initialMedspas, searchQuery, error }: SearchContentProps) {
   if (error) {
     throw error;
   }
 
   const [medspas, setMedspas] = useState<Medspa[]>(initialMedspas as Medspa[]);
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean | number | null>>({
+    Price: null,
+    google_star: null,
+    google_review: null,
+    yelp_star: null,
+    yelp_review: null,
+    Distance: null,
+    'Free consultation': false
+  });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(null);
   
   const router = useRouter();
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
   
-
   const [showMap, setShowMap] = useState(false);
   const [mapLoading, setMapLoading] = useState(false);
   const [currentImageIndexes, setCurrentImageIndexes] = useState<{[key: string]: number}>({});
@@ -358,6 +364,9 @@ export default function SearchContent({
   
   // 이미지 인덱스 변경 함수
   const changeImageIndex = (medspaId: string, newIndex: number) => {
+    const currentIndex = currentImageIndexes[medspaId] || 0;
+    const direction = newIndex > currentIndex ? 1 : -1;
+    
     setCurrentImageIndexes({
       ...currentImageIndexes,
       [medspaId]: newIndex
@@ -450,278 +459,280 @@ export default function SearchContent({
   };
 
   return (
-    <>
-      <div className="relative flex flex-col min-h-screen">
-        <div className="sticky top-0 z-40 bg-white">
-          <div className="container mx-auto px-4 pt-4 pb-1 flex items-center justify-between">
-            {/* Back Button (왼쪽) */}
-            <Link href="/" className="flex items-center text-black">
-              <ChevronLeftIcon className="h-6 w-6" />
-            </Link>
+    <div className="min-h-screen bg-white">
+      <div className="sticky top-0 z-40 bg-white">
+        <div className="container mx-auto px-4 pt-4 pb-1 flex items-center justify-between">
+          {/* Back Button (왼쪽) */}
+          <Link href="/" className="flex items-center text-black">
+            <ChevronLeftIcon className="h-6 w-6" />
+          </Link>
 
-            {/* Search Bar (가운데) */}
-            <div className="w-[480px] flex-1 mx-4">
-              <SearchBar 
-                initialValue={searchQuery} 
-                onSearch={(value) => console.log(value)}
-                className="mt-0"
-              />
-            </div>
-
-            {/* Map 버튼 */}
-            <button 
-              onClick={toggleMapView} 
-              className={`flex items-center justify-center rounded-full p-2.5 transition-colors ${
-                showMap 
-                  ? 'bg-transparent text-black hover:text-gray-500' 
-                  : 'bg-transparent text-black hover:text-gray-500'
-              }`}
-              aria-label={showMap ? "Show list" : "Show map"}
-              disabled={mapLoading}
-            >
-              <span className="text-sm font-medium">
-                {showMap ? "List" : "Map"}
-              </span>
-            </button>
-          </div>
-          <div className="container mx-auto pl-3 pb-2">
-            <SearchFilters 
-              selectedFilter={selectedFilter}
-              onFilterChange={(filter) => setSelectedFilter(filter)}
+          {/* Search Bar (가운데) */}
+          <div className="w-[480px] flex-1 mx-4">
+            <SearchBar 
+              initialValue={searchQuery} 
+              onSearch={(value) => console.log(value)}
+              className="mt-0"
             />
           </div>
+
+          {/* Map 버튼 */}
+          <button 
+            onClick={toggleMapView} 
+            className={`flex items-center justify-center rounded-full p-2.5 transition-colors ${
+              showMap 
+                ? 'bg-transparent text-black hover:text-gray-500' 
+                : 'bg-transparent text-black hover:text-gray-500'
+            }`}
+            aria-label={showMap ? "Show list" : "Show map"}
+            disabled={mapLoading}
+          >
+            <span className="text-sm font-medium">
+              {showMap ? "List" : "Map"}
+            </span>
+          </button>
         </div>
-
-        {/* 지도/목록 뷰 전환 */}
-        {mapLoading ? (
-          // 로딩 상태
-          <div className="container mx-auto px-4 py-2 h-[calc(100vh-140px)] flex items-center justify-center">
-            <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mb-4"></div>
-              <p className="text-gray-600">Loading {showMap ? "map" : "list"}...</p>
-            </div>
-          </div>
-        ) : showMap ? (
-          // 지도 뷰
-          <div className="container mx-auto px-4 py-2 h-[calc(100vh-140px)]">
-            <DynamicMap 
-              medspas={filteredMedspas} 
-              onMedspaSelect={(medspa) => handleMedspaClick(medspa.id)}
-            />
-          </div>
-        ) : (
-          // 목록 뷰
-          <div className="container mx-auto px-4 py-2">
-            <div className="flex flex-col gap-4">
-              {filteredMedspas.map((medspa) => {
-                console.log('Processing medspa:', medspa); // 디버깅용 로그
-                const imageUrls = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
-                const currentIndex = currentImageIndexes[medspa.id] || 0;
-                
-                return (
-                  <div 
-                    key={medspa.id}
-                    onClick={() => handleMedspaClick(medspa.id)}
-                    className="flex flex-col gap-4 bg-white border-b p-4 cursor-pointer hover:border-b"
-                  >
-                    <div className="flex gap-4">
-                      <div className="flex flex-col w-32 gap-2">
-                        {/* 이미지 슬라이더 구현 */}
-                        <div className="relative w-32 h-32 overflow-hidden rounded-md">
-                          {imageUrls.length > 0 ? (
-                            <motion.div 
-                              className="relative w-full h-full"
-                              drag="x"
-                              dragConstraints={{ left: 0, right: 0 }}
-                              onDragEnd={(e, info) => handleDragEnd(medspa.id, info, imageUrls.length)}
-                            >
-                              <AnimatePresence initial={false} custom={1}>
-                                <motion.div 
-                                  key={currentIndex}
-                                  custom={1}
-                                  initial={{ 
-                                    opacity: 0,
-                                    x: 100 
-                                  }}
-                                  animate={{ 
-                                    opacity: 1,
-                                    x: 0,
-                                    transition: { duration: 0.3 }
-                                  }}
-                                  exit={{ 
-                                    opacity: 0,
-                                    x: -100,
-                                    transition: { duration: 0.3 }
-                                  }}
-                                  className="absolute w-full h-full"
-                                >
-                                  <Image 
-                                    src={imageUrls[currentIndex]} 
-                                    alt={`${medspa.medspa_name} image ${currentIndex + 1}`}
-                                    width={128}
-                                    height={128}
-                                    style={{
-                                      width: '100%',
-                                      height: '100%',
-                                      objectFit: 'cover',
-                                      objectPosition: 'center'
-                                    }}
-                                    priority={currentIndex === 0}
-                                  />
-                                </motion.div>
-                              </AnimatePresence>
-                              
-                              {/* 이미지 인디케이터 (닷) */}
-                              {imageUrls.length > 1 && (
-                                <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
-                                  {imageUrls.map((_, index) => (
-                                    <button
-                                      key={index}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        changeImageIndex(medspa.id, index);
-                                      }}
-                                      className={`w-1.5 h-1.5 rounded-full ${
-                                        currentIndex === index 
-                                          ? 'bg-white' 
-                                          : 'bg-white/50'
-                                      }`}
-                                      aria-label={`Go to image ${index + 1}`}
-                                    />
-                                  ))}
-                                </div>
-                              )}
-                            </motion.div>
-                          ) : (
-                            <div className="text-gray-400">No Image</div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Right side - Content */}
-                      <div className="flex-1 flex flex-col">
-                        {/* Medspa name and village */}
-                        <h3 className="cormorant text-xl font-semibold text-black">
-                          {medspa.medspa_name}
-                        </h3>
-                        <div className="flex items-center text-gray-500 text-xs mb-1">
-                          <MapPin className="h-3.5 w-3.5 mr-1" />
-                          <span>{medspa.village}</span>
-                          {userLocation && (
-                            <span className="flex items-center ml-1">
-                              <Navigation className="h-3.5 w-3.5 mx-1 text-gray-400" />
-                              {getMedspaDistance(medspa)?.toFixed(1) || '?'} mil
-                            </span>
-                          )}
-                        </div>
- 
-                        {/* Ratings */}
-                        <div className="flex flex-col gap-2 mt-2">
-                          {/* Google rating */}
-                          <div className="flex items-center gap-1">
-                            <Image src="/images/google-logo.png" alt="Google" width={24} height={24} />
-                            <Star className="w-4 h-4 fill-current text-yellow-400" />
-                            <span className="text-xs text-black">{medspa.google_star || ''}</span>
-                            <span className="text-xs text-gray-500">({medspa.google_review || 0})</span>
-                          </div>
-
-                          {/* Yelp rating - 데이터가 있을 때만 표시 */}
-                          {medspa.yelp_star && medspa.yelp_review && (
-                            <div className="flex items-center gap-1">
-                              <Image src="/images/yelp-logo.png" alt="Yelp" width={24} height={24} />
-                              <Star className="w-4 h-4 fill-current text-red-500" />
-                              <span className="text-xs text-black">{medspa.yelp_star}</span>
-                              <span className="text-xs text-gray-500">({medspa.yelp_review})</span>
-                            </div>
-                          )}
-                          {/* Free consultation button */}
-                          <div className="flex gap-2">
-                            {medspa.free_consultation && medspa.free_consultation.trim() !== '' ? (
-                              <button className="gotu text-3xl bg-gray-200 text-gray-500 px-4 py-1 rounded-full text-sm">
-                                {medspa.free_consultation}
-                              </button>
-                            ) : (
-                              <button className="gotu text-3xl bg-gray-200 text-gray-500 px-4 py-1 rounded-full text-sm">
-                                Paid Consultation
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Treatment Price */}
-                    <div className="text-left">
-                      <span className="gotu text-lg font-bold text-black">
-                        {findTreatmentPrice(medspa, searchQuery) && (
-                          <>
-                            {searchQuery} - {findTreatmentPrice(medspa, searchQuery)}
-                          </>
-                        )}
-                      </span>
-                    </div>
-                    
-                    
-                    {/* Reviews - 이미지와 왼쪽 정렬 */}
-                    <div className="mt-2 space-y-2">
-                      <div className="flex items-start gap-2">
-                        <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                          <Image 
-                            src="/icons/thumbup.png" 
-                            alt="Positive" 
-                            width={20} 
-                            height={20}
-                            className="w-6 h-6 text-black object-contain flex-shrink-0"
-                          />
-                        </div>
-                        <span className="gotu text-sm text-black">{medspa.good_review_short || ""}</span>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                          <Image 
-                            src="/icons/thumbdown.png" 
-                            alt="Negative" 
-                            width={20} 
-                            height={20}
-                            className="w-6 h-6 object-contain flex-shrink-0"
-                          />
-                        </div>
-                        <span className="gotu text-sm text-black">{medspa.bad_review_short || ""}</span>
-                      </div>
-                    </div>
-
-                    {/* Call and Consultation CTA Buttons */}
-                    <div className="flex flex-row gap-3">
-                      <button 
-                        onClick={(e) => handleCall(medspa.number, e)}
-                        className="btn bg-amber-800 hover:bg-amber-900 text-white border-none hover:shadow-lg transform flex items-center justify-center gap-2 w-12"
-                      >
-                        <Phone size={16} />
-                      </button>
-                      <button 
-                        onClick={(e) => handleOpenModal(medspa, e)}
-                        className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
-                      >
-                        <span>Get Consultation</span>
-                      </button>
-                    </div>
-
-                    
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        <div className="container mx-auto pl-3 pb-2">
+          <SearchFilters 
+            selectedFilter={selectedFilter}
+            onFilterChange={(filter) => setSelectedFilter(filter)}
+          />
+        </div>
       </div>
 
-      {isModalOpen && (
-        <ConsultationModal 
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          medspa={selectedMedspa}
-        />
+      {/* 지도/목록 뷰 전환 */}
+      {mapLoading ? (
+        // 로딩 상태
+        <div className="container mx-auto px-4 py-2 h-[calc(100vh-140px)] flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mb-4"></div>
+            <p className="text-gray-600">Loading {showMap ? "map" : "list"}...</p>
+          </div>
+        </div>
+      ) : showMap ? (
+        // 지도 뷰
+        <div className="container mx-auto px-4 py-2 h-[calc(100vh-140px)]">
+          <DynamicMap 
+            medspas={filteredMedspas} 
+            onMedspaSelect={(medspa) => handleMedspaClick(medspa.id)}
+          />
+        </div>
+      ) : (
+        // 목록 뷰
+        <div className="container mx-auto px-4 py-2">
+          <div className="flex flex-col gap-4">
+            {filteredMedspas.map((medspa) => {
+              console.log('Processing medspa:', medspa); // 디버깅용 로그
+              const imageUrls = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
+              const currentIndex = currentImageIndexes[medspa.id] || 0;
+              
+              return (
+                <div 
+                  key={medspa.id}
+                  onClick={() => handleMedspaClick(medspa.id)}
+                  className="flex flex-col gap-4 bg-white border-b p-4 cursor-pointer hover:border-b"
+                >
+                  <div className="flex gap-4">
+                    <div className="flex flex-col w-32 gap-2">
+                      {/* 이미지 슬라이더 구현 */}
+                      <div className="relative w-32 h-32 overflow-hidden rounded-md">
+                        {imageUrls.length > 0 ? (
+                          <motion.div 
+                            className="relative w-full h-full"
+                            drag="x"
+                            dragConstraints={{ left: 0, right: 0 }}
+                            onDragEnd={(e, info) => handleDragEnd(medspa.id, info, imageUrls.length)}
+                          >
+                            <AnimatePresence initial={false} custom={1}>
+                              <motion.div 
+                                key={currentIndex}
+                                custom={1}
+                                initial={{ 
+                                  opacity: 0,
+                                  x: 100 
+                                }}
+                                animate={{ 
+                                  opacity: 1,
+                                  x: 0,
+                                  transition: { duration: 0.3 }
+                                }}
+                                exit={{ 
+                                  opacity: 0,
+                                  x: -100,
+                                  transition: { duration: 0.3 }
+                                }}
+                                className="absolute w-full h-full"
+                              >
+                                <Image 
+                                  src={imageUrls[currentIndex]} 
+                                  alt={`${medspa.medspa_name} image ${currentIndex + 1}`}
+                                  width={128}
+                                  height={128}
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    objectPosition: 'center'
+                                  }}
+                                  priority={currentIndex === 0}
+                                />
+                              </motion.div>
+                            </AnimatePresence>
+                            
+                            {/* 이미지 인디케이터 (닷) */}
+                            {imageUrls.length > 1 && (
+                              <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
+                                {imageUrls.map((_, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      changeImageIndex(medspa.id, index);
+                                    }}
+                                    className={`w-1.5 h-1.5 rounded-full ${
+                                      currentIndex === index 
+                                        ? 'bg-white' 
+                                        : 'bg-white/50'
+                                    }`}
+                                    aria-label={`Go to image ${index + 1}`}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </motion.div>
+                        ) : (
+                          <div className="text-gray-400">No Image</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right side - Content */}
+                    <div className="flex-1 flex flex-col">
+                      {/* Medspa name and village */}
+                      <h3 className="cormorant text-xl font-semibold text-black">
+                        {medspa.medspa_name}
+                      </h3>
+                      <div className="flex items-center text-gray-500 text-xs mb-1">
+                        <MapPin className="h-3.5 w-3.5 mr-1" />
+                        <span>{medspa.village}</span>
+                        {userLocation && (
+                          <span className="flex items-center ml-1">
+                            <Navigation className="h-3.5 w-3.5 mx-1 text-gray-400" />
+                            {getMedspaDistance(medspa)?.toFixed(1) || '?'} mil
+                          </span>
+                        )}
+                      </div>
+ 
+                      {/* Ratings */}
+                      <div className="flex flex-col gap-2 mt-2">
+                        {/* Google rating */}
+                        <div className="flex items-center gap-1">
+                          <Image src="/images/google-logo.png" alt="Google" width={24} height={24} />
+                          <Star className="w-4 h-4 fill-current text-yellow-400" />
+                          <span className="text-xs text-black">{medspa.google_star || ''}</span>
+                          <span className="text-xs text-gray-500">({medspa.google_review || 0})</span>
+                        </div>
+
+                        {/* Yelp rating - 데이터가 있을 때만 표시 */}
+                        {medspa.yelp_star && medspa.yelp_review && (
+                          <div className="flex items-center gap-1">
+                            <Image src="/images/yelp-logo.png" alt="Yelp" width={24} height={24} />
+                            <Star className="w-4 h-4 fill-current text-red-500" />
+                            <span className="text-xs text-black">{medspa.yelp_star}</span>
+                            <span className="text-xs text-gray-500">({medspa.yelp_review})</span>
+                          </div>
+                        )}
+                        {/* Free consultation button */}
+                        <div className="flex gap-2">
+                          {medspa.free_consultation && medspa.free_consultation.trim() !== '' ? (
+                            <button className="cormorant text-3xl bg-black text-white px-4 py-1 rounded-full text-sm">
+                              {medspa.free_consultation}
+                            </button>
+                          ) : (
+                            <button className="cormorant text-3xl bg-gray-200 text-gray-500 px-4 py-1 rounded-full text-sm">
+                              Paid Consultation
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Treatment Price */}
+                  <div className="text-left">
+                    <span className="gotu text-lg font-bold text-black">
+                      {findTreatmentPrice(medspa, searchQuery)}
+                    </span>
+                  </div>
+                  
+                  {/* Call and Consultation CTA Buttons */}
+                  <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                    <button 
+                      onClick={(e) => handleCall(medspa.number, e)}
+                      className="btn bg-amber-800 hover:bg-amber-900 text-white border-none shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2"
+                      style={{ 
+                        borderRadius: '0.75rem',
+                        boxShadow: '0 4px 6px -1px rgba(139, 69, 19, 0.3), 0 2px 4px -1px rgba(139, 69, 19, 0.2)'
+                      }}
+                    >
+                      <Phone size={16} />
+                      <span>Call Now</span>
+                    </button>
+                    <button 
+                      onClick={(e) => handleOpenModal(medspa, e)}
+                      className="btn bg-white hover:bg-gray-50 text-amber-800 border-2 border-amber-800 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2"
+                      style={{ 
+                        borderRadius: '0.75rem',
+                        boxShadow: '0 4px 6px -1px rgba(139, 69, 19, 0.1), 0 2px 4px -1px rgba(139, 69, 19, 0.06)'
+                      }}
+                    >
+                      <Calendar size={16} />
+                      <span>Get Consultation</span>
+                    </button>
+                  </div>
+                  
+                  {/* Reviews - 이미지와 왼쪽 정렬 */}
+                  <div className="mt-2 space-y-2">
+                    <div className="flex items-start gap-2">
+                      <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                        <Image 
+                          src="/icons/thumbup.png" 
+                          alt="Positive" 
+                          width={20} 
+                          height={20}
+                          className="w-6 h-6 text-black object-contain flex-shrink-0"
+                        />
+                      </div>
+                      <span className="gotu text-sm text-black">{medspa.good_review_short || ""}</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                        <Image 
+                          src="/icons/thumbdown.png" 
+                          alt="Negative" 
+                          width={20} 
+                          height={20}
+                          className="w-6 h-6 object-contain flex-shrink-0"
+                        />
+                      </div>
+                      <span className="gotu text-sm text-black">{medspa.bad_review_short || ""}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
-    </>
+    </div>
+
+   {/*
+      Use the new ConsultationModal component
+    */}
+    <ConsultationModal 
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      medspa={selectedMedspa}
+    />
   );
 }

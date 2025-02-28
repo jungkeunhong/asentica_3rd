@@ -76,6 +76,15 @@ export default function SearchContent({
   }
 
   const [medspas, setMedspas] = useState<Medspa[]>(initialMedspas as Medspa[]);
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean | number | null>>({
+    Price: null,
+    google_star: null,
+    google_review: null,
+    yelp_star: null,
+    yelp_review: null,
+    Distance: null,
+    'Free consultation': false
+  });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(null);
@@ -358,6 +367,9 @@ export default function SearchContent({
   
   // 이미지 인덱스 변경 함수
   const changeImageIndex = (medspaId: string, newIndex: number) => {
+    const currentIndex = currentImageIndexes[medspaId] || 0;
+    const direction = newIndex > currentIndex ? 1 : -1;
+    
     setCurrentImageIndexes({
       ...currentImageIndexes,
       [medspaId]: newIndex
@@ -663,7 +675,7 @@ export default function SearchContent({
                     
                     
                     {/* Reviews - 이미지와 왼쪽 정렬 */}
-                    <div className="mt-2 space-y-2">
+                    <div className="mt-2 space-y-1">
                       <div className="flex items-start gap-2">
                         <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
                           <Image 

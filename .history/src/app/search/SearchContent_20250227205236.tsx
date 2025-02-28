@@ -76,6 +76,15 @@ export default function SearchContent({
   }
 
   const [medspas, setMedspas] = useState<Medspa[]>(initialMedspas as Medspa[]);
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean | number | null>>({
+    Price: null,
+    google_star: null,
+    google_review: null,
+    yelp_star: null,
+    yelp_review: null,
+    Distance: null,
+    'Free consultation': false
+  });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(null);
@@ -358,6 +367,9 @@ export default function SearchContent({
   
   // 이미지 인덱스 변경 함수
   const changeImageIndex = (medspaId: string, newIndex: number) => {
+    const currentIndex = currentImageIndexes[medspaId] || 0;
+    const direction = newIndex > currentIndex ? 1 : -1;
+    
     setCurrentImageIndexes({
       ...currentImageIndexes,
       [medspaId]: newIndex
@@ -691,7 +703,7 @@ export default function SearchContent({
                     </div>
 
                     {/* Call and Consultation CTA Buttons */}
-                    <div className="flex flex-row gap-3">
+                    <div className="mt-2 flex flex-row gap-3">
                       <button 
                         onClick={(e) => handleCall(medspa.number, e)}
                         className="btn bg-amber-800 hover:bg-amber-900 text-white border-none hover:shadow-lg transform flex items-center justify-center gap-2 w-12"
@@ -700,7 +712,7 @@ export default function SearchContent({
                       </button>
                       <button 
                         onClick={(e) => handleOpenModal(medspa, e)}
-                        className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
+                        className="btn bg-white hover:bg-amber-200 border border-amber-800 text-amber-800 hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
                       >
                         <span>Get Consultation</span>
                       </button>
