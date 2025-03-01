@@ -16,9 +16,16 @@ export async function GET(request: Request) {
   console.log('요청 Origin:', requestUrl.origin);
   console.log('리다이렉트 경로:', decodedRedirectTo);
 
+  // Vercel 배포 환경에서의 origin 처리
+  // 'localhost'가 포함된 경우 실제 배포 URL로 변경
+  const deployedOrigin = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin;
+  const effectiveOrigin = requestUrl.origin.includes('localhost') ? deployedOrigin : requestUrl.origin;
+  
+  console.log('유효 Origin:', effectiveOrigin);
+
   if (error) {
     console.error('OAuth error:', error, errorDescription);
-    return NextResponse.redirect(new URL('/', requestUrl.origin));
+    return NextResponse.redirect(new URL('/', effectiveOrigin));
   }
   
   if (code) {
@@ -28,7 +35,7 @@ export async function GET(request: Request) {
       
       if (supabaseError) {
         console.error('Supabase auth error:', supabaseError);
-        return NextResponse.redirect(new URL('/', requestUrl.origin));
+        return NextResponse.redirect(new URL('/', effectiveOrigin));
       }
       
       // 성공적으로 로그인한 경우 redirectTo 경로로 리디렉션
@@ -39,25 +46,31 @@ export async function GET(request: Request) {
         let redirectUrl;
         
         if (decodedRedirectTo.startsWith('http')) {
-          // 이미 절대 URL인 경우
-          redirectUrl = decodedRedirectTo;
+          // 이미 절대 URL인 경우 - localhost 체크
+          if (decodedRedirectTo.includes('localhost')) {
+            // localhost URL을 배포 URL로 변환
+            const parsedUrl = new URL(decodedRedirectTo);
+            redirectUrl = `${effectiveOrigin}${parsedUrl.pathname}${parsedUrl.search}`;
+          } else {
+            redirectUrl = decodedRedirectTo;
+          }
         } else {
           // 상대 URL인 경우 현재 origin과 결합
           const path = decodedRedirectTo.startsWith('/') ? decodedRedirectTo : `/${decodedRedirectTo}`;
-          redirectUrl = `${requestUrl.origin}${path}`;
+          redirectUrl = `${effectiveOrigin}${path}`;
         }
         
         console.log('최종 리다이렉트 URL:', redirectUrl);
         return NextResponse.redirect(redirectUrl);
       } else {
         // redirectTo가 없는 경우 기본 페이지로 리다이렉션
-        const defaultRedirect = new URL('/my-page', requestUrl.origin);
+        const defaultRedirect = new URL('/my-page', effectiveOrigin);
         console.log('기본 리다이렉트 URL:', defaultRedirect.toString());
         return NextResponse.redirect(defaultRedirect);
       }
     } catch (err) {
       console.error('Unexpected auth error:', err);
-      return NextResponse.redirect(new URL('/', requestUrl.origin));
+      return NextResponse.redirect(new URL('/', effectiveOrigin));
     }
   }
 
@@ -66,16 +79,22 @@ export async function GET(request: Request) {
   
   if (decodedRedirectTo) {
     if (decodedRedirectTo.startsWith('http')) {
-      // 이미 절대 URL인 경우
-      finalRedirectUrl = decodedRedirectTo;
+      // 이미 절대 URL인 경우 - localhost 체크
+      if (decodedRedirectTo.includes('localhost')) {
+        // localhost URL을 배포 URL로 변환
+        const parsedUrl = new URL(decodedRedirectTo);
+        finalRedirectUrl = `${effectiveOrigin}${parsedUrl.pathname}${parsedUrl.search}`;
+      } else {
+        finalRedirectUrl = decodedRedirectTo;
+      }
     } else {
       // 상대 URL인 경우 현재 origin과 결합
       const path = decodedRedirectTo.startsWith('/') ? decodedRedirectTo : `/${decodedRedirectTo}`;
-      finalRedirectUrl = `${requestUrl.origin}${path}`;
+      finalRedirectUrl = `${effectiveOrigin}${path}`;
     }
   } else {
     // 리다이렉트 경로가 없는 경우 기본 경로 사용
-    finalRedirectUrl = `${requestUrl.origin}/my-page`;
+    finalRedirectUrl = `${effectiveOrigin}/my-page`;
   }
   
   console.log('코드 없음, 최종 리다이렉트 URL:', finalRedirectUrl);

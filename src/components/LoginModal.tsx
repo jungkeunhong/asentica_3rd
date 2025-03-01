@@ -39,7 +39,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
   const [showPassword, setShowPassword] = useState(false);
 
   // 현재 URL 가져오기 (리다이렉트용)
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : '/';
+  const currentUrl = typeof window !== 'undefined' ? 
+    window.location.href.replace('http://localhost:3000', process.env.NEXT_PUBLIC_SITE_URL || 'https://medspa-marketplace.vercel.app') : 
+    '/';
   // 리다이렉트 URL 설정 - 현재 페이지로 리다이렉트
   const redirectUrl = `/auth/callback?redirectTo=${encodeURIComponent(currentUrl)}`;
 
