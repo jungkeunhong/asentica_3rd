@@ -12,7 +12,9 @@ export async function GET(request: Request) {
   // URL 디코딩 적용
   const decodedRedirectTo = redirectTo ? decodeURIComponent(redirectTo) : null;
   
-  console.log('Auth callback 호출됨, 리다이렉트 경로:', decodedRedirectTo);
+  console.log('Auth callback 호출됨, 요청 URL:', request.url);
+  console.log('요청 Origin:', requestUrl.origin);
+  console.log('리다이렉트 경로:', decodedRedirectTo);
 
   if (error) {
     console.error('OAuth error:', error, errorDescription);
@@ -34,15 +36,24 @@ export async function GET(request: Request) {
       
       if (decodedRedirectTo) {
         // 절대 URL 또는 상대 URL 처리
-        const redirectUrl = decodedRedirectTo.startsWith('http') 
-          ? decodedRedirectTo 
-          : `${requestUrl.origin}${decodedRedirectTo.startsWith('/') ? decodedRedirectTo : `/${decodedRedirectTo}`}`;
+        let redirectUrl;
+        
+        if (decodedRedirectTo.startsWith('http')) {
+          // 이미 절대 URL인 경우
+          redirectUrl = decodedRedirectTo;
+        } else {
+          // 상대 URL인 경우 현재 origin과 결합
+          const path = decodedRedirectTo.startsWith('/') ? decodedRedirectTo : `/${decodedRedirectTo}`;
+          redirectUrl = `${requestUrl.origin}${path}`;
+        }
         
         console.log('최종 리다이렉트 URL:', redirectUrl);
         return NextResponse.redirect(redirectUrl);
       } else {
         // redirectTo가 없는 경우 기본 페이지로 리다이렉션
-        return NextResponse.redirect(new URL('/my-page', requestUrl.origin));
+        const defaultRedirect = new URL('/my-page', requestUrl.origin);
+        console.log('기본 리다이렉트 URL:', defaultRedirect.toString());
+        return NextResponse.redirect(defaultRedirect);
       }
     } catch (err) {
       console.error('Unexpected auth error:', err);
@@ -51,12 +62,22 @@ export async function GET(request: Request) {
   }
 
   // 코드가 없는 경우에도 redirectTo 경로로 리디렉션
-  const redirectUrl = decodedRedirectTo 
-    ? (decodedRedirectTo.startsWith('http') 
-        ? decodedRedirectTo 
-        : `${requestUrl.origin}${decodedRedirectTo.startsWith('/') ? decodedRedirectTo : `/${decodedRedirectTo}`}`)
-    : `${requestUrl.origin}/my-page`;
+  let finalRedirectUrl;
   
-  console.log('코드 없음, 최종 리다이렉트 URL:', redirectUrl);
-  return NextResponse.redirect(redirectUrl);
+  if (decodedRedirectTo) {
+    if (decodedRedirectTo.startsWith('http')) {
+      // 이미 절대 URL인 경우
+      finalRedirectUrl = decodedRedirectTo;
+    } else {
+      // 상대 URL인 경우 현재 origin과 결합
+      const path = decodedRedirectTo.startsWith('/') ? decodedRedirectTo : `/${decodedRedirectTo}`;
+      finalRedirectUrl = `${requestUrl.origin}${path}`;
+    }
+  } else {
+    // 리다이렉트 경로가 없는 경우 기본 경로 사용
+    finalRedirectUrl = `${requestUrl.origin}/my-page`;
+  }
+  
+  console.log('코드 없음, 최종 리다이렉트 URL:', finalRedirectUrl);
+  return NextResponse.redirect(finalRedirectUrl);
 }

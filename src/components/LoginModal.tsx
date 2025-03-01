@@ -39,9 +39,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
   const [showPassword, setShowPassword] = useState(false);
 
   // 현재 URL 가져오기 (리다이렉트용)
-  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : '/';
   // 리다이렉트 URL 설정 - 현재 페이지로 리다이렉트
-  const redirectUrl = `/auth/callback?redirectTo=${encodeURIComponent(currentPath)}`;
+  const redirectUrl = `/auth/callback?redirectTo=${encodeURIComponent(currentUrl)}`;
 
   // 모달이 열릴 때 body에 스크롤 방지
   useEffect(() => {
