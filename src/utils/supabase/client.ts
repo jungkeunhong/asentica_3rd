@@ -24,14 +24,7 @@ export const createClient = () => {
           flowType: 'pkce',
           detectSessionInUrl: true,
           autoRefreshToken: true,
-          persistSession: true,
-          cookies: {
-            name: 'sb-auth-token',
-            lifetime: 60 * 60 * 8,
-            domain: '',
-            path: '/',
-            sameSite: 'lax'
-          }
+          persistSession: true
         }
       }
     );
