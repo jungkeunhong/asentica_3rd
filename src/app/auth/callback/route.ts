@@ -3,108 +3,60 @@ import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
+  // URL 파라미터 추출
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
-  const error = requestUrl.searchParams.get('error');
-  const errorDescription = requestUrl.searchParams.get('error_description');
-  const redirectTo = requestUrl.searchParams.get('redirectTo');
+  const redirectParam = requestUrl.searchParams.get('redirectTo');
   
-  // URL 디코딩 적용
-  const decodedRedirectTo = redirectTo ? decodeURIComponent(redirectTo) : null;
+  // 디버깅을 위한 로그
+  console.log('Auth callback triggered');
+  console.log('Code present:', !!code);
+  console.log('Redirect param:', redirectParam);
   
-  console.log('Auth callback 호출됨, 요청 URL:', request.url);
-  console.log('요청 Origin:', requestUrl.origin);
-  console.log('리다이렉트 경로:', decodedRedirectTo);
-
-  // 환경 확인
-  const isProduction = process.env.NODE_ENV === 'production';
-  console.log('환경:', isProduction ? 'production' : 'development');
-
-  // Vercel 배포 환경에서의 origin 처리
-  // 'localhost'가 포함된 경우 실제 배포 URL로 변경
-  const deployedOrigin = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin;
-  console.log('배포 Origin:', deployedOrigin);
+  // 환경 변수에서 사이트 URL 가져오기
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 
+                  (process.env.NEXT_PUBLIC_VERCEL_URL ? 
+                    `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 
+                    'http://localhost:3000');
   
-  const effectiveOrigin = requestUrl.origin.includes('localhost') ? deployedOrigin : requestUrl.origin;
-  console.log('유효 Origin:', effectiveOrigin);
-
-  if (error) {
-    console.error('OAuth error:', error, errorDescription);
-    return NextResponse.redirect(new URL('/', effectiveOrigin));
-  }
+  console.log('Site URL from env:', siteUrl);
   
-  if (code) {
-    try {
-      console.log('코드 교환 시작');
-      const supabase = await createClient();
-      const { error: supabaseError } = await supabase.auth.exchangeCodeForSession(code);
-      
-      if (supabaseError) {
-        console.error('Supabase auth error:', supabaseError);
-        return NextResponse.redirect(new URL('/', effectiveOrigin));
-      }
-      
-      // 성공적으로 로그인한 경우 redirectTo 경로로 리디렉션
-      console.log('로그인 성공, 리다이렉션 경로:', decodedRedirectTo);
-      
-      if (decodedRedirectTo) {
-        // 절대 URL 또는 상대 URL 처리
-        let redirectUrl;
-        
-        if (decodedRedirectTo.startsWith('http')) {
-          // 이미 절대 URL인 경우 - localhost 체크
-          if (decodedRedirectTo.includes('localhost')) {
-            // localhost URL을 배포 URL로 변환
-            const parsedUrl = new URL(decodedRedirectTo);
-            redirectUrl = `${effectiveOrigin}${parsedUrl.pathname}${parsedUrl.search}`;
-            console.log('localhost URL을 배포 URL로 변환:', redirectUrl);
-          } else {
-            redirectUrl = decodedRedirectTo;
-          }
-        } else {
-          // 상대 URL인 경우 현재 origin과 결합
-          const path = decodedRedirectTo.startsWith('/') ? decodedRedirectTo : `/${decodedRedirectTo}`;
-          redirectUrl = `${effectiveOrigin}${path}`;
-        }
-        
-        console.log('최종 리다이렉트 URL:', redirectUrl);
-        return NextResponse.redirect(redirectUrl);
-      } else {
-        // redirectTo가 없는 경우 기본 페이지로 리다이렉션
-        const defaultRedirect = new URL('/my-page', effectiveOrigin);
-        console.log('기본 리다이렉트 URL:', defaultRedirect.toString());
-        return NextResponse.redirect(defaultRedirect);
-      }
-    } catch (err) {
-      console.error('Unexpected auth error:', err);
-      return NextResponse.redirect(new URL('/', effectiveOrigin));
-    }
-  }
-
-  // 코드가 없는 경우에도 redirectTo 경로로 리디렉션
-  let finalRedirectUrl;
+  // 기본 리다이렉트 URL 설정
+  let redirectTo = `${siteUrl}/my-page`;
   
-  if (decodedRedirectTo) {
-    if (decodedRedirectTo.startsWith('http')) {
-      // 이미 절대 URL인 경우 - localhost 체크
-      if (decodedRedirectTo.includes('localhost')) {
-        // localhost URL을 배포 URL로 변환
-        const parsedUrl = new URL(decodedRedirectTo);
-        finalRedirectUrl = `${effectiveOrigin}${parsedUrl.pathname}${parsedUrl.search}`;
-        console.log('코드 없음 - localhost URL을 배포 URL로 변환:', finalRedirectUrl);
-      } else {
-        finalRedirectUrl = decodedRedirectTo;
-      }
+  // redirectParam이 있으면 사용
+  if (redirectParam) {
+    // localhost 리다이렉트 처리 (프로덕션 환경에서는 허용하지 않음)
+    if (redirectParam.includes('localhost') && !siteUrl.includes('localhost')) {
+      console.log('Localhost redirect detected in production, using default redirect');
     } else {
-      // 상대 URL인 경우 현재 origin과 결합
-      const path = decodedRedirectTo.startsWith('/') ? decodedRedirectTo : `/${decodedRedirectTo}`;
-      finalRedirectUrl = `${effectiveOrigin}${path}`;
+      redirectTo = redirectParam;
+      console.log('Using provided redirect URL:', redirectTo);
     }
-  } else {
-    // 리다이렉트 경로가 없는 경우 기본 경로 사용
-    finalRedirectUrl = `${effectiveOrigin}/my-page`;
   }
   
-  console.log('코드 없음, 최종 리다이렉트 URL:', finalRedirectUrl);
-  return NextResponse.redirect(finalRedirectUrl);
+  // 코드가 없으면 리다이렉트
+  if (!code) {
+    console.log('No code provided, redirecting to:', redirectTo);
+    return NextResponse.redirect(redirectTo);
+  }
+
+  // Supabase 클라이언트 초기화
+  const supabase = await createClient();
+
+  try {
+    // 코드 교환 및 세션 생성
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    
+    if (error) {
+      console.error('Error exchanging code for session:', error.message);
+      return NextResponse.redirect(`${siteUrl}/auth/auth-error?error=${encodeURIComponent(error.message)}`);
+    }
+    
+    console.log('Successfully exchanged code for session, redirecting to:', redirectTo);
+    return NextResponse.redirect(redirectTo);
+  } catch (error) {
+    console.error('Unexpected error in auth callback:', error);
+    return NextResponse.redirect(`${siteUrl}/auth/auth-error?error=Unexpected_error`);
+  }
 }

@@ -38,31 +38,44 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // 현재 URL 가져오기 및 리다이렉트 URL 설정
+  // 리다이렉트 URL을 가져오는 함수
   const getRedirectUrl = () => {
-    if (typeof window === 'undefined') return '/my-page';
-    
-    // 현재 URL 가져오기
-    let currentUrl = window.location.href;
-    
-    // 배포 URL 가져오기
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://medspa-marketplace.vercel.app';
-    
-    // localhost URL을 배포 URL로 변환
-    if (currentUrl.includes('localhost')) {
-      const parsedUrl = new URL(currentUrl);
-      currentUrl = `${siteUrl}${parsedUrl.pathname}${parsedUrl.search}`;
+    // 서버 사이드에서 실행될 경우 기본 경로 반환
+    if (typeof window === 'undefined') {
+      return '/my-page';
     }
     
-    // 기본값으로 my-page 사용
-    const defaultPath = '/my-page';
+    // 사이트 URL 가져오기 (환경에 따라 다름)
+    let url = 
+      process.env.NEXT_PUBLIC_SITE_URL || // 프로덕션 환경에서 설정된 사이트 URL
+      process.env.NEXT_PUBLIC_VERCEL_URL || // Vercel에서 자동으로 설정
+      'http://localhost:3000';
     
-    // 홈페이지인 경우 기본 경로로 리다이렉트
-    if (currentUrl.endsWith('/') || currentUrl.endsWith('/login')) {
-      return `/auth/callback?redirectTo=${encodeURIComponent(defaultPath)}`;
+    // URL이 http로 시작하지 않으면 https:// 추가
+    url = url.startsWith('http') ? url : `https://${url}`;
+    
+    // URL 끝에 슬래시가 없으면 추가
+    url = url.endsWith('/') ? url : `${url}/`;
+    
+    console.log('Base URL for redirect:', url);
+    
+    // 기본 리다이렉트 경로
+    const defaultPath = 'my-page';
+    
+    // 현재 경로 가져오기 (홈페이지나 로그인 페이지가 아닌 경우)
+    let redirectPath = defaultPath;
+    if (typeof window !== 'undefined') {
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/' && currentPath !== '/login') {
+        redirectPath = currentPath.startsWith('/') ? currentPath.substring(1) : currentPath;
+      }
     }
     
-    return `/auth/callback?redirectTo=${encodeURIComponent(currentUrl)}`;
+    // 최종 리다이렉트 URL 생성
+    const redirectUrl = `${url}auth/callback?redirectTo=${encodeURIComponent(`${url}${redirectPath}`)}`;
+    console.log('Final redirect URL:', redirectUrl);
+    
+    return redirectUrl;
   };
 
   // 모달이 열릴 때 body에 스크롤 방지
@@ -90,81 +103,96 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
     });
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
+  // 이메일 로그인/회원가입 처리
+  const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      const { data, error } = isSignUp
-        ? await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              emailRedirectTo: getRedirectUrl(),
-              data: {
-                name: name,
-              },
-            },
-          })
-        : await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
+      const redirectUrl = getRedirectUrl();
+      console.log('Email auth with redirect URL:', redirectUrl);
+      
+      if (isSignUp) {
+        // 회원가입 처리
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { name },
+            emailRedirectTo: redirectUrl
+          }
+        });
 
-      if (error) {
-        throw error;
-      }
+        if (error) {
+          console.error('Signup error:', error);
+          throw error;
+        }
 
-      if (data?.user) {
-        console.log('로그인 성공');
-        // 회원가입 성공 시 confetti 효과 표시
-        if (isSignUp) {
+        if (data.user) {
+          console.log('Signup successful, user:', data.user.id);
           showConfetti();
-          // 잠시 대기 후 로그인 성공 처리
-          setTimeout(() => {
-            onLoginSuccess();
-          }, 1500);
-        } else {
           onLoginSuccess();
+          onClose();
+        }
+      } else {
+        // 로그인 처리
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          console.error('Login error:', error);
+          throw error;
+        }
+
+        if (data.user) {
+          console.log('Login successful, user:', data.user.id);
+          showConfetti();
+          onLoginSuccess();
+          onClose();
         }
       }
-    } catch (error: unknown) {
-      console.error('Login error:', error);
-      setError(error instanceof Error ? error.message : 'An error occurred during login');
+    } catch (err: unknown) {
+      console.error('Email auth error:', err);
+      setError(err instanceof Error ? err.message : '인증 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
+  // Google 로그인 처리
   const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
-    setError(null);
-
     try {
-      console.log('Google 로그인 시작, 리다이렉트 URL:', getRedirectUrl());
+      setGoogleLoading(true);
+      setError(null);
       
-      const { error } = await supabase.auth.signInWithOAuth({
+      const redirectUrl = getRedirectUrl();
+      console.log('Google login with redirect URL:', redirectUrl);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: getRedirectUrl(),
-          skipBrowserRedirect: false,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent',
+            prompt: 'consent'
           }
-        },
+        }
       });
 
       if (error) {
-        throw error;
+        console.error('Google login error:', error);
+        setError(error.message);
       }
       
-      // 에러가 없으면 OAuth 로그인이 진행 중입니다.
-      console.log('Google 로그인 진행 중');
-    } catch (error: unknown) {
-      console.error('Google login error:', error);
-      setError(error instanceof Error ? error.message : 'An error occurred during Google login');
+      // 성공적으로 리다이렉트되면 이 코드는 실행되지 않음
+      console.log('OAuth login initiated:', data);
+    } catch (err: unknown) {
+      console.error('Unexpected error during Google login:', err);
+      setError(err instanceof Error ? err.message : '구글 로그인 중 오류가 발생했습니다.');
+    } finally {
       setGoogleLoading(false);
     }
   };
@@ -215,14 +243,29 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
         {!showEmailForm ? (
           <>
             <button
-              onClick={() => setShowEmailForm(true)}
+              type={showEmailForm ? 'button' : 'submit'}
+              onClick={showEmailForm ? handleEmailAuth : () => setShowEmailForm(true)}
               className={button({ variant: 'email' })}
+              disabled={showEmailForm ? loading : false}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="20" height="16" x="2" y="4" rx="2"/>
-                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-              </svg>
-              Continue with Email
+              {showEmailForm ? (
+                loading ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    처리 중...
+                  </span>
+                ) : (
+                  isSignUp ? '회원가입' : '로그인'
+                )
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-mail"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                  이메일로 계속하기
+                </>
+              )}
             </button>
 
             <button
@@ -294,7 +337,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
             </div>
           </>
         ) : (
-          <form onSubmit={handleLogin} className="w-full">
+          <form onSubmit={handleEmailAuth} className="w-full">
             <button 
               type="button"
               onClick={() => setShowEmailForm(false)}
