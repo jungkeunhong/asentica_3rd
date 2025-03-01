@@ -40,7 +40,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
 
   // 현재 페이지 경로 가져오기
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
-  const redirectUrl = `${window.location.origin}/auth/callback?redirectTo=${currentPath}`;
+  const redirectUrl = `/auth/callback?redirectTo=${currentPath}`;
 
   // 모달이 열릴 때 body에 스크롤 방지
   useEffect(() => {
