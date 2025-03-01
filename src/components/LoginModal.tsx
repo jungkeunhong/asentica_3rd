@@ -38,12 +38,32 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // 현재 URL 가져오기 (리다이렉트용)
-  const currentUrl = typeof window !== 'undefined' ? 
-    window.location.href.replace('http://localhost:3000', process.env.NEXT_PUBLIC_SITE_URL || 'https://medspa-marketplace.vercel.app') : 
-    '/';
-  // 리다이렉트 URL 설정 - 현재 페이지로 리다이렉트
-  const redirectUrl = `/auth/callback?redirectTo=${encodeURIComponent(currentUrl)}`;
+  // 현재 URL 가져오기 및 리다이렉트 URL 설정
+  const getRedirectUrl = () => {
+    if (typeof window === 'undefined') return '/my-page';
+    
+    // 현재 URL 가져오기
+    let currentUrl = window.location.href;
+    
+    // 배포 URL 가져오기
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://medspa-marketplace.vercel.app';
+    
+    // localhost URL을 배포 URL로 변환
+    if (currentUrl.includes('localhost')) {
+      const parsedUrl = new URL(currentUrl);
+      currentUrl = `${siteUrl}${parsedUrl.pathname}${parsedUrl.search}`;
+    }
+    
+    // 기본값으로 my-page 사용
+    const defaultPath = '/my-page';
+    
+    // 홈페이지인 경우 기본 경로로 리다이렉트
+    if (currentUrl.endsWith('/') || currentUrl.endsWith('/login')) {
+      return `/auth/callback?redirectTo=${encodeURIComponent(defaultPath)}`;
+    }
+    
+    return `/auth/callback?redirectTo=${encodeURIComponent(currentUrl)}`;
+  };
 
   // 모달이 열릴 때 body에 스크롤 방지
   useEffect(() => {
@@ -81,7 +101,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
             email,
             password,
             options: {
-              emailRedirectTo: redirectUrl,
+              emailRedirectTo: getRedirectUrl(),
               data: {
                 name: name,
               },
@@ -122,10 +142,17 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
     setError(null);
 
     try {
+      console.log('Google 로그인 시작, 리다이렉트 URL:', getRedirectUrl());
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: getRedirectUrl(),
+          skipBrowserRedirect: false,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         },
       });
 
@@ -134,7 +161,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
       }
       
       // 에러가 없으면 OAuth 로그인이 진행 중입니다.
-      console.log('Google 로그인 진행 중, 리다이렉트 URL:', redirectUrl);
+      console.log('Google 로그인 진행 중');
     } catch (error: unknown) {
       console.error('Google login error:', error);
       setError(error instanceof Error ? error.message : 'An error occurred during Google login');
@@ -149,7 +176,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: getRedirectUrl(),
+          skipBrowserRedirect: false,
         },
       });
 
@@ -158,7 +186,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
       }
       
       // 에러가 없으면 OAuth 로그인이 진행 중입니다.
-      console.log('Facebook 로그인 진행 중, 리다이렉트 URL:', redirectUrl);
+      console.log('Facebook 로그인 진행 중');
     } catch (error: unknown) {
       console.error('Facebook login error:', error);
       setError(error instanceof Error ? error.message : 'An error occurred during Facebook login');

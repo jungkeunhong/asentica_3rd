@@ -18,7 +18,22 @@ export const createClient = () => {
     
     const client = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        auth: {
+          flowType: 'pkce',
+          detectSessionInUrl: true,
+          autoRefreshToken: true,
+          persistSession: true,
+          cookieOptions: {
+            name: 'sb-auth-token',
+            lifetime: 60 * 60 * 8,
+            domain: '',
+            path: '/',
+            sameSite: 'lax'
+          }
+        }
+      }
     );
     
     console.log('Supabase browser client created successfully');

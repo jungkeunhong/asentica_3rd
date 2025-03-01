@@ -16,11 +16,16 @@ export async function GET(request: Request) {
   console.log('요청 Origin:', requestUrl.origin);
   console.log('리다이렉트 경로:', decodedRedirectTo);
 
+  // 환경 확인
+  const isProduction = process.env.NODE_ENV === 'production';
+  console.log('환경:', isProduction ? 'production' : 'development');
+
   // Vercel 배포 환경에서의 origin 처리
   // 'localhost'가 포함된 경우 실제 배포 URL로 변경
   const deployedOrigin = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin;
-  const effectiveOrigin = requestUrl.origin.includes('localhost') ? deployedOrigin : requestUrl.origin;
+  console.log('배포 Origin:', deployedOrigin);
   
+  const effectiveOrigin = requestUrl.origin.includes('localhost') ? deployedOrigin : requestUrl.origin;
   console.log('유효 Origin:', effectiveOrigin);
 
   if (error) {
@@ -30,6 +35,7 @@ export async function GET(request: Request) {
   
   if (code) {
     try {
+      console.log('코드 교환 시작');
       const supabase = await createClient();
       const { error: supabaseError } = await supabase.auth.exchangeCodeForSession(code);
       
@@ -51,6 +57,7 @@ export async function GET(request: Request) {
             // localhost URL을 배포 URL로 변환
             const parsedUrl = new URL(decodedRedirectTo);
             redirectUrl = `${effectiveOrigin}${parsedUrl.pathname}${parsedUrl.search}`;
+            console.log('localhost URL을 배포 URL로 변환:', redirectUrl);
           } else {
             redirectUrl = decodedRedirectTo;
           }
@@ -84,6 +91,7 @@ export async function GET(request: Request) {
         // localhost URL을 배포 URL로 변환
         const parsedUrl = new URL(decodedRedirectTo);
         finalRedirectUrl = `${effectiveOrigin}${parsedUrl.pathname}${parsedUrl.search}`;
+        console.log('코드 없음 - localhost URL을 배포 URL로 변환:', finalRedirectUrl);
       } else {
         finalRedirectUrl = decodedRedirectTo;
       }
