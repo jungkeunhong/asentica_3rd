@@ -259,14 +259,14 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
                         />
                       </div>
 
-                      <div className="form-control mt-6">
+                      <div className="form-control h-6 mt-6">
                         <button
                           ref={buttonRef}
                           type="submit"
-                          className={`${submitButton({ isSubmitting })} consultation-button h-10`}
+                          className={`${submitButton({ isSubmitting })} consultation-button`}
                           disabled={isSubmitting}
                         >
-                          {isSubmitting ? 'Sending...' : 'Submit'}
+                          {isSubmitting ? 'Sending...' : 'Request Consultation'}
                         </button>
                       </div>
                     </>

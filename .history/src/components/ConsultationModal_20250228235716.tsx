@@ -65,6 +65,16 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  if (!isOpen) {
+    console.log('Modal is not open, not rendering');
+    return null;
+  }
+
+  if (!medspa) {
+    console.log('No medspa data provided');
+    return null;
+  }
+
   useEffect(() => {
     if (isSuccess) {
       console.log('Success state activated, triggering confetti');
@@ -77,17 +87,27 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
     }
   }, [isSuccess]);
 
-  if (!isOpen) {
-    console.log('Modal is not open, not rendering');
-    return null;
-  }
+  const triggerConfetti = () => {
+    if (buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      const x = (buttonRect.left + buttonRect.width / 2) / window.innerWidth;
+      const y = (buttonRect.top + buttonRect.height / 2) / window.innerHeight;
+      
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { x, y },
+        colors: ['#92400e', '#b45309', '#d97706', '#f59e0b', '#fbbf24'],
+        zIndex: 9999
+      });
+    }
+  };
 
-  if (!medspa) {
-    console.log('No medspa data provided, not rendering modal');
-    return null;
-  }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-  // 다음 단계로 넘어가는 함수
   const handleNextStep = () => {
     if (formData.firstname && formData.lastname) {
       setStep(2);
@@ -96,7 +116,6 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
     }
   };
 
-  // 폼 제출 처리
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -139,17 +158,15 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
   return (
     <>
       <dialog 
         id="consultation_modal" 
-        className={`modal fixed top-0 left-0 w-full h-full flex justify-center items-center z-50 bg-black bg-opacity-50`}
+        className={`modal fixed top-0 left-0 w-full h-full flex justify-center items-center z-50`}
         open={isOpen}
+        style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        }}
       >
         <div className="modal-box bg-white rounded-2xl shadow-xl p-6 max-w-md mx-auto">
           <form method="dialog">
@@ -165,7 +182,7 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
                   </svg>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800">Thank You!</h3>
-                <p className="text-gray-600">Your consultation request has been submitted successfully. We&apos;ll contact you soon!</p>
+                <p className="text-gray-600">Your consultation request has been submitted successfully. We'll contact you soon!</p>
                 <button
                   onClick={onClose}
                   className={buttonVariants({ variant: "default" })}
@@ -177,7 +194,7 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
               <>
                 <h3 className="font-bold text-lg text-amber-800 mb-2">Request Consultation</h3>
 
-                {error && <div className="mb-4"><p className="text-red-500">{error}</p></div>}
+                {error && <div className="alert alert-error mb-4"><p>{error}</p></div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {step === 1 && (
@@ -263,10 +280,10 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
                         <button
                           ref={buttonRef}
                           type="submit"
-                          className={`${submitButton({ isSubmitting })} consultation-button h-10`}
+                          className={`${submitButton({ isSubmitting })} consultation-button`}
                           disabled={isSubmitting}
                         >
-                          {isSubmitting ? 'Sending...' : 'Submit'}
+                          {isSubmitting ? 'Sending...' : 'Request Consultation'}
                         </button>
                       </div>
                     </>

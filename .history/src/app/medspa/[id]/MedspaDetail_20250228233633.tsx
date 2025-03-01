@@ -8,7 +8,6 @@ import { Star, MapPin, Globe } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { Medspa } from '@/types';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import ConsultationModal from '@/components/ConsultationModal';
 
 // Dynamically import the map component (client-side only)
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
@@ -85,7 +84,6 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
     setCurrentImageIndex(newIndex);
   };
 
-  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
 
   return (
     <div className="max-w-4xl mx-auto pb-20 bg-white">
@@ -300,11 +298,20 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               {recommendedPractitioners.map((practitioner, index) => (
                 <div 
                   key={`practitioner-${index}`}
-                  className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)]"
+                  className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg"
+                  style={{
+                    background: "linear-gradient(135deg, #f8f6f4 0%, #f0ebe6 100%)",
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.05)"
+                  }}
                 >
                   {/* Large Number Background with Blur Effect */}
                   <div 
-                    className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#e9e1d8] blur-[1px]"
+                    className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none"
+                    style={{
+                      color: "#e9e1d8",
+                      textShadow: "1px 1px 2px rgba(255, 255, 255, 0.8)",
+                      filter: "blur(1px)"
+                    }}
                   >
                     {index + 1}
                   </div>
@@ -313,7 +320,10 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                   <div className="relative z-10 p-6">
                     {/* Title */}
                     <h4 
-                      className="text-xl font-semibold mb-3 text-[#5a4738]"
+                      className="text-xl font-semibold mb-3"
+                      style={{
+                        color: "#5a4738",
+                      }}
                     >
                       {practitioner.name}
                     </h4>
@@ -363,19 +373,6 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         </div>
       )}
 
-      {/* Get Consultation Button */}
-      <div className="px-4 mt-8">
-        <button 
-          className="w-full py-3 px-4 bg-amber-800 hover:bg-amber-900 text-white rounded-lg font-medium transition duration-300 shadow-md hover:shadow-lg"
-          onClick={() => {
-            console.log('Clicked Get Consultation in MedspaDetail');
-            setIsConsultationModalOpen(true);
-          }}
-        >
-          Get Consultation
-        </button>
-      </div>
-
       {/* Map */}
       {medspa.lat && medspa.lng && (
         <div className="px-4 mt-8">
@@ -395,11 +392,6 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           </div>
         </div>
       )}
-      <ConsultationModal 
-        isOpen={isConsultationModalOpen} 
-        onClose={() => setIsConsultationModalOpen(false)} 
-        medspa={medspa}
-      />
     </div>
   );
 }

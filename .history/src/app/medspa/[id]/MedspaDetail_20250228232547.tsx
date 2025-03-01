@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeftIcon} from '@heroicons/react/24/outline';
@@ -9,6 +9,8 @@ import dynamic from 'next/dynamic';
 import { Medspa } from '@/types';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import ConsultationModal from '@/components/ConsultationModal';
+import LoginModal from '@/components/LoginModal';
+import { createClient } from '@/utils/supabase/client';
 
 // Dynamically import the map component (client-side only)
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
@@ -85,7 +87,39 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
     setCurrentImageIndex(newIndex);
   };
 
-  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
+  // 상담 모달 상태 관리
+  const [showConsultationModal, setShowConsultationModal] = useState(false);
+  // 로그인 모달 상태 관리
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  // 로그인 상태 관리
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.auth.getSession();
+        const isAuthenticated = !!data.session;
+        console.log('로그인 상태:', isAuthenticated);
+        setIsLoggedIn(isAuthenticated);
+      } catch (error) {
+        console.error('인증 상태 확인 중 오류:', error);
+        setIsLoggedIn(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
+  // 상담 버튼 클릭 핸들러
+  const handleConsultationClick = () => {
+    if (isLoggedIn) {
+      setShowConsultationModal(true);
+    } else {
+      setShowLoginModal(true);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto pb-20 bg-white">
@@ -300,11 +334,20 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               {recommendedPractitioners.map((practitioner, index) => (
                 <div 
                   key={`practitioner-${index}`}
-                  className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)]"
+                  className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg"
+                  style={{
+                    background: "linear-gradient(135deg, #f8f6f4 0%, #f0ebe6 100%)",
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.05)"
+                  }}
                 >
                   {/* Large Number Background with Blur Effect */}
                   <div 
-                    className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#e9e1d8] blur-[1px]"
+                    className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none"
+                    style={{
+                      color: "#e9e1d8",
+                      textShadow: "1px 1px 2px rgba(255, 255, 255, 0.8)",
+                      filter: "blur(1px)"
+                    }}
                   >
                     {index + 1}
                   </div>
@@ -313,7 +356,10 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                   <div className="relative z-10 p-6">
                     {/* Title */}
                     <h4 
-                      className="text-xl font-semibold mb-3 text-[#5a4738]"
+                      className="text-xl font-semibold mb-3"
+                      style={{
+                        color: "#5a4738",
+                      }}
                     >
                       {practitioner.name}
                     </h4>
@@ -348,6 +394,16 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         {/* Instagram link removed since it's not available in the database */}
       </div>
 
+      {/* Get Consultation 버튼 추가 */}
+      <div className="px-4 mt-6">
+        <button
+          onClick={handleConsultationClick}
+          className="w-full py-3 px-4 bg-amber-800 hover:bg-amber-900 text-white rounded-lg font-medium transition duration-300 shadow-md hover:shadow-lg"
+        >
+          Get Consultation
+        </button>
+      </div>
+
       {/* Treatments and Prices */}
       {treatments.length > 0 && (
         <div className="px-4 mt-8">
@@ -362,19 +418,6 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           </div>
         </div>
       )}
-
-      {/* Get Consultation Button */}
-      <div className="px-4 mt-8">
-        <button 
-          className="w-full py-3 px-4 bg-amber-800 hover:bg-amber-900 text-white rounded-lg font-medium transition duration-300 shadow-md hover:shadow-lg"
-          onClick={() => {
-            console.log('Clicked Get Consultation in MedspaDetail');
-            setIsConsultationModalOpen(true);
-          }}
-        >
-          Get Consultation
-        </button>
-      </div>
 
       {/* Map */}
       {medspa.lat && medspa.lng && (
@@ -395,11 +438,6 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           </div>
         </div>
       )}
-      <ConsultationModal 
-        isOpen={isConsultationModalOpen} 
-        onClose={() => setIsConsultationModalOpen(false)} 
-        medspa={medspa}
-      />
     </div>
   );
 }

@@ -266,7 +266,7 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
                           className={`${submitButton({ isSubmitting })} consultation-button h-10`}
                           disabled={isSubmitting}
                         >
-                          {isSubmitting ? 'Sending...' : 'Submit'}
+                          {isSubmitting ? 'Sending...' : 'Request Consultation'}
                         </button>
                       </div>
                     </>

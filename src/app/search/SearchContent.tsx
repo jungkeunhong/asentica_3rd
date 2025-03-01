@@ -79,8 +79,8 @@ export default function SearchContent({
 
   const [medspas, setMedspas] = useState<Medspa[]>(initialMedspas as Medspa[]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(null);
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
+  const [selectedMedspa, setSelectedMedspa] = useState<Medspa | undefined>(undefined);
   
   // 로그인 모달 상태 추가
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -100,10 +100,42 @@ export default function SearchContent({
   
   // Toggle favorite status
   const toggleFavorite = (medspa: Medspa) => {
-    if (isFavorite(medspa.id)) {
-      removeFavorite(medspa.id);
-    } else {
-      addFavorite(medspa);
+    // 로그인 상태 확인
+    const checkLoginStatus = async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        // 로그인된 경우 즐겨찾기 토글
+        if (isFavorite(medspa.id)) {
+          removeFavorite(medspa.id);
+        } else {
+          addFavorite(medspa);
+        }
+      } else {
+        // 로그인되지 않은 경우 로그인 모달 표시
+        setSelectedMedspa(medspa);
+        setShowLoginModal(true);
+      }
+    };
+    
+    checkLoginStatus();
+  };
+
+  // 로그인 성공 핸들러
+  const handleLoginSuccess = () => {
+    console.log('로그인 성공, 현재 페이지 유지');
+    setIsLoggedIn(true);
+    setShowLoginModal(false);
+    
+    // 로그인 성공 후 즐겨찾기 추가 (선택된 메드스파가 있는 경우)
+    if (selectedMedspa) {
+      addFavorite(selectedMedspa);
+    }
+    
+    // 로그인 성공 후 상담 모달 표시 (선택된 메드스파가 있는 경우)
+    if (selectedMedspa && scrollThreshold.current) {
+      setIsConsultationModalOpen(true);
     }
   };
 
@@ -360,30 +392,49 @@ export default function SearchContent({
         const isAuthenticated = !!data.session;
         console.log('로그인 상태:', isAuthenticated);
         setIsLoggedIn(isAuthenticated);
+        
+        // 로그인 상태가 확인되면 모달을 표시하지 않음
+        if (isAuthenticated) {
+          setShowLoginModal(false);
+          scrollThreshold.current = true; // 로그인 되었으므로 더 이상 모달 표시 안함
+        } else {
+          // 로그아웃 상태일 때는 scrollThreshold 초기화
+          scrollThreshold.current = false;
+        }
       } catch (error) {
         console.error('인증 상태 확인 중 오류:', error);
         setIsLoggedIn(false); // 오류 발생 시 로그아웃 상태로 간주
+        scrollThreshold.current = false; // 오류 발생 시 scrollThreshold 초기화
       }
     };
     
     checkAuth();
     
-    
     // 클라이언트 사이드에서만 실행
     if (typeof window !== 'undefined') {
       console.log('스크롤 이벤트 리스너 등록');
       
-      // 테스트를 위해 5초 후에 강제로 모달 표시 (개발 중에만 사용)
-      const timer = setTimeout(() => {
+      // 스크롤 이벤트 리스너 추가
+      const handleScroll = () => {
+        // 로그인하지 않은 상태에서만 모달 표시 로직 실행
         if (!isLoggedIn && !scrollThreshold.current) {
-          console.log('타이머에 의한 로그인 모달 표시');
-          setShowLoginModal(true);
-          scrollThreshold.current = true;
+          const scrollPosition = window.scrollY;
+          const windowHeight = window.innerHeight;
+          const scrollPercentage = scrollPosition / windowHeight;
+          
+          // 스크롤이 화면 높이의 30% 이상일 때 모달 표시
+          if (scrollPercentage > 0.3) {
+            console.log('스크롤 위치에 따른 로그인 모달 표시');
+            setShowLoginModal(true);
+            scrollThreshold.current = true; // 한 번만 표시하도록 설정
+          }
         }
-      }, 5000);
+      };
+      
+      window.addEventListener('scroll', handleScroll);
       
       return () => {
-        clearTimeout(timer);
+        window.removeEventListener('scroll', handleScroll);
       };
     }
   }, [isLoggedIn]);
@@ -487,13 +538,6 @@ export default function SearchContent({
       console.error(`Error calculating distance for MedSpa ${medspa.id}:`, error);
       return null;
     }
-  };
-
-  // Handle consultation form submission
-  const handleOpenModal = (medspa: Medspa, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent navigation to medspa detail
-    setSelectedMedspa(medspa);
-    setIsModalOpen(true);
   };
 
   // Handle phone call
@@ -778,7 +822,13 @@ export default function SearchContent({
                         <Phone size={16} />
                       </button>
                       <button 
-                        onClick={(e) => handleOpenModal(medspa, e)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log('Clicked Get Consultation for:', medspa.medspa_name);
+                          setSelectedMedspa(medspa);
+                          setIsConsultationModalOpen(true);
+                        }}
                         className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:border-amber-800 hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
                       >
                         <span>Get Consultation</span>
@@ -794,24 +844,17 @@ export default function SearchContent({
         )}
       </div>
 
-      {isModalOpen && (
-        <ConsultationModal 
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          medspa={selectedMedspa}
-        />
-      )}
+      <ConsultationModal 
+        isOpen={isConsultationModalOpen}
+        onClose={() => setIsConsultationModalOpen(false)}
+        medspa={selectedMedspa}
+      />
       
       {showLoginModal && (
         <LoginModal 
           isOpen={showLoginModal} 
           onClose={() => setShowLoginModal(false)}
-          onLoginSuccess={() => {
-            console.log('로그인 성공, 현재 페이지 유지');
-            setIsLoggedIn(true);
-            setShowLoginModal(false);
-            // 페이지 새로고침 없이 로그인 상태 업데이트
-          }}
+          onLoginSuccess={handleLoginSuccess}
         />
       )}
     </>

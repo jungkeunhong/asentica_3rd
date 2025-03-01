@@ -8,6 +8,7 @@ import { ChevronLeftIcon, Heart, Star, LogOut } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { createClient } from '@/utils/supabase/client';
 import LoginModal from '@/components/LoginModal';
+import { useRouter } from 'next/navigation';
 
 // Define user type
 interface UserProfile {
@@ -23,6 +24,7 @@ export default function MyPage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const router = useRouter();
   
   // Check authentication status when component mounts
   useEffect(() => {
@@ -46,8 +48,11 @@ export default function MyPage() {
               month: 'long'
             })
           });
+          
+          console.log('인증된 사용자 확인됨:', authUser.email);
         } else {
           // Show login modal if not logged in
+          console.log('인증되지 않은 사용자, 로그인 모달 표시');
           setShowLoginModal(true);
         }
       } catch (error) {
@@ -58,16 +63,12 @@ export default function MyPage() {
     };
     
     checkAuth();
-  }, []);
-
-  // Handle successful login
-  const handleLoginSuccess = () => {
-    setShowLoginModal(false);
-    // Fetch user data after login
-    const fetchUser = async () => {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+    
+    // 인증 상태 변경 감지
+    const supabase = createClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        // 로그인 이벤트 발생 시 사용자 정보 업데이트
         const { user: authUser } = session;
         
         setUser({
@@ -80,27 +81,62 @@ export default function MyPage() {
             month: 'long'
           })
         });
+        
+        setShowLoginModal(false);
+        console.log('로그인 이벤트 감지, 사용자 정보 업데이트');
+      } else if (event === 'SIGNED_OUT') {
+        // 로그아웃 이벤트 발생 시 사용자 정보 초기화
+        setUser(null);
+        setShowLoginModal(true);
+        console.log('로그아웃 이벤트 감지, 사용자 정보 초기화');
       }
+    });
+    
+    return () => {
+      subscription.unsubscribe();
     };
-    fetchUser();
+  }, []);
+  
+  const handleLoginSuccess = () => {
+    console.log('로그인 성공 처리');
+    setShowLoginModal(false);
+    // 로그인 성공 후 페이지 새로고침 (사용자 정보 업데이트를 위해)
+    window.location.reload();
   };
   
-  // Handle sign out
-  const handleSignOut = async () => {
+  const handleLogout = async () => {
     try {
       const supabase = createClient();
       await supabase.auth.signOut();
-      window.location.href = '/'; // Redirect to home page after sign out
+      console.log('로그아웃 성공');
+      // 로그아웃 후 홈페이지로 리다이렉트
+      router.push('/');
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('로그아웃 오류:', error);
     }
   };
   
-  // Show loading spinner while checking auth
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#754731]"></div>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full border-4 border-t-transparent border-[#754731] animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+  
+  // 로그인되지 않은 경우 로그인 모달 표시
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <LoginModal 
+          isOpen={showLoginModal} 
+          onClose={() => router.push('/')} 
+          onLoginSuccess={handleLoginSuccess}
+        />
       </div>
     );
   }
@@ -155,7 +191,7 @@ export default function MyPage() {
                 </div>
                 
                 <button
-                  onClick={handleSignOut}
+                  onClick={handleLogout}
                   className="w-full mt-6 flex items-center justify-center gap-2 bg-[#F5EBE0] hover:bg-[#EAD7C7] text-[#754731] py-2 px-4 rounded-md transition-colors"
                 >
                   <LogOut className="h-4 w-4" />

@@ -38,10 +38,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // 현재 URL 가져오기 (리다이렉트용)
+  // 현재 페이지 경로 가져오기
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
-  // 리다이렉트 URL 설정 - 현재 페이지로 리다이렉트
-  const redirectUrl = `/auth/callback?redirectTo=${encodeURIComponent(currentPath)}`;
+  const redirectUrl = `/auth/callback?redirectTo=${currentPath}`;
 
   // 모달이 열릴 때 body에 스크롤 방지
   useEffect(() => {
@@ -95,7 +94,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
       }
 
       if (data?.user) {
-        console.log('로그인 성공');
         // 회원가입 성공 시 confetti 효과 표시
         if (isSignUp) {
           showConfetti();
@@ -130,9 +128,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
       if (error) {
         throw error;
       }
-      
-      // 에러가 없으면 OAuth 로그인이 진행 중입니다.
-      console.log('Google 로그인 진행 중, 리다이렉트 URL:', redirectUrl);
     } catch (error: unknown) {
       console.error('Google login error:', error);
       setError(error instanceof Error ? error.message : 'An error occurred during Google login');
@@ -154,9 +149,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
       if (error) {
         throw error;
       }
-      
-      // 에러가 없으면 OAuth 로그인이 진행 중입니다.
-      console.log('Facebook 로그인 진행 중, 리다이렉트 URL:', redirectUrl);
     } catch (error: unknown) {
       console.error('Facebook login error:', error);
       setError(error instanceof Error ? error.message : 'An error occurred during Facebook login');
