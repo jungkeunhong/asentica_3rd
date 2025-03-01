@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get('code');
   const error = requestUrl.searchParams.get('error');
   const errorDescription = requestUrl.searchParams.get('error_description');
-  const redirectPath = requestUrl.searchParams.get('redirectPath') || '/search';
+  const redirectTo = requestUrl.searchParams.get('redirectTo') || '/search';
 
   if (error) {
     console.error('OAuth error:', error, errorDescription);
@@ -24,15 +24,15 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${requestUrl.origin}?auth_error=${supabaseError.message}`);
       }
       
-      // 성공적으로 로그인한 경우 search 페이지로 리디렉션
-      console.log('로그인 성공, 리디렉션 경로:', `${requestUrl.origin}${redirectPath}`);
-      return NextResponse.redirect(`${requestUrl.origin}${redirectPath}`);
+      // 성공적으로 로그인한 경우 redirectTo 경로로 리디렉션
+      console.log('로그인 성공, 리디렉션 경로:', `${requestUrl.origin}${redirectTo}`);
+      return NextResponse.redirect(`${requestUrl.origin}${redirectTo}`);
     } catch (err) {
       console.error('Unexpected auth error:', err);
       return NextResponse.redirect(`${requestUrl.origin}?auth_error=unexpected_error`);
     }
   }
 
-  // 코드가 없는 경우에도 search 페이지로 리디렉션
-  return NextResponse.redirect(`${requestUrl.origin}${redirectPath}`);
+  // 코드가 없는 경우에도 redirectTo 경로로 리디렉션
+  return NextResponse.redirect(`${requestUrl.origin}${redirectTo}`);
 }
