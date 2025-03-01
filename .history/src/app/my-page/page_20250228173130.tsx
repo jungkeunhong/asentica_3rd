@@ -4,23 +4,14 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useFavorites } from '@/context/FavoritesContext';
-import { ChevronLeftIcon, Heart, Star, LogOut } from 'lucide-react';
+import { User, Heart, MapPin, Star, ArrowLeft, LogOut } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { createClient } from '@/utils/supabase/client';
 import LoginModal from '@/components/LoginModal';
 
-// Define user type
-interface UserProfile {
-  id: string;
-  email: string | undefined;
-  name: string;
-  avatar_url: string;
-  created_at: string;
-}
-
 export default function MyPage() {
   const { favorites } = useFavorites();
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
   
@@ -122,7 +113,7 @@ export default function MyPage() {
       {user && (
         <div className="container mx-auto px-4 py-8 pt-24">
           <Link href="/" className="inline-flex items-center text-[#754731] mb-6 hover:underline">
-            <ChevronLeftIcon className="mr-2 h-4 w-4" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
           </Link>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -186,14 +177,8 @@ export default function MyPage() {
                             <h3 className="font-medium text-[#754731]">{favorite.medspa_name || favorite.name || 'MedSpa'}</h3>
                             <p className="text-gray-500 text-sm mt-1">{favorite.location || favorite.village || 'Location not available'}</p>
                             <div className="flex items-center mt-2">
-                              <Star className="w-4 h-4 fill-current text-yellow-400 mr-1" />
-                              <span className="text-sm text-black">{favorite.google_star || ''}</span>
-                              <span className="text-sm text-gray-500">({favorite.google_review || 0})</span>
-                            </div>
-                            <div className="flex items-center mt-2">
-                              <Star className="w-4 h-4 fill-current text-red-400 mr-1" />
-                              <span className="text-sm text-black">{favorite.yelp_star || ''}</span>
-                              <span className="text-sm text-gray-500">({favorite.yelp_review || 0})</span>
+                              <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                              <span className="text-sm text-gray-700">{favorite.google_star || favorite.rating || '0.0'}</span>
                             </div>
                           </div>
                         </div>
@@ -203,7 +188,7 @@ export default function MyPage() {
                 ) : (
                   <div className="text-center py-10">
                     <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">You haven&apos;t added any favorites yet</p>
+                    <p className="text-gray-500">You haven't added any favorites yet</p>
                     <Link href="/" className="mt-4 inline-block text-[#754731] hover:underline">
                       Explore MedSpas
                     </Link>

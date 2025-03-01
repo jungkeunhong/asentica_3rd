@@ -19,7 +19,7 @@ const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full rounded-lg bg-gray-200 flex items-center justify-center">
-      <p className="text-gray-500">loading map...</p>
+      <p className="text-gray-500">지도를 불러오는 중...</p>
     </div>
   )
 });
@@ -368,21 +368,35 @@ export default function SearchContent({
     
     checkAuth();
     
+    // 스크롤 이벤트 리스너
+    const handleScroll = () => {
+      // 스크롤 위치 로깅
+      console.log('현재 스크롤 위치:', window.scrollY, '스크롤 임계값 설정 여부:', scrollThreshold.current);
+      
+      // 스크롤 위치가 500px을 넘으면 모달 표시 (테스트를 위해 임계값 낮춤)
+      if (!isLoggedIn && !scrollThreshold.current && window.scrollY > 500) {
+        console.log('로그인 모달 표시 조건 충족');
+        setShowLoginModal(true);
+        scrollThreshold.current = true; // 한 번만 표시하도록 설정
+      }
+    };
     
     // 클라이언트 사이드에서만 실행
     if (typeof window !== 'undefined') {
       console.log('스크롤 이벤트 리스너 등록');
+      window.addEventListener('scroll', handleScroll);
       
-      // 테스트를 위해 5초 후에 강제로 모달 표시 (개발 중에만 사용)
+      // 테스트를 위해 3초 후에 강제로 모달 표시 (개발 중에만 사용)
       const timer = setTimeout(() => {
         if (!isLoggedIn && !scrollThreshold.current) {
           console.log('타이머에 의한 로그인 모달 표시');
           setShowLoginModal(true);
           scrollThreshold.current = true;
         }
-      }, 5000);
+      }, 3000);
       
       return () => {
+        window.removeEventListener('scroll', handleScroll);
         clearTimeout(timer);
       };
     }
@@ -536,7 +550,7 @@ export default function SearchContent({
               aria-label={showMap ? "Show list" : "Show map"}
               disabled={mapLoading}
             >
-              <span className="gotu text-lg font-semibold text-[#754731]">
+              <span className="text-lg font-medium text-[#754731]">
                 {showMap ? "List" : "Map"}
               </span>
             </button>
@@ -779,7 +793,7 @@ export default function SearchContent({
                       </button>
                       <button 
                         onClick={(e) => handleOpenModal(medspa, e)}
-                        className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:border-amber-800 hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
+                        className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
                       >
                         <span>Get Consultation</span>
                       </button>
@@ -807,10 +821,8 @@ export default function SearchContent({
           isOpen={showLoginModal} 
           onClose={() => setShowLoginModal(false)}
           onLoginSuccess={() => {
-            console.log('로그인 성공, 현재 페이지 유지');
             setIsLoggedIn(true);
             setShowLoginModal(false);
-            // 페이지 새로고침 없이 로그인 상태 업데이트
           }}
         />
       )}

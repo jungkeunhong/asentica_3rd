@@ -536,7 +536,7 @@ export default function SearchContent({
               aria-label={showMap ? "Show list" : "Show map"}
               disabled={mapLoading}
             >
-              <span className="gotu text-lg font-semibold text-[#754731]">
+              <span className="gotu text-lg font-medium text-[#754731]">
                 {showMap ? "List" : "Map"}
               </span>
             </button>

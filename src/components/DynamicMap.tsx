@@ -6,7 +6,7 @@ import { Medspa } from '@/types';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { MapPin, Navigation, Phone, Heart } from 'lucide-react';
+import { MapPin, Navigation, Phone, Heart, CalendarClock } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
 
 // 지도 컨테이너 스타일
@@ -176,6 +176,14 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
     }
   };
   
+  // Function to create position style for InfoWindow
+  const createInfoWindowPositionStyle = (x: number, y: number): React.CSSProperties => {
+    return {
+      '--x-position': `${x}px`,
+      '--y-position': `${y}px`
+    } as React.CSSProperties;
+  };
+  
   // 마커 렌더링
   const renderMarkers = () => {
     if (!isLoaded) return null;
@@ -318,14 +326,10 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
           
           {/* Custom InfoWindow */}
           <div 
-            className="absolute z-20 bg-white rounded-lg shadow-lg"
-            style={{
-              left: `${infoWindowPosition.x}px`,
-              top: `${infoWindowPosition.y}px`,
-              transform: 'translate(-50%, -100%)',
-              maxWidth: '280px',
-              width: '280px'
-            }}
+            className="absolute z-20 bg-white rounded-lg shadow-lg info-window"
+            data-x-position={`${infoWindowPosition.x}px`}
+            data-y-position={`${infoWindowPosition.y}px`}
+            style={createInfoWindowPositionStyle(infoWindowPosition.x, infoWindowPosition.y)}
           >
             <div className="p-3">
               <div className="relative h-32 w-full mb-2">
@@ -394,22 +398,26 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
                     window.location.href = `tel:${selectedMedspa.number}`;
                   }}
                   className="btn bg-amber-800 hover:bg-amber-900 text-white border-none hover:shadow-lg transform flex items-center justify-center gap-2 w-12 h-9 rounded"
+                  title="전화하기"
+                  aria-label="전화하기"
                 >
                   <Phone size={16} />
                 </button>
                 <button 
                   onClick={() => onMedspaSelect(selectedMedspa)}
                   className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:shadow-lg transform flex items-center justify-center gap-2 flex-1 h-9 rounded text-sm"
+                  title="상담 예약"
+                  aria-label="상담 예약"
                 >
-                  <span>Get Consultation</span>
+                  <CalendarClock size={16} className="mr-1" />
+                  <span>상담 예약</span>
                 </button>
               </div>
             </div>
             
             {/* Arrow pointing to marker */}
             <div 
-              className="absolute left-1/2 bottom-0 w-4 h-4 bg-white transform rotate-45 translate-y-1/2 -translate-x-1/2"
-              style={{ boxShadow: '2px 2px 2px rgba(0,0,0,0.1)' }}
+              className="absolute left-1/2 bottom-0 w-4 h-4 bg-white transform rotate-45 translate-y-1/2 -translate-x-1/2 info-window-arrow"
             />
           </div>
         </>

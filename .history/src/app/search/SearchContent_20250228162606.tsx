@@ -383,6 +383,7 @@ export default function SearchContent({
       }, 5000);
       
       return () => {
+        window.removeEventListener('scroll', handleScroll);
         clearTimeout(timer);
       };
     }
@@ -536,7 +537,7 @@ export default function SearchContent({
               aria-label={showMap ? "Show list" : "Show map"}
               disabled={mapLoading}
             >
-              <span className="gotu text-lg font-semibold text-[#754731]">
+              <span className="text-lg font-medium text-[#754731]">
                 {showMap ? "List" : "Map"}
               </span>
             </button>

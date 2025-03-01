@@ -9,18 +9,9 @@ import Navbar from '@/components/Navbar';
 import { createClient } from '@/utils/supabase/client';
 import LoginModal from '@/components/LoginModal';
 
-// Define user type
-interface UserProfile {
-  id: string;
-  email: string | undefined;
-  name: string;
-  avatar_url: string;
-  created_at: string;
-}
-
 export default function MyPage() {
   const { favorites } = useFavorites();
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
   

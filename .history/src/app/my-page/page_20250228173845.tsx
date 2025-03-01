@@ -4,23 +4,14 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useFavorites } from '@/context/FavoritesContext';
-import { ChevronLeftIcon, Heart, Star, LogOut } from 'lucide-react';
+import { ChevronLeftIcon, Heart, Star, ArrowLeft, LogOut } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { createClient } from '@/utils/supabase/client';
 import LoginModal from '@/components/LoginModal';
 
-// Define user type
-interface UserProfile {
-  id: string;
-  email: string | undefined;
-  name: string;
-  avatar_url: string;
-  created_at: string;
-}
-
 export default function MyPage() {
   const { favorites } = useFavorites();
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
   
@@ -138,7 +129,7 @@ export default function MyPage() {
                       className="object-cover"
                     />
                   </div>
-                  <h2 className="text-xl font-semibold text-[#754731]">{user.name}</h2>
+                  <h2 className="text-xl font-semibold text-[#754731]">{user.first_name}</h2>
                   <p className="text-gray-400 text-xs mt-1">Skincare journey since {user.created_at}</p>
                 </div>
                 

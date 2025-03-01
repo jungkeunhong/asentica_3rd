@@ -4,23 +4,14 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useFavorites } from '@/context/FavoritesContext';
-import { ChevronLeftIcon, Heart, Star, LogOut } from 'lucide-react';
+import { ChevronLeftIcon, Heart, Star, ArrowLeft, LogOut } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { createClient } from '@/utils/supabase/client';
 import LoginModal from '@/components/LoginModal';
 
-// Define user type
-interface UserProfile {
-  id: string;
-  email: string | undefined;
-  name: string;
-  avatar_url: string;
-  created_at: string;
-}
-
 export default function MyPage() {
   const { favorites } = useFavorites();
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
   
@@ -187,13 +178,9 @@ export default function MyPage() {
                             <p className="text-gray-500 text-sm mt-1">{favorite.location || favorite.village || 'Location not available'}</p>
                             <div className="flex items-center mt-2">
                               <Star className="w-4 h-4 fill-current text-yellow-400 mr-1" />
-                              <span className="text-sm text-black">{favorite.google_star || ''}</span>
-                              <span className="text-sm text-gray-500">({favorite.google_review || 0})</span>
-                            </div>
-                            <div className="flex items-center mt-2">
-                              <Star className="w-4 h-4 fill-current text-red-400 mr-1" />
-                              <span className="text-sm text-black">{favorite.yelp_star || ''}</span>
-                              <span className="text-sm text-gray-500">({favorite.yelp_review || 0})</span>
+                              <span className="text-sm text-black">{medspa.google_star || ''}</span>
+                              <span className="text-sm text-gray-500">({medspa.google_review || 0})</span>
+                            
                             </div>
                           </div>
                         </div>
@@ -203,7 +190,7 @@ export default function MyPage() {
                 ) : (
                   <div className="text-center py-10">
                     <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">You haven&apos;t added any favorites yet</p>
+                    <p className="text-gray-500">You haven't added any favorites yet</p>
                     <Link href="/" className="mt-4 inline-block text-[#754731] hover:underline">
                       Explore MedSpas
                     </Link>

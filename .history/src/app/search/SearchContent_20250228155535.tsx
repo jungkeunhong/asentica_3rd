@@ -383,6 +383,7 @@ export default function SearchContent({
       }, 5000);
       
       return () => {
+        window.removeEventListener('scroll', handleScroll);
         clearTimeout(timer);
       };
     }
@@ -536,7 +537,7 @@ export default function SearchContent({
               aria-label={showMap ? "Show list" : "Show map"}
               disabled={mapLoading}
             >
-              <span className="gotu text-lg font-semibold text-[#754731]">
+              <span className="text-lg font-medium text-[#754731]">
                 {showMap ? "List" : "Map"}
               </span>
             </button>
@@ -779,7 +780,7 @@ export default function SearchContent({
                       </button>
                       <button 
                         onClick={(e) => handleOpenModal(medspa, e)}
-                        className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:border-amber-800 hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
+                        className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
                       >
                         <span>Get Consultation</span>
                       </button>

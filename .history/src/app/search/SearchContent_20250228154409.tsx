@@ -372,6 +372,7 @@ export default function SearchContent({
     // 클라이언트 사이드에서만 실행
     if (typeof window !== 'undefined') {
       console.log('스크롤 이벤트 리스너 등록');
+      window.addEventListener('scroll', handleScroll);
       
       // 테스트를 위해 5초 후에 강제로 모달 표시 (개발 중에만 사용)
       const timer = setTimeout(() => {
@@ -383,6 +384,7 @@ export default function SearchContent({
       }, 5000);
       
       return () => {
+        window.removeEventListener('scroll', handleScroll);
         clearTimeout(timer);
       };
     }
@@ -536,7 +538,7 @@ export default function SearchContent({
               aria-label={showMap ? "Show list" : "Show map"}
               disabled={mapLoading}
             >
-              <span className="gotu text-lg font-semibold text-[#754731]">
+              <span className="text-lg font-medium text-[#754731]">
                 {showMap ? "List" : "Map"}
               </span>
             </button>
@@ -779,7 +781,7 @@ export default function SearchContent({
                       </button>
                       <button 
                         onClick={(e) => handleOpenModal(medspa, e)}
-                        className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:border-amber-800 hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
+                        className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
                       >
                         <span>Get Consultation</span>
                       </button>
@@ -811,6 +813,7 @@ export default function SearchContent({
             setIsLoggedIn(true);
             setShowLoginModal(false);
             // 페이지 새로고침 없이 로그인 상태 업데이트
+            checkAuth();
           }}
         />
       )}

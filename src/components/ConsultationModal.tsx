@@ -235,11 +235,7 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
             <button
               ref={buttonRef}
               type="submit"
-              className={submitButton({ isSubmitting })}
-              style={{
-                borderRadius: '0.5rem',
-                boxShadow: '0 4px 6px -1px rgba(139, 69, 19, 0.3), 0 2px 4px -1px rgba(139, 69, 19, 0.2)'
-              }}
+              className={`${submitButton({ isSubmitting })} consultation-button`}
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Sending...' : 'Send Request'}

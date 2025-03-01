@@ -4,23 +4,14 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useFavorites } from '@/context/FavoritesContext';
-import { ChevronLeftIcon, Heart, Star, LogOut } from 'lucide-react';
+import { ChevronLeftIcon, Heart, Star, ArrowLeft, LogOut } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { createClient } from '@/utils/supabase/client';
 import LoginModal from '@/components/LoginModal';
 
-// Define user type
-interface UserProfile {
-  id: string;
-  email: string | undefined;
-  name: string;
-  avatar_url: string;
-  created_at: string;
-}
-
 export default function MyPage() {
   const { favorites } = useFavorites();
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
   
@@ -203,7 +194,7 @@ export default function MyPage() {
                 ) : (
                   <div className="text-center py-10">
                     <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">You haven&apos;t added any favorites yet</p>
+                    <p className="text-gray-500">You haven't added any favorites yet</p>
                     <Link href="/" className="mt-4 inline-block text-[#754731] hover:underline">
                       Explore MedSpas
                     </Link>

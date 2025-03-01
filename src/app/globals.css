@@ -56,3 +56,30 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Custom InfoWindow Styles */
+.info-window {
+  transform: translate(-50%, -100%);
+  max-width: 280px;
+  width: 280px;
+}
+
+/* Dynamic positioning for InfoWindow */
+.info-window[data-x-position] {
+  left: var(--x-position);
+}
+
+.info-window[data-y-position] {
+  top: var(--y-position);
+}
+
+/* InfoWindow arrow */
+.info-window-arrow {
+  box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+}
+
+/* Consultation Modal Button */
+.consultation-button {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(139, 69, 19, 0.3), 0 2px 4px -1px rgba(139, 69, 19, 0.2);
+}
