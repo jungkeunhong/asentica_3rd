@@ -105,7 +105,7 @@ const CategoryGrid = () => {
                 
                 {/* 좋아요 버튼 */}
                 <button 
-                  className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center z-10"
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-md z-10"
                   onClick={(e) => toggleFavorite(category.id, e)}
                   title="Toggle favorite"
                   aria-label="Toggle favorite"
@@ -115,7 +115,7 @@ const CategoryGrid = () => {
                     fill={isFavorite ? "currentColor" : "none"} 
                     viewBox="0 0 24 24" 
                     stroke="currentColor" 
-                    className={`w-5 h-5 ${isFavorite ? 'text-red-500' : 'text-white'}`}
+                    className={`w-5 h-5 ${isFavorite ? 'text-red-500' : 'text-gray-600'}`}
                   >
                     <path 
                       strokeLinecap="round" 

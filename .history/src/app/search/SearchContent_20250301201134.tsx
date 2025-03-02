@@ -14,7 +14,6 @@ import ConsultationModal from '@/components/ConsultationModal';
 import LoginModal from '@/components/LoginModal';
 import { useFavorites } from '@/context/FavoritesContext';
 import { createClient } from '@/utils/supabase/client';
-import { MedspaRatings } from "@/components/ui/medspa-ratings";
 
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
   ssr: false,
@@ -766,12 +765,6 @@ export default function SearchContent({
                           </div>
                         </div>
  
-                        <MedspaRatings 
-                          googleStar={medspa.google_star} 
-                          googleReview={medspa.google_review} 
-                          yelpStar={medspa.yelp_star} 
-                          yelpReview={medspa.yelp_review} 
-                        />
                         {/* Ratings */}
                         <div className="flex flex-col gap-0.5 mt-3">
                           {/* Google rating */}
@@ -805,13 +798,14 @@ export default function SearchContent({
                               <span className="text-xs text-gray-500">({medspa.yelp_review})</span>
                             </div>
                           )}
+
                         </div>
                       </div>
                     </div>
                     
                     {/* Treatment Price */}
                     <div className="text-left mt-2">
-                      <span className="text-2xl font-bold text-black">
+                      <span className="text-lg font-normal text-black">
                         {findTreatmentPrice(medspa, searchQuery) && (
                           <>
                             {searchQuery} - {findTreatmentPrice(medspa, searchQuery)}

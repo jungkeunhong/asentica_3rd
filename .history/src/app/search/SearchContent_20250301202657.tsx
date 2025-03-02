@@ -820,68 +820,81 @@ export default function SearchContent({
                       </span>
                     </div>
                     
-                    
-                    {/* Reviews - 이미지와 왼쪽 정렬 */}
-                    <div className="mt-1 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          height="20px" 
-                          viewBox="0 -960 960 960" 
-                          width="20px" 
-                          fill="#6b7280" 
-                          stroke="#6b7280" 
-                          stroke-width="0.5" 
-                        >
-                          <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
-                        </svg>
+                        
+                        {/* Reviews - 이미지와 왼쪽 정렬 */}
+                        <div className="mt-1 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                            <svg 
+                              xmlns="http://www.w3.org/2000/svg" 
+                              height="20px" 
+                              viewBox="0 -960 960 960" 
+                              width="20px" 
+                              fill="#6b7280" 
+                              stroke="#6b7280" 
+                              stroke-width="0.5" 
+                            >
+                              <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
+                            </svg>
 
+                            </div>
+                            <span className="text-base text-gray-500">{medspa.good_review_short || ""}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                            <svg 
+                              xmlns="http://www.w3.org/2000/svg" 
+                              height="20px" 
+                              viewBox="0 -960 960 960" 
+                              width="20px" 
+                              fill="#6b7280"
+                              stroke="#6b7280"
+                              strokeWidth="0.5"
+                            >
+                              <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
+                            </svg>
+                            </div>
+                            <span className="text-base text-gray-500">{medspa.bad_review_short || ""}</span>
+                          </div>
                         </div>
-                        <span className="text-base text-gray-500">{medspa.good_review_short || ""}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          height="20px" 
-                          viewBox="0 -960 960 960" 
-                          width="20px" 
-                          fill="#6b7280"
-                          stroke="#6b7280"
-                          strokeWidth="0.5"
-                        >
-                          <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
-                        </svg>
+
+                        {/* Treatment Price */}
+                        <div className="text-left mt-2">
+                          <span className="text-2xl font-bold text-black">
+                            {findTreatmentPrice(medspa, searchQuery) && (
+                              <>
+                                {searchQuery} - {findTreatmentPrice(medspa, searchQuery)}
+                              </>
+                            )}
+                          </span>
                         </div>
-                        <span className="text-base text-gray-500">{medspa.bad_review_short || ""}</span>
+                        
+                        {/* Call and Consultation CTA Buttons */}
+                        <div className="flex flex-row gap-3">
+                          <button 
+                            onClick={(e) => handleCall(medspa.number, e)}
+                            className="btn bg-amber-900 hover:bg-amber-950 text-white border-none hover:shadow-lg transform flex items-center justify-center gap-2 w-12"
+                            title="call"
+                            aria-label="call"
+                          >
+                            <Phone size={16} />
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              console.log('Clicked Get Consultation for:', medspa.medspa_name);
+                              setSelectedMedspa(medspa);
+                              setIsConsultationModalOpen(true);
+                            }}
+                            className="btn bg-white hover:bg-amber-800 border border-amber-900 text-amber-900 hover:text-white hover:border-amber-800 hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
+                          >
+                            <span>Get Consultation</span>
+                          </button>
+                        </div>
+
                       </div>
                     </div>
-
-                    {/* Call and Consultation CTA Buttons */}
-                    <div className="flex flex-row gap-3">
-                      <button 
-                        onClick={(e) => handleCall(medspa.number, e)}
-                        className="btn bg-amber-900 hover:bg-amber-950 text-white border-none hover:shadow-lg transform flex items-center justify-center gap-2 w-12"
-                        title="call"
-                        aria-label="call"
-                      >
-                        <Phone size={16} />
-                      </button>
-                      <button 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          console.log('Clicked Get Consultation for:', medspa.medspa_name);
-                          setSelectedMedspa(medspa);
-                          setIsConsultationModalOpen(true);
-                        }}
-                        className="btn bg-white hover:bg-amber-800 border border-amber-900 text-amber-900 hover:text-white hover:border-amber-800 hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
-                      >
-                        <span>Get Consultation</span>
-                      </button>
-                    </div>
-
                     
                   </div>
                 );

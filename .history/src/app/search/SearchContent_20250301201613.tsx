@@ -14,7 +14,6 @@ import ConsultationModal from '@/components/ConsultationModal';
 import LoginModal from '@/components/LoginModal';
 import { useFavorites } from '@/context/FavoritesContext';
 import { createClient } from '@/utils/supabase/client';
-import { MedspaRatings } from "@/components/ui/medspa-ratings";
 
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
   ssr: false,
@@ -638,53 +637,52 @@ export default function SearchContent({
                     key={medspa.id}
                     onClick={() => handleMedspaClick(medspa.id)}
                     className="flex flex-col gap-4 bg-white border-b p-4 cursor-pointer hover:border-b"
-                  >
-                    <div className="flex gap-4">
-                      <div className="flex flex-col w-32 gap-2">
-                        {/* 이미지 슬라이더 구현 */}
-                        <div className="relative w-32 h-32 overflow-hidden rounded-md">
-                          {imageUrls.length > 0 ? (
-                            <motion.div 
-                              className="relative w-full h-full"
-                              drag="x"
-                              dragConstraints={{ left: 0, right: 0 }}
-                              onDragEnd={(e, info) => handleDragEnd(medspa.id, info, imageUrls.length)}
-                            >                              
-                              <AnimatePresence initial={false} custom={1}>
-                                <motion.div 
-                                  key={currentIndex}
-                                  custom={1}
-                                  initial={{ 
-                                    opacity: 0,
-                                    x: 100 
-                                  }}
-                                  animate={{ 
-                                    opacity: 1,
-                                    x: 0,
-                                    transition: { duration: 0.3 }
-                                  }}
-                                  exit={{ 
-                                    opacity: 0,
-                                    x: -100,
-                                    transition: { duration: 0.3 }
-                                  }}
-                                  className="absolute w-full h-full"
-                                >
-                                  <Image 
-                                    src={imageUrls[currentIndex]} 
-                                    alt={`${medspa.medspa_name} image ${currentIndex + 1}`}
-                                    width={128}
-                                    height={128}
-                                    style={{
-                                      width: '100%',
-                                      height: '100%',
-                                      objectFit: 'cover',
-                                      objectPosition: 'center'
-                                    }}
-                                    priority={currentIndex === 0}
-                                  />
-                                </motion.div>
-                              </AnimatePresence>
+                  >                
+                    <div className="relative w-32 h-32 overflow-hidden rounded-md">
+                      {imageUrls.length > 0 && (
+                        <motion.div 
+                          className="flex"
+                          drag="x"
+                          dragConstraints={{ left: -32 * (imageUrls.length - 1), right: 0 }}
+                          dragElastic={0.2}
+                          dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+                          onDragEnd={(e, info) => {
+                            const threshold = 50; // 드래그 임계값
+                            const draggedDistance = info.offset.x;
+                            const currentPos = info.point.x;
+                            
+                            // 드래그 방향과 거리에 따라 인덱스 변경
+                            if (Math.abs(draggedDistance) > threshold) {
+                              if (draggedDistance < 0 && currentIndex < imageUrls.length - 1) {
+                                setCurrentIndex(currentIndex + 1);
+                              } else if (draggedDistance > 0 && currentIndex > 0) {
+                                setCurrentIndex(currentIndex - 1);
+                              }
+                            }
+                          }}
+                          animate={{ x: -currentIndex * 128 }} // 이미지 너비에 맞게 조정
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        >
+                          {imageUrls.map((url, index) => (
+                            <div key={index} className="w-32 h-32 flex-shrink-0">
+                              <Image 
+                                src={url} 
+                                alt={`${medspa.medspa_name} image ${index + 1}`}
+                                width={128}
+                                height={128}
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover',
+                                  objectPosition: 'center'
+                                }}
+                                priority={index === 0}
+                              />
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </div>
                               
                               {/* 이미지 인디케이터 (닷) */}
                               {imageUrls.length > 1 && (
@@ -766,12 +764,6 @@ export default function SearchContent({
                           </div>
                         </div>
  
-                        <MedspaRatings 
-                          googleStar={medspa.google_star} 
-                          googleReview={medspa.google_review} 
-                          yelpStar={medspa.yelp_star} 
-                          yelpReview={medspa.yelp_review} 
-                        />
                         {/* Ratings */}
                         <div className="flex flex-col gap-0.5 mt-3">
                           {/* Google rating */}
@@ -805,13 +797,14 @@ export default function SearchContent({
                               <span className="text-xs text-gray-500">({medspa.yelp_review})</span>
                             </div>
                           )}
+
                         </div>
                       </div>
                     </div>
                     
                     {/* Treatment Price */}
                     <div className="text-left mt-2">
-                      <span className="text-2xl font-bold text-black">
+                      <span className="text-lg font-normal text-black">
                         {findTreatmentPrice(medspa, searchQuery) && (
                           <>
                             {searchQuery} - {findTreatmentPrice(medspa, searchQuery)}

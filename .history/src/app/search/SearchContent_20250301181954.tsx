@@ -14,7 +14,6 @@ import ConsultationModal from '@/components/ConsultationModal';
 import LoginModal from '@/components/LoginModal';
 import { useFavorites } from '@/context/FavoritesContext';
 import { createClient } from '@/utils/supabase/client';
-import { MedspaRatings } from "@/components/ui/medspa-ratings";
 
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
   ssr: false,
@@ -649,7 +648,27 @@ export default function SearchContent({
                               drag="x"
                               dragConstraints={{ left: 0, right: 0 }}
                               onDragEnd={(e, info) => handleDragEnd(medspa.id, info, imageUrls.length)}
-                            >                              
+                            >
+                              {/* Favorite heart icon */}
+                              <button 
+                                className={`absolute top-2 right-2 p-1 rounded-full z-10 ${
+                                  isFavorite(medspa.id) 
+                                    ? 'bg-white/80 text-red-500' 
+                                    : 'bg-white/60 text-gray-500 hover:bg-white/80'
+                                } transition-all duration-200`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  toggleFavorite(medspa);
+                                }}
+                                aria-label={isFavorite(medspa.id) ? "Remove from favorites" : "Add to favorites"}
+                              >
+                                <Heart 
+                                  size={18} 
+                                  className={isFavorite(medspa.id) ? "fill-red-500" : ""} 
+                                />
+                              </button>
+                              
                               <AnimatePresence initial={false} custom={1}>
                                 <motion.div 
                                   key={currentIndex}
@@ -715,63 +734,33 @@ export default function SearchContent({
 
                       {/* Right side - Content */}
                       <div className="flex-1 flex flex-col">
-                        {/* Free consultation button with heart */}
-                        <div className="flex justify-between items-center mb-1">
-                          <div>
-                            {medspa.free_consultation && medspa.free_consultation.trim() !== '' ? (
-                              <button className="text-3xl text-left text-amber-900 py-1 text-sm">
-                                {medspa.free_consultation}
-                              </button>
-                            ) : (
-                              <button className="text-3xl text-left text-gray-500 py-1 text-sm">
-                                Paid Consultation
-                              </button>
-                            )}
-                          </div>
-                          
-                          {/* Favorite heart icon */}
-                          <button 
-                            className={`p-1 rounded-full ${
-                              isFavorite(medspa.id) 
-                                ? 'bg-white/80 text-red-500' 
-                                : 'bg-white/60 text-gray-500 hover:bg-white/80'
-                            } transition-all duration-200`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              toggleFavorite(medspa);
-                            }}
-                            aria-label={isFavorite(medspa.id) ? "Remove from favorites" : "Add to favorites"}
-                          >
-                            <Heart 
-                              size={18} 
-                              className={isFavorite(medspa.id) ? "fill-red-500" : ""} 
-                            />
-                          </button>
+                        {/* Free consultation button */}
+                        <div className="flex gap-2 mb-1">
+                          {medspa.free_consultation && medspa.free_consultation.trim() !== '' ? (
+                            <button className="text-3xl text-left text-amber-900 py-1 text-sm">
+                              {medspa.free_consultation}
+                            </button>
+                              ) : (
+                            <button className="text-3xl text-left text-gray-500 py-1 text-sm">
+                              Paid Consultation
+                            </button>
+                          )}
                         </div>
                         {/* Medspa name and village */}
-                        <h3 className="cormorant text-xl font-semibold text-black truncate">
+                        <h3 className="cormorant text-xl font-semibold text-black">
                           {medspa.medspa_name}
                         </h3>
                         <div className="flex items-center text-gray-500 text-[12px] mb-1">
+                          <MapPin className="h-3.5 w-3.5 mr-1" />
+                          <span>{medspa.village}</span>
                           {userLocation && (
-                            <span className="flex items-center whitespace-nowrap mr-2">
-                              <Navigation className="h-3.5 w-3.5 text-gray-400 mr-1" />
-                              {getMedspaDistance(medspa)?.toFixed(1) || '?'}mil
+                            <span className="flex items-center ml-1">
+                              <Navigation className="h-3.5 w-3.5 mx-1 text-gray-400" />
+                              {getMedspaDistance(medspa)?.toFixed(1) || '?'} mil
                             </span>
                           )}
-                          <div className="flex items-center truncate">
-                            <MapPin className="h-3.5 w-3.5 flex-shrink-0 mr-1" />
-                            <span className="truncate">{medspa.village}</span>
-                          </div>
                         </div>
  
-                        <MedspaRatings 
-                          googleStar={medspa.google_star} 
-                          googleReview={medspa.google_review} 
-                          yelpStar={medspa.yelp_star} 
-                          yelpReview={medspa.yelp_review} 
-                        />
                         {/* Ratings */}
                         <div className="flex flex-col gap-0.5 mt-3">
                           {/* Google rating */}
@@ -805,13 +794,14 @@ export default function SearchContent({
                               <span className="text-xs text-gray-500">({medspa.yelp_review})</span>
                             </div>
                           )}
+
                         </div>
                       </div>
                     </div>
                     
                     {/* Treatment Price */}
                     <div className="text-left mt-2">
-                      <span className="text-2xl font-bold text-black">
+                      <span className="text-lg font-normal text-black">
                         {findTreatmentPrice(medspa, searchQuery) && (
                           <>
                             {searchQuery} - {findTreatmentPrice(medspa, searchQuery)}

@@ -115,7 +115,7 @@ const CategoryGrid = () => {
                     fill={isFavorite ? "currentColor" : "none"} 
                     viewBox="0 0 24 24" 
                     stroke="currentColor" 
-                    className={`w-5 h-5 ${isFavorite ? 'text-red-500' : 'text-white'}`}
+                    className={`w-5 h-5 ${isFavorite ? 'text-red-500' : 'text-gray-600'}`}
                   >
                     <path 
                       strokeLinecap="round" 
