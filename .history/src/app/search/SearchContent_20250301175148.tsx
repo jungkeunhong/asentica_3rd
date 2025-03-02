@@ -747,7 +747,7 @@ export default function SearchContent({
                           )}
                         </div>
                         {/* Medspa name and village */}
-                        <h3 className="cormorant text-2xl font-semibold text-black">
+                        <h3 className="cormorant text-xl font-semibold text-black">
                           {medspa.medspa_name}
                         </h3>
                         <div className="flex items-center text-gray-500 text-[12px] mb-1">
@@ -812,7 +812,7 @@ export default function SearchContent({
                     
                     
                     {/* Reviews - 이미지와 왼쪽 정렬 */}
-                    <div className="mt-1 space-y-1">
+                    <div className="mt-1 space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
                         <svg 
@@ -841,8 +841,8 @@ export default function SearchContent({
                           stroke="#6b7280"
                           strokeWidth="0.5"
                         >
-                          <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
-                        </svg>
+                           <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H280L160-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
+                          </svg>
                         </div>
                         <span className="text-base text-gray-500">{medspa.bad_review_short || ""}</span>
                       </div>

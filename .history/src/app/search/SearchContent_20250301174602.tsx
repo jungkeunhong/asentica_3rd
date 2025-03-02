@@ -747,7 +747,7 @@ export default function SearchContent({
                           )}
                         </div>
                         {/* Medspa name and village */}
-                        <h3 className="cormorant text-2xl font-semibold text-black">
+                        <h3 className="cormorant text-xl font-semibold text-black">
                           {medspa.medspa_name}
                         </h3>
                         <div className="flex items-center text-gray-500 text-[12px] mb-1">
@@ -812,8 +812,8 @@ export default function SearchContent({
                     
                     
                     {/* Reviews - 이미지와 왼쪽 정렬 */}
-                    <div className="mt-1 space-y-1">
-                      <div className="flex items-center gap-2">
+                    <div className="mt-1 space-y-2">
+                      <div className="flex items-start gap-2">
                         <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
                         <svg 
                           xmlns="http://www.w3.org/2000/svg" 
@@ -828,9 +828,9 @@ export default function SearchContent({
                         </svg>
 
                         </div>
-                        <span className="text-base text-gray-500">{medspa.good_review_short || ""}</span>
+                        <span className="text-sm text-gray-500">{medspa.good_review_short || ""}</span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-start gap-2">
                         <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
                         <svg 
                           xmlns="http://www.w3.org/2000/svg" 
@@ -841,10 +841,10 @@ export default function SearchContent({
                           stroke="#6b7280"
                           strokeWidth="0.5"
                         >
-                          <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
+                          <path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm0 12-4.34 4.34L12 14H3v-2l3-7h9v10zm4-12h4v12h-4z"/>
                         </svg>
                         </div>
-                        <span className="text-base text-gray-500">{medspa.bad_review_short || ""}</span>
+                        <span className="text-sm text-gray-500">{medspa.bad_review_short || ""}</span>
                       </div>
                     </div>
 

@@ -747,7 +747,7 @@ export default function SearchContent({
                           )}
                         </div>
                         {/* Medspa name and village */}
-                        <h3 className="cormorant text-2xl font-semibold text-black">
+                        <h3 className="cormorant text-xl font-semibold text-black">
                           {medspa.medspa_name}
                         </h3>
                         <div className="flex items-center text-gray-500 text-[12px] mb-1">

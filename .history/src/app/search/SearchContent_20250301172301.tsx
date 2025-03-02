@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import {  MapPin, Navigation, Phone, Heart } from 'lucide-react';
+import { Star, MapPin, Navigation, Phone, Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -551,17 +551,17 @@ export default function SearchContent({
   };
 
   // 꽉 찬 별 SVG 컴포넌트
-  const FilledStar = (props) => (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      height="20px" 
-      viewBox="0 -960 960 960" 
-      width="20px" 
-      {...props}
-    >
-      <path d="m243-144 237-141 237 141-63-266 210-179-276-23-108-252-108 251-276 24 210 179-63 266Z" />
-    </svg>
-  );
+const FilledStar = (props) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    height="20px" 
+    viewBox="0 -960 960 960" 
+    width="20px" 
+    {...props}
+  >
+    <path d="m243-144 237-141 237 141-63-266 210-179-276-23-108-252-108 251-276 24 210 179-63 266Z" />
+  </svg>
+);
 
   return (
     <>
@@ -747,7 +747,7 @@ export default function SearchContent({
                           )}
                         </div>
                         {/* Medspa name and village */}
-                        <h3 className="cormorant text-2xl font-semibold text-black">
+                        <h3 className="cormorant text-xl font-semibold text-black">
                           {medspa.medspa_name}
                         </h3>
                         <div className="flex items-center text-gray-500 text-[12px] mb-1">
@@ -812,39 +812,30 @@ export default function SearchContent({
                     
                     
                     {/* Reviews - 이미지와 왼쪽 정렬 */}
-                    <div className="mt-1 space-y-1">
-                      <div className="flex items-center gap-2">
+                    <div className="mt-2 space-y-2">
+                      <div className="flex items-start gap-2">
                         <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          height="20px" 
-                          viewBox="0 -960 960 960" 
-                          width="20px" 
-                          fill="#6b7280" 
-                          stroke="#6b7280" 
-                          stroke-width="0.5" 
-                        >
-                          <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
-                        </svg>
-
+                          <Image 
+                            src="/icons/thumbup.png" 
+                            alt="Positive" 
+                            width={20} 
+                            height={20}
+                            className="w-6 h-6 object-contain flex-shrink-0"
+                          />
                         </div>
-                        <span className="text-base text-gray-500">{medspa.good_review_short || ""}</span>
+                        <span className="text-sm text-gray-500">{medspa.good_review_short || ""}</span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-start gap-2">
                         <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                        <svg 
-                          xmlns="http://www.w3.org/2000/svg" 
-                          height="20px" 
-                          viewBox="0 -960 960 960" 
-                          width="20px" 
-                          fill="#6b7280"
-                          stroke="#6b7280"
-                          strokeWidth="0.5"
-                        >
-                          <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
-                        </svg>
+                          <Image 
+                            src="/icons/thumbdown.png" 
+                            alt="Negative" 
+                            width={20} 
+                            height={20}
+                            className="w-6 h-6 object-contain flex-shrink-0"
+                          />
                         </div>
-                        <span className="text-base text-gray-500">{medspa.bad_review_short || ""}</span>
+                        <span className="text-sm text-gray-500">{medspa.bad_review_short || ""}</span>
                       </div>
                     </div>
 

@@ -747,7 +747,7 @@ export default function SearchContent({
                           )}
                         </div>
                         {/* Medspa name and village */}
-                        <h3 className="cormorant text-2xl font-semibold text-black">
+                        <h3 className="cormorant text-xl font-semibold text-black">
                           {medspa.medspa_name}
                         </h3>
                         <div className="flex items-center text-gray-500 text-[12px] mb-1">
@@ -812,7 +812,7 @@ export default function SearchContent({
                     
                     
                     {/* Reviews - 이미지와 왼쪽 정렬 */}
-                    <div className="mt-1 space-y-1">
+                    <div className="mt-1 space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
                         <svg 

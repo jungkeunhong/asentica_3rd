@@ -324,7 +324,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
               </button>
             </div>
 
-            <div className="mt-4 mb-4 text-center">
+            <div className="mt-4 text-center">
               <button
                 onClick={() => {
                   setIsSignUp(!isSignUp);

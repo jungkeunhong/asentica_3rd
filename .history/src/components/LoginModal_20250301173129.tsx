@@ -324,13 +324,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
               </button>
             </div>
 
-            <div className="mt-4 mb-4 text-center">
+            <div className="mt-4 text-center">
               <button
                 onClick={() => {
                   setIsSignUp(!isSignUp);
                   setShowEmailForm(true);
                 }}
-                className="text-amber-900 hover:underline"
+                className="text-[#754731] hover:underline"
               >
                 {isSignUp ? 'Already have an account? Log In' : 'Need an account? Sign Up'}
               </button>

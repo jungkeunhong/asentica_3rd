@@ -236,7 +236,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
           <X size={24} />
         </button>
 
-        <h2 className="cormorant text-3xl font-normal text-center text-amber-900 mb-8 mt-6">
+        <h2 className="gotu text-2xl font-bold text-center text-[#754731] mb-6">
           Better skin starts today
         </h2>
 
@@ -255,10 +255,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Processing...
+                    처리 중...
                   </span>
                 ) : (
-                  isSignUp ? 'Sign-up' : 'Login'
+                  isSignUp ? '회원가입' : '로그인'
                 )
               ) : (
                 <>
@@ -315,22 +315,22 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
               <p className="text-gray-600 text-sm">
                 By continuing, you agree to our
               </p>
-              <button className="text-amber-900 underline text-sm">
+              <button className="text-[#754731] underline text-sm">
                 Terms
               </button>
               <span className="text-gray-600 text-sm"> and acknowledge that you have read our </span>
-              <button className="text-amber-900 underline text-sm">
+              <button className="text-[#754731] underline text-sm">
                 Privacy Policy
               </button>
             </div>
 
-            <div className="mt-4 mb-4 text-center">
+            <div className="mt-4 text-center">
               <button
                 onClick={() => {
                   setIsSignUp(!isSignUp);
                   setShowEmailForm(true);
                 }}
-                className="text-amber-900 hover:underline"
+                className="text-[#754731] hover:underline"
               >
                 {isSignUp ? 'Already have an account? Log In' : 'Need an account? Sign Up'}
               </button>
