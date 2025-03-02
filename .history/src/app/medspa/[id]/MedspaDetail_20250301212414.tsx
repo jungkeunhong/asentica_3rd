@@ -255,7 +255,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
 
       {/* Highlights Section */}
       <div className="px-4 mt-8">
-        <h2 className="text-2xl font-base mb-4 font-sans">Highlights</h2>
+        <h2 className="text-2xl font-semibold mb-4 font-sans">Highlights</h2>
         
         {/* Good Reviews */}
         {goodReviews.length > 0 && (
@@ -276,26 +276,21 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
             </div>
             <h3 className="text-lg font-medium text-green-700 font-sans">Pros</h3>
           </div>
-          
-          <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-            <div className="flex gap-4 px-1">
-              {goodReviews.map((review, index) => (
-                <div 
-                  key={`good-${index}`} 
-                  className="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#f8fff8] to-[#eaf6ea] p-4 shadow-sm min-w-[280px] w-[280px] flex-shrink-0 snap-start"
-                >
-                  <p className="text-sm text-gray-700">{review}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ul className="space-y-3">
+            {goodReviews.map((review, index) => (
+              <li key={`good-${index}`} className="flex">
+                <span className="font-medium mr-2">{index + 1}.</span>
+                <p className="text-sm text-gray-700">{review}</p>
+              </li>
+            ))}
+          </ul>
         </div>
-        )}
+      )}
 
         
         {/* Bad Reviews */}
         {badReviews.length > 0 && (
-        <div className="mb-6">
+        <div>
           <div className="flex items-center mb-2">
             <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center mr-1">
               <svg 
@@ -303,42 +298,37 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 height="24px" 
                 viewBox="0 -960 960 960" 
                 width="24px" 
-                fill="#6b7280" 
-                stroke="#6b7280" 
-                stroke-width="0.5" 
+                fill="#6b7280"
+                stroke="#6b7280"
+                strokeWidth="0.5"
               >
                 <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
               </svg>
             </div>
             <h3 className="text-lg font-medium text-red-700 font-sans">Cons</h3>
           </div>
-          
-          <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-            <div className="flex gap-4 px-1">
-              {badReviews.map((review, index) => (
-                <div 
-                  key={`bad-${index}`} 
-                  className="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#fff8f8] to-[#f6eaea] p-4 shadow-sm min-w-[280px] w-[280px] flex-shrink-0 snap-start"
-                >
-                  <p className="text-sm text-gray-700">{review}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ul className="space-y-3">
+            {badReviews.map((review, index) => (
+              <li key={`bad-${index}`} className="flex">
+                <span className="font-medium mr-2">{index + 1}.</span>
+                <p className="text-sm text-gray-700">{review}</p>
+              </li>
+            ))}
+          </ul>
         </div>
-        )}
+      )}
 
         {/* Recommended Practitioners - Modern Skeuomorphic Style */}
         {recommendedPractitioners.length > 0 && (
           <div className="mt-12 mb-8">
-            <h3 className="text-2xl font-base text-gray-800 mb-6 font-sans">Best Practitioner</h3>
+            <h3 className="text-2xl font-bold text-gray-800 mb-6 font-sans">Best Practitioner</h3>
             
             <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
               <div className="flex gap-4 px-4">
                 {recommendedPractitioners.map((practitioner, index) => (
                   <div 
                     key={`practitioner-${index}`}
-                    className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)] min-w-[280px] w-[280px] flex-shrink-0 snap-start"
+                    className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)] min-w-[320px] w-[320px] flex-shrink-0 snap-start"
                   >
                     {/* Large Number Background with Blur Effect */}
                     <div 
@@ -374,7 +364,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
       {/* Treatments and Prices */}
       {treatments.length > 0 && (
         <div className="px-4 mt-8">
-          <h2 className="text-2xl font-base mb-4 font-sans">Prices</h2>
+          <h2 className="text-2xl font-semibold mb-4 font-sans">Prices</h2>
           <div className="space-y-3">
             {treatments.map((treatment, index) => (
               <div key={`treatment-${index}`} className="flex items-start py-2 border-b border-gray-200">
@@ -402,7 +392,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
       {/* Map */}
       {medspa.lat && medspa.lng && (
         <div className="px-4 mt-8">
-          <h2 className="text-xl font-base mb-4 font-sans">Location</h2>
+          <h2 className="text-xl font-semibold mb-4 font-sans">Location</h2>
           <div className="h-[300px] w-full rounded-lg overflow-hidden">
             <DynamicMap 
               medspas={[{
