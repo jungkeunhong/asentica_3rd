@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import SearchBar from '@/components/SearchBar';
 import SearchFilters, { FilterType } from '@/components/SearchFilters';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
-import { motion } from 'framer-motion';
+import { motion, PanInfo } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import ConsultationModal from '@/components/ConsultationModal';
 import LoginModal from '@/components/LoginModal';
@@ -439,6 +439,27 @@ export default function SearchContent({
       };
     }
   }, [isLoggedIn]);
+
+    
+    const currentIndex = currentImageIndexes[medspaId] || 0;
+    
+    // 왼쪽으로 드래그하면 다음 이미지 (오른쪽으로 이동)
+    if (info.offset.x < -50) {
+      const newIndex = (currentIndex + 1) % imageCount;
+      setCurrentImageIndexes({
+        ...currentImageIndexes,
+        [medspaId]: newIndex
+      });
+    }
+    // 오른쪽으로 드래그하면 이전 이미지 (왼쪽으로 이동)
+    else if (info.offset.x > 50) {
+      const newIndex = (currentIndex - 1 + imageCount) % imageCount;
+      setCurrentImageIndexes({
+        ...currentImageIndexes,
+        [medspaId]: newIndex
+      });
+    }
+  };
   
   // 이미지 인덱스 변경 함수
   const changeImageIndex = (medspaId: string, newIndex: number) => {

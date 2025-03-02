@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import SearchBar from '@/components/SearchBar';
 import SearchFilters, { FilterType } from '@/components/SearchFilters';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
-import { motion } from 'framer-motion';
+import { motion, PanInfo } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import ConsultationModal from '@/components/ConsultationModal';
 import LoginModal from '@/components/LoginModal';

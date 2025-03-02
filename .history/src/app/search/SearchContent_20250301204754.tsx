@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import SearchBar from '@/components/SearchBar';
 import SearchFilters, { FilterType } from '@/components/SearchFilters';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
-import { motion } from 'framer-motion';
+import { motion, PanInfo } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import ConsultationModal from '@/components/ConsultationModal';
 import LoginModal from '@/components/LoginModal';
@@ -439,6 +439,31 @@ export default function SearchContent({
       };
     }
   }, [isLoggedIn]);
+
+  // 드래그 핸들러
+  const handleDragEnd = (medspaId: string, info: PanInfo, imageCount: number) => {
+    // 이미지가 1개 이하면 슬라이드 처리 안함
+    if (imageCount <= 1) return;
+    
+    const currentIndex = currentImageIndexes[medspaId] || 0;
+    
+    // 왼쪽으로 드래그하면 다음 이미지 (오른쪽으로 이동)
+    if (info.offset.x < -50) {
+      const newIndex = (currentIndex + 1) % imageCount;
+      setCurrentImageIndexes({
+        ...currentImageIndexes,
+        [medspaId]: newIndex
+      });
+    }
+    // 오른쪽으로 드래그하면 이전 이미지 (왼쪽으로 이동)
+    else if (info.offset.x > 50) {
+      const newIndex = (currentIndex - 1 + imageCount) % imageCount;
+      setCurrentImageIndexes({
+        ...currentImageIndexes,
+        [medspaId]: newIndex
+      });
+    }
+  };
   
   // 이미지 인덱스 변경 함수
   const changeImageIndex = (medspaId: string, newIndex: number) => {
@@ -525,6 +550,19 @@ export default function SearchContent({
       alert('Phone number not available');
     }
   };
+
+  // 꽉 찬 별 SVG 컴포넌트
+  const FilledStar = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      height="20px" 
+      viewBox="0 -960 960 960" 
+      width="20px" 
+      {...props}
+    >
+      <path d="m243-144 237-141 237 141-63-266 210-179-276-23-108-252-108 251-276 24 210 179-63 266Z" />
+    </svg>
+  );
 
   return (
     <>
