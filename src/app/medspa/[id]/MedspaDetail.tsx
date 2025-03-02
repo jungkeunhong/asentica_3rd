@@ -32,6 +32,8 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   const touchStartTimeRef = useRef<number>(0);
   const touchEndTimeRef = useRef<number>(0);
   const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
+  const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(null);
 
   // Create an array of available images
   const imageArray = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
@@ -45,133 +47,153 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
     };
   }, []);
 
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+  // Handle image change
+  const changeImageIndex = (index: number) => {
+    if (index < 0 || index >= imageArray.length) return;
+    
+    setCurrentImageIndex(index);
+    setTranslateX(-index * 100);
+    setTransitionDuration('0.3s');
+    
+    // Reset transition duration after animation completes
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+    
+    transitionTimeoutRef.current = setTimeout(() => {
+      setTransitionDuration('0s');
+    }, 300);
+  };
+
+  // Touch event handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (imageArray.length <= 1) return;
+    
     touchStartTimeRef.current = Date.now();
     setIsDragging(true);
     setStartX(e.touches[0].clientX);
     setTransitionDuration('0s');
-    
-    if (transitionTimeoutRef.current) {
-      clearTimeout(transitionTimeoutRef.current);
-    }
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || imageArray.length <= 1) return;
+    
+    const currentX = e.touches[0].clientX;
+    const diff = currentX - startX;
+    
+    // Calculate percentage moved
+    const percentMoved = (diff / (sliderRef.current?.clientWidth || 1)) * 100;
+    
+    // Apply resistance at edges
+    let newTranslateX = -currentImageIndex * 100 + percentMoved;
+    
+    // Add resistance at the edges
+    if (newTranslateX > 0) {
+      newTranslateX = newTranslateX * 0.3; // More resistance at left edge
+    } else if (newTranslateX < -(imageArray.length - 1) * 100) {
+      const overflowAmount = newTranslateX + (imageArray.length - 1) * 100;
+      newTranslateX = -(imageArray.length - 1) * 100 + overflowAmount * 0.3; // More resistance at right edge
+    }
+    
+    setTranslateX(newTranslateX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging || imageArray.length <= 1) return;
+    
+    touchEndTimeRef.current = Date.now();
+    setIsDragging(false);
+    
+    // Calculate swipe velocity
+    const touchDuration = touchEndTimeRef.current - touchStartTimeRef.current;
+    const currentTranslateX = translateX;
+    const targetIndex = -Math.round(currentTranslateX / 100);
+    
+    // Determine if it was a fast swipe
+    const isFastSwipe = touchDuration < 250;
+    
+    // Determine direction of swipe
+    const direction = currentTranslateX > -currentImageIndex * 100 ? -1 : 1;
+    
+    let newIndex = targetIndex;
+    
+    // If it was a fast swipe, move one more in the direction of the swipe
+    if (isFastSwipe) {
+      newIndex = currentImageIndex + direction;
+    }
+    
+    // Clamp the index
+    newIndex = Math.max(0, Math.min(imageArray.length - 1, newIndex));
+    
+    // Update the current image index
+    changeImageIndex(newIndex);
+  };
+
+  // Mouse event handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (imageArray.length <= 1) return;
+    
     touchStartTimeRef.current = Date.now();
     setIsDragging(true);
     setStartX(e.clientX);
     setTransitionDuration('0s');
     
-    if (transitionTimeoutRef.current) {
-      clearTimeout(transitionTimeoutRef.current);
-    }
+    // Prevent default behavior (like text selection)
+    e.preventDefault();
   };
 
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
-    
-    const currentX = e.touches[0].clientX;
-    const diff = currentX - startX;
-    const newTranslateX = -currentImageIndex * 100 + (diff / sliderRef.current!.offsetWidth) * 100;
-    
-    // Limit overscroll with resistance
-    if (
-      (currentImageIndex === 0 && diff > 0) || 
-      (currentImageIndex === imageArray.length - 1 && diff < 0)
-    ) {
-      setTranslateX(newTranslateX / 3); // Add resistance
-    } else {
-      setTranslateX(newTranslateX);
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || imageArray.length <= 1) return;
     
     const currentX = e.clientX;
     const diff = currentX - startX;
-    const newTranslateX = -currentImageIndex * 100 + (diff / sliderRef.current!.offsetWidth) * 100;
     
-    // Limit overscroll with resistance
-    if (
-      (currentImageIndex === 0 && diff > 0) || 
-      (currentImageIndex === imageArray.length - 1 && diff < 0)
-    ) {
-      setTranslateX(newTranslateX / 3); // Add resistance
-    } else {
-      setTranslateX(newTranslateX);
+    // Calculate percentage moved
+    const percentMoved = (diff / (sliderRef.current?.clientWidth || 1)) * 100;
+    
+    // Apply resistance at edges
+    let newTranslateX = -currentImageIndex * 100 + percentMoved;
+    
+    // Add resistance at the edges
+    if (newTranslateX > 0) {
+      newTranslateX = newTranslateX * 0.3; // More resistance at left edge
+    } else if (newTranslateX < -(imageArray.length - 1) * 100) {
+      const overflowAmount = newTranslateX + (imageArray.length - 1) * 100;
+      newTranslateX = -(imageArray.length - 1) * 100 + overflowAmount * 0.3; // More resistance at right edge
     }
-  };
-
-  const handleTouchEnd = () => {
-    if (!isDragging) return;
     
-    touchEndTimeRef.current = Date.now();
-    const touchDuration = touchEndTimeRef.current - touchStartTimeRef.current;
-    
-    finishDragOperation(touchDuration);
+    setTranslateX(newTranslateX);
   };
 
   const handleMouseUp = () => {
-    if (!isDragging) return;
+    if (!isDragging || imageArray.length <= 1) return;
     
     touchEndTimeRef.current = Date.now();
-    const touchDuration = touchEndTimeRef.current - touchStartTimeRef.current;
-    
-    finishDragOperation(touchDuration);
-  };
-
-  const finishDragOperation = (touchDuration: number) => {
     setIsDragging(false);
     
-    // Calculate how far we've moved as a percentage of image width
-    const movePercentage = Math.abs(translateX + currentImageIndex * 100);
+    // Calculate swipe velocity
+    const touchDuration = touchEndTimeRef.current - touchStartTimeRef.current;
+    const currentTranslateX = translateX;
+    const targetIndex = -Math.round(currentTranslateX / 100);
     
-    // Determine if we should snap to the next/prev image or stay on current
-    let nextIndex = currentImageIndex;
-    
-    // Fast swipe detection (less than 250ms)
+    // Determine if it was a fast swipe
     const isFastSwipe = touchDuration < 250;
     
+    // Determine direction of swipe
+    const direction = currentTranslateX > -currentImageIndex * 100 ? -1 : 1;
+    
+    let newIndex = targetIndex;
+    
+    // If it was a fast swipe, move one more in the direction of the swipe
     if (isFastSwipe) {
-      // For fast swipes, we need less movement to trigger a slide change
-      if (translateX < -currentImageIndex * 100) {
-        nextIndex = Math.min(currentImageIndex + 1, imageArray.length - 1);
-      } else if (translateX > -currentImageIndex * 100) {
-        nextIndex = Math.max(currentImageIndex - 1, 0);
-      }
-    } else {
-      // For normal swipes, require at least 30% movement to change slides
-      if (movePercentage > 30) {
-        if (translateX < -currentImageIndex * 100) {
-          nextIndex = Math.min(currentImageIndex + 1, imageArray.length - 1);
-        } else {
-          nextIndex = Math.max(currentImageIndex - 1, 0);
-        }
-      }
+      newIndex = currentImageIndex + direction;
     }
     
-    // Calculate transition duration based on distance to travel
-    const distance = Math.abs(nextIndex - currentImageIndex);
-    const baseDuration = 0.3; // Base duration in seconds
-    const duration = Math.min(baseDuration, Math.max(0.15, distance * baseDuration));
+    // Clamp the index
+    newIndex = Math.max(0, Math.min(imageArray.length - 1, newIndex));
     
-    transitionToImage(nextIndex, duration);
-  };
-
-  const transitionToImage = (index: number, duration: number) => {
-    setCurrentImageIndex(index);
-    setTranslateX(-index * 100);
-    setTransitionDuration(`${duration}s`);
-    
-    // Reset transition duration after animation completes
-    transitionTimeoutRef.current = setTimeout(() => {
-      setTransitionDuration('0s');
-    }, duration * 1000 + 50); // Add 50ms buffer
-  };
-
-  const changeImageIndex = (index: number) => {
-    transitionToImage(index, 0.3);
+    // Update the current image index
+    changeImageIndex(newIndex);
   };
 
   // Treatments and prices
@@ -204,14 +226,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
     { name: medspa.recommended_practitioner3_name, reason: medspa.recommended_practitioner3_reason },
   ].filter(p => p.name && p.reason);
 
-  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
-  const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(medspa);
-
-  // Function to handle phone calls
-  const handleCall = (phoneNumber: string | undefined, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
+  const handleCall = (phoneNumber: string | undefined) => {
     if (phoneNumber) {
       // Format phone number if needed
       const formattedNumber = phoneNumber.replace(/\D/g, '');
@@ -261,18 +276,20 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
           >
+            {/* Slider track */}
             <div 
-              className="absolute w-full h-full flex transition-transform duration-300 ease-in-out"
+              className={`absolute inset-0 flex transition-transform ${transitionDuration === '0.3s' ? 'duration-300' : ''} ease-out`}
               style={{ 
                 transform: `translateX(${translateX}%)`,
-                transition: `transform ${transitionDuration} cubic-bezier(0.25, 0.46, 0.45, 0.94)`,
+                width: `${imageArray.length * 100}%`
               }}
             >
+              {/* Slider items */}
               {imageArray.map((url, index) => (
                 <div 
                   key={index} 
-                  className="relative h-full flex-shrink-0"
-                  style={{ width: `${100 / imageArray.length}%` }}
+                  className="relative h-full w-full"
+                  style={{ flexBasis: `${100 / imageArray.length}%`, flexShrink: 0, flexGrow: 0 }}
                 >
                   <Image
                     src={url}
@@ -299,7 +316,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                     }}
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       idx === currentImageIndex 
-                        ? 'bg-white w-3' 
+                        ? 'bg-white scale-125' 
                         : 'bg-white/50'
                     }`}
                     aria-label={`Go to image ${idx + 1}`}
@@ -340,7 +357,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           </div>
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <p className="text-gray-500">No image available</p>
+            <p className="text-gray-500">No images available</p>
           </div>
         )}
       </div>
@@ -595,7 +612,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
       {/* Call and Consultation CTA Buttons */}
       <div className="flex flex-row px-4 mt-8 gap-3">
         <button 
-          onClick={(e) => handleCall(medspa.number, e)}
+          onClick={() => handleCall(medspa.number)}
           className="btn bg-amber-900 hover:bg-amber-950 text-white border-none hover:shadow-lg transform flex items-center justify-center gap-2 w-12"
           title="call"
           aria-label="call"
@@ -603,9 +620,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           <Phone size={16} />
         </button>
         <button 
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
+          onClick={() => {
             console.log('Clicked Get Consultation for:', medspa.medspa_name);
             setSelectedMedspa(medspa);
             setIsConsultationModalOpen(true);
@@ -632,7 +647,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           </div>
           <div className="mt-2 flex items-center text-gray-700">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <path fill="#000000" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              <path fill="#000000" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
             </svg>
             <span>{medspa.location}</span>
           </div>
