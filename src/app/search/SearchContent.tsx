@@ -81,7 +81,7 @@ export default function SearchContent({
   const [medspas, setMedspas] = useState<Medspa[]>(initialMedspas as Medspa[]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
-  const [selectedMedspa, setSelectedMedspa] = useState<Medspa | undefined>(undefined);
+  const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(null);
   
   // 로그인 모달 상태 추가
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -423,8 +423,8 @@ export default function SearchContent({
           const windowHeight = window.innerHeight;
           const scrollPercentage = scrollPosition / windowHeight;
           
-          // 스크롤이 화면 높이의 30% 이상일 때 모달 표시
-          if (scrollPercentage > 0.3) {
+          // 스크롤이 화면 높이의 80% 이상일 때 모달 표시
+          if (scrollPercentage > 0.8) {
             console.log('스크롤 위치에 따른 로그인 모달 표시');
             setShowLoginModal(true);
             scrollThreshold.current = true; // 한 번만 표시하도록 설정
@@ -775,7 +775,7 @@ export default function SearchContent({
                             fill="#6b7280"
                             stroke="#6b7280"
                           >
-                            <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
+                            <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
                           </svg>
                         </div>
                         <span className="text-base text-gray-500">{medspa.bad_review_short || ""}</span>

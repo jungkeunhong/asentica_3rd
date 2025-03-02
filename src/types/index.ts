@@ -12,6 +12,9 @@ export interface Medspa {
   yelp_star?: number;
   yelp_review?: number;
   best_treatment?: string;
+  best_treatment1?: string;
+  best_treatment2?: string;
+  best_treatment3?: string;
   free_consultation?: string;
   good_review_short?: string;
   good_review_deepdive1?: string;
