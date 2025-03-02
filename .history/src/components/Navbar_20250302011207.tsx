@@ -6,7 +6,6 @@ import { LogIn } from 'lucide-react'; // 트렌디한 아이콘 라이브러리
 import { createClient } from '@/utils/supabase/client';
 import LoginModal from './LoginModal';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
