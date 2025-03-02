@@ -17,11 +17,17 @@ export interface Medspa {
   good_review_deepdive1?: string;
   good_review_deepdive2?: string;
   good_review_deepdive3?: string;
+  good_review_deepdive1_explanation?: string;
+  good_review_deepdive2_explanation?: string;
+  good_review_deepdive3_explanation?: string;
   bad_review_short?: string;
   bad_review_deepdive?: string;
   bad_review_deepdive1?: string;
   bad_review_deepdive2?: string;
   bad_review_deepdive3?: string;
+  bad_review_deepdive1_explanation?: string;
+  bad_review_deepdive2_explanation?: string;
+  bad_review_deepdive3_explanation?: string;
   recommended_practitioner1_name?: string;
   recommended_practitioner1_reason?: string;
   recommended_practitioner2_name?: string;

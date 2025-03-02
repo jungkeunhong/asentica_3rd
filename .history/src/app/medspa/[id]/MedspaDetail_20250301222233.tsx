@@ -41,16 +41,16 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
 
   // Good and bad reviews
   const goodReviews = [
-    { review: medspa.good_review_deepdive1, explanation: medspa.good_review_deepdive1_explanation },
-    { review: medspa.good_review_deepdive2, explanation: medspa.good_review_deepdive2_explanation },
-    { review: medspa.good_review_deepdive3, explanation: medspa.good_review_deepdive3_explanation },
-  ].filter(r => r.review);
+    medspa.good_review_deepdive1,
+    medspa.good_review_deepdive2,
+    medspa.good_review_deepdive3,
+  ].filter(Boolean);
   
   const badReviews = [
-    { review: medspa.bad_review_deepdive1, explanation: medspa.bad_review_deepdive1_explanation },
-    { review: medspa.bad_review_deepdive2, explanation: medspa.bad_review_deepdive2_explanation },
-    { review: medspa.bad_review_deepdive3, explanation: medspa.bad_review_deepdive3_explanation },
-  ].filter(r => r.review);
+    medspa.bad_review_deepdive1,
+    medspa.bad_review_deepdive2,
+    medspa.bad_review_deepdive3,
+  ].filter(Boolean);
 
   // Recommended practitioners
   const recommendedPractitioners = [
@@ -267,14 +267,14 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 height="24px" 
                 viewBox="0 -960 960 960" 
                 width="24px" 
-                fill="#000000" 
-                stroke="#000000" 
+                fill="#6b7280" 
+                stroke="#6b7280" 
                 stroke-width="0.5" 
               >
-                <path d="M720-120H280v-520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15l120-282q9-20 30-34t44-14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
+                <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-black font-sans">Pros</h3>
+            <h3 className="text-lg font-medium text-green-700 font-sans">Pros</h3>
           </div>
           
           <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
@@ -282,34 +282,45 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               {goodReviews.map((review, index) => (
                 <div 
                   key={`good-${index}`} 
-                  className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8fff8] to-[#eaf6ea] shadow-[0_10px_30px_rgba(0,0,0,0.05)] min-w-[280px] w-[280px] flex-shrink-0 snap-start"
+                  className="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#f8fff8] to-[#eaf6ea] p-4 shadow-sm min-w-[280px] w-[280px] flex-shrink-0 snap-start"
                 >
-                  {/* Large Number Background with Blur Effect */}
-                  <div 
-                    className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#e9f6e9] blur-[1px]"
-                  >
-                    {index + 1}
-                  </div>
-                  
-                  {/* Content Container */}
-                  <div className="relative z-10 p-6">
-                    {/* Title */}
-                    <h4 
-                      className="text-xl font-semibold mb-3 text-[#3c6d3c]"
-                    >
-                      {review.review}
-                    </h4>
-                    
-                    {/* Description */}
-                    <div className="text-sm">
-                      {review.explanation || ""}
-                    </div>
-                  </div>
+                  <p className="text-sm text-gray-700">{review}</p>
                 </div>
               ))}
             </div>
           </div>
-          
+          <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+              <div className="flex gap-4 px-4">
+                {recommendedPractitioners.map((practitioner, index) => (
+                  <div 
+                    key={`practitioner-${index}`}
+                    className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)] min-w-[280px] w-[280px] flex-shrink-0 snap-start"
+                  >
+                    {/* Large Number Background with Blur Effect */}
+                    <div 
+                      className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#e9e1d8] blur-[1px]"
+                    >
+                      {index + 1}
+                    </div>
+                    
+                    {/* Content Container */}
+                    <div className="relative z-10 p-6">
+                      {/* Title */}
+                      <h4 
+                        className="text-xl font-semibold mb-3 text-[#5a4738]"
+                      >
+                        {practitioner.name}
+                      </h4>
+                      
+                      {/* Description */}
+                      <div className="text-sm">
+                        {practitioner.reason}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
         </div>
         )}
 
@@ -324,14 +335,14 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 height="24px" 
                 viewBox="0 -960 960 960" 
                 width="24px" 
-                fill="#000000" 
-                stroke="#000000" 
+                fill="#6b7280" 
+                stroke="#6b7280" 
                 stroke-width="0.5" 
               >
-                <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
+                <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-black font-sans">Cons</h3>
+            <h3 className="text-lg font-medium text-red-700 font-sans">Cons</h3>
           </div>
           
           <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
@@ -339,29 +350,9 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               {badReviews.map((review, index) => (
                 <div 
                   key={`bad-${index}`} 
-                  className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#fff8f8] to-[#f6eaea] shadow-[0_10px_30px_rgba(0,0,0,0.05)] min-w-[280px] w-[280px] flex-shrink-0 snap-start"
+                  className="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#fff8f8] to-[#f6eaea] p-4 shadow-sm min-w-[280px] w-[280px] flex-shrink-0 snap-start"
                 >
-                  {/* Large Number Background with Blur Effect */}
-                  <div 
-                    className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#f6eaea] blur-[1px]"
-                  >
-                    {index + 1}
-                  </div>
-                  
-                  {/* Content Container */}
-                  <div className="relative z-10 p-6">
-                    {/* Title */}
-                    <h4 
-                      className="text-xl font-semibold mb-3 text-[#6d3c3c]"
-                    >
-                      {review.review}
-                    </h4>
-                    
-                    {/* Description */}
-                    <div className="text-sm">
-                      {review.explanation || ""}
-                    </div>
-                  </div>
+                  <p className="text-sm text-gray-700">{review}</p>
                 </div>
               ))}
             </div>
@@ -374,7 +365,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           <div className="mt-12 mb-8">
             <h3 className="text-2xl font-base text-gray-800 mb-6 font-sans">Best Practitioner</h3>
             
-            <div className="flex overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+            <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
               <div className="flex gap-4 px-4">
                 {recommendedPractitioners.map((practitioner, index) => (
                   <div 

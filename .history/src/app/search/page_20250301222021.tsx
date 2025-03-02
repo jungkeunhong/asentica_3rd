@@ -1,26 +1,24 @@
 import { Metadata } from 'next';
 import { createClient } from '@/utils/supabase/server';
-import { notFound } from 'next/navigation';
-import MedspaDetail from './MedspaDetail';
+import SearchContent from './SearchContent';
 
 export const metadata: Metadata = {
-  title: 'MedSpa Details - Asentica',
-  description: 'View detailed information about medical spas',
+  title: 'Search - Asentica',
+  description: 'Search for medical spas and treatments',
 };
 
 // Configure the page for dynamic rendering
 export const dynamic = 'force-dynamic';
 
-// Define params type for Next.js 15
-type PageParams = {
-  params: Promise<{ id: string }>;
-};
-
-export default async function Page({ params }: PageParams) {
-  // First await the params object, then access the id property
-  const resolvedParams = await params;
-  const id = resolvedParams.id;
-  console.log(`🔍 Loading MedSpa details for ID: ${id}`);
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  // Await searchParams
+  const params = await searchParams;
+  const searchQuery = params.q || '';
+  console.log("🔍 Starting search page...");
 
   try {
     const supabase = await createClient();
@@ -46,17 +44,11 @@ export default async function Page({ params }: PageParams) {
         good_review_deepdive1,
         good_review_deepdive2,
         good_review_deepdive3,
-        good_review_deepdive1_explanation,
-        good_review_deepdive2_explanation,
-        good_review_deepdive3_explanation,
         bad_review_short,
         bad_review_deepdive,
         bad_review_deepdive1,
         bad_review_deepdive2,
         bad_review_deepdive3,
-        bad_review_deepdive1_explanation,
-        bad_review_deepdive2_explanation,
-        bad_review_deepdive3_explanation,
         recommended_practitioner1_name,
         recommended_practitioner1_reason,
         recommended_practitioner2_name,
@@ -81,19 +73,23 @@ export default async function Page({ params }: PageParams) {
         lat,
         lng
       `)
-      .eq('id', id)
-      .single();
+      .filter('best_treatment', 'ilike', `%${searchQuery}%`)
+      .limit(20);
       
-    console.log("✅ Supabase data:", medspaData);
+    console.log("✅ Supabase data:", medspaData?.map(m => ({
+      id: m.id,
+      name: m.medspa_name,
+      lat: m.lat,
+      lng: m.lng
+    })));
     
-    if (error || !medspaData) {
-      console.error("❌ Error fetching MedSpa data:", error);
-      return notFound();
+    if (error) {
+      throw new Error(error.message);
     }
 
-    return <MedspaDetail medspa={medspaData} />;
+    return <SearchContent initialMedspas={medspaData || []} searchQuery={searchQuery} />;
   } catch (error) {
-    console.error("❌ Unexpected error in MedSpa detail page:", error);
-    return notFound();
+    console.error("❌ Unexpected error in search page:", error);
+    return <SearchContent initialMedspas={[]} searchQuery={searchQuery} />;
   }
 }

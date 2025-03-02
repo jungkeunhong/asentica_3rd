@@ -44,13 +44,13 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
     { review: medspa.good_review_deepdive1, explanation: medspa.good_review_deepdive1_explanation },
     { review: medspa.good_review_deepdive2, explanation: medspa.good_review_deepdive2_explanation },
     { review: medspa.good_review_deepdive3, explanation: medspa.good_review_deepdive3_explanation },
-  ].filter(r => r.review);
+  ].filter(r => r.review && r.explanation);
   
   const badReviews = [
     { review: medspa.bad_review_deepdive1, explanation: medspa.bad_review_deepdive1_explanation },
     { review: medspa.bad_review_deepdive2, explanation: medspa.bad_review_deepdive2_explanation },
     { review: medspa.bad_review_deepdive3, explanation: medspa.bad_review_deepdive3_explanation },
-  ].filter(r => r.review);
+  ].filter(r => r.review && r.explanation);
 
   // Recommended practitioners
   const recommendedPractitioners = [
@@ -267,11 +267,11 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 height="24px" 
                 viewBox="0 -960 960 960" 
                 width="24px" 
-                fill="#000000" 
-                stroke="#000000" 
+                fill="#6b7280" 
+                stroke="#6b7280" 
                 stroke-width="0.5" 
               >
-                <path d="M720-120H280v-520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15l120-282q9-20 30-34t44-14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
+                <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
               </svg>
             </div>
             <h3 className="text-lg font-medium text-black font-sans">Pros</h3>
@@ -302,7 +302,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                     
                     {/* Description */}
                     <div className="text-sm">
-                      {review.explanation || ""}
+                      {review.explanation}
                     </div>
                   </div>
                 </div>
@@ -324,8 +324,8 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 height="24px" 
                 viewBox="0 -960 960 960" 
                 width="24px" 
-                fill="#000000" 
-                stroke="#000000" 
+                fill="#6b7280" 
+                stroke="#6b7280" 
                 stroke-width="0.5" 
               >
                 <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
@@ -359,7 +359,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                     
                     {/* Description */}
                     <div className="text-sm">
-                      {review.explanation || ""}
+                      {review.explanation}
                     </div>
                   </div>
                 </div>
@@ -374,7 +374,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           <div className="mt-12 mb-8">
             <h3 className="text-2xl font-base text-gray-800 mb-6 font-sans">Best Practitioner</h3>
             
-            <div className="flex overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+            <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
               <div className="flex gap-4 px-4">
                 {recommendedPractitioners.map((practitioner, index) => (
                   <div 
