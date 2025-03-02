@@ -75,7 +75,7 @@ const CategoryGrid = () => {
 
   return (
     <div className="py-6">
-      <h2 className="cormorant text-4xl font-base mb-4 mt-8 text-gray-900 tracking-tight pl-5">Find NYC medspa for you</h2>
+      <h2 className="cormorant text-4xl font-base mb-4 mt-8 text-gray-900 pl-5">Find the best medspa for you</h2>
       
       <div className="columns-2 gap-2 px-2">
         {categories.map((category) => {

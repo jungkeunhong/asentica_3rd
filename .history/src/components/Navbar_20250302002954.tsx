@@ -54,7 +54,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-8">
           <div className="font-extrabold flex justify-between h-16 items-center">
             <Link href="/" className="flex items-center">
-              <span className="cormorant text-2xl text-black font-light  tracking-tighter">Asentica</span>
+              <span className="cormorant text-2xl text-black font-base tracking-tighter">Asentica</span>
             </Link>
             {loading ? (
               <div className="w-6 h-6 rounded-full border-2 border-t-transparent border-[#754731] animate-spin"></div>

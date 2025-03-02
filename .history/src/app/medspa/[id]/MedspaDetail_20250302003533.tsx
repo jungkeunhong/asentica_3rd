@@ -285,9 +285,10 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               .map((treatment, index) => (
                 <div 
                   key={`treatment-${index}`}
-                  className="inline-flex items-center px-3 py-1 rounded-full  border border-black shadow-sm"
+                  className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-white-50 to-white-100 border border-amber-800 shadow-sm"
                 >
-                  <span className="text-sm font-medium text-black">{treatment}</span>
+                  <div className="w-2 h-2 rounded-full bg-black mr-2"></div>
+                  <span className="text-sm font-medium text-amber-900">{treatment}</span>
                 </div>
               ))}
           </div>

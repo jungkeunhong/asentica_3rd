@@ -287,6 +287,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                   key={`treatment-${index}`}
                   className="inline-flex items-center px-3 py-1 rounded-full  border border-black shadow-sm"
                 >
+                  
                   <span className="text-sm font-medium text-black">{treatment}</span>
                 </div>
               ))}
