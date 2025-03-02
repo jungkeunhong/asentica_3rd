@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeftIcon, Phone } from 'lucide-react';
+import { ChevronLeftIcon, Phone, ChevronRightIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { Medspa } from '@/types';
-import { motion, PanInfo } from 'framer-motion';
 import ConsultationModal from '@/components/ConsultationModal';
 
 // Dynamically import the map component (client-side only)
@@ -25,11 +24,156 @@ interface MedspaDetailProps {
 
 export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
-  const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(medspa);
-  
-  const images = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
-  
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [translateX, setTranslateX] = useState(0);
+  const [transitionDuration, setTransitionDuration] = useState('0s');
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const touchStartTimeRef = useRef<number>(0);
+  const touchEndTimeRef = useRef<number>(0);
+  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Create an array of available images
+  const imageArray = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
+
+  // Clean up transition timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartTimeRef.current = Date.now();
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+    setTransitionDuration('0s');
+    
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    touchStartTimeRef.current = Date.now();
+    setIsDragging(true);
+    setStartX(e.clientX);
+    setTransitionDuration('0s');
+    
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    
+    const currentX = e.touches[0].clientX;
+    const diff = currentX - startX;
+    const newTranslateX = -currentImageIndex * 100 + (diff / sliderRef.current!.offsetWidth) * 100;
+    
+    // Limit overscroll with resistance
+    if (
+      (currentImageIndex === 0 && diff > 0) || 
+      (currentImageIndex === imageArray.length - 1 && diff < 0)
+    ) {
+      setTranslateX(newTranslateX / 3); // Add resistance
+    } else {
+      setTranslateX(newTranslateX);
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    
+    const currentX = e.clientX;
+    const diff = currentX - startX;
+    const newTranslateX = -currentImageIndex * 100 + (diff / sliderRef.current!.offsetWidth) * 100;
+    
+    // Limit overscroll with resistance
+    if (
+      (currentImageIndex === 0 && diff > 0) || 
+      (currentImageIndex === imageArray.length - 1 && diff < 0)
+    ) {
+      setTranslateX(newTranslateX / 3); // Add resistance
+    } else {
+      setTranslateX(newTranslateX);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    
+    touchEndTimeRef.current = Date.now();
+    const touchDuration = touchEndTimeRef.current - touchStartTimeRef.current;
+    
+    finishDragOperation(touchDuration);
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    
+    touchEndTimeRef.current = Date.now();
+    const touchDuration = touchEndTimeRef.current - touchStartTimeRef.current;
+    
+    finishDragOperation(touchDuration);
+  };
+
+  const finishDragOperation = (touchDuration: number) => {
+    setIsDragging(false);
+    
+    // Calculate how far we've moved as a percentage of image width
+    const movePercentage = Math.abs(translateX + currentImageIndex * 100);
+    
+    // Determine if we should snap to the next/prev image or stay on current
+    let nextIndex = currentImageIndex;
+    
+    // Fast swipe detection (less than 250ms)
+    const isFastSwipe = touchDuration < 250;
+    
+    if (isFastSwipe) {
+      // For fast swipes, we need less movement to trigger a slide change
+      if (translateX < -currentImageIndex * 100) {
+        nextIndex = Math.min(currentImageIndex + 1, imageArray.length - 1);
+      } else if (translateX > -currentImageIndex * 100) {
+        nextIndex = Math.max(currentImageIndex - 1, 0);
+      }
+    } else {
+      // For normal swipes, require at least 30% movement to change slides
+      if (movePercentage > 30) {
+        if (translateX < -currentImageIndex * 100) {
+          nextIndex = Math.min(currentImageIndex + 1, imageArray.length - 1);
+        } else {
+          nextIndex = Math.max(currentImageIndex - 1, 0);
+        }
+      }
+    }
+    
+    // Calculate transition duration based on distance to travel
+    const distance = Math.abs(nextIndex - currentImageIndex);
+    const baseDuration = 0.3; // Base duration in seconds
+    const duration = Math.min(baseDuration, Math.max(0.15, distance * baseDuration));
+    
+    transitionToImage(nextIndex, duration);
+  };
+
+  const transitionToImage = (index: number, duration: number) => {
+    setCurrentImageIndex(index);
+    setTranslateX(-index * 100);
+    setTransitionDuration(`${duration}s`);
+    
+    // Reset transition duration after animation completes
+    transitionTimeoutRef.current = setTimeout(() => {
+      setTransitionDuration('0s');
+    }, duration * 1000 + 50); // Add 50ms buffer
+  };
+
+  const changeImageIndex = (index: number) => {
+    transitionToImage(index, 0.3);
+  };
+
   // Treatments and prices
   const treatments = [
     { name: medspa.treatment1, price: medspa.price1 },
@@ -60,25 +204,8 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
     { name: medspa.recommended_practitioner3_name, reason: medspa.recommended_practitioner3_reason },
   ].filter(p => p.name && p.reason);
 
-  // Handle drag end for image slider
-  const handleDragEnd = (info: PanInfo) => {
-    const threshold = 100; // Drag threshold
-    const draggedDistance = info.offset.x;
-    
-    // Change image based on drag direction and distance
-    if (Math.abs(draggedDistance) > threshold) {
-      if (draggedDistance < 0 && currentImageIndex < images.length - 1) {
-        setCurrentImageIndex(currentImageIndex + 1);
-      } else if (draggedDistance > 0 && currentImageIndex > 0) {
-        setCurrentImageIndex(currentImageIndex - 1);
-      }
-    }
-  };
-  
-  // Change image index directly (when clicking on dots)
-  const changeImageIndex = (newIndex: number) => {
-    setCurrentImageIndex(newIndex);
-  };
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
+  const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(medspa);
 
   // Function to handle phone calls
   const handleCall = (phoneNumber: string | undefined, e: React.MouseEvent) => {
@@ -93,19 +220,6 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
       console.log('No phone number available');
     }
   };
-
-  // Navigation arrow components
-  const PrevArrow = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-      <path fill="#000000" d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/>
-    </svg>
-  );
-
-  const NextArrow = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-      <path fill="#000000" d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/>
-    </svg>
-  );
 
   // FilledStar 컴포넌트 정의
   const FilledStar = (props: React.SVGProps<SVGSVGElement>) => (
@@ -127,51 +241,65 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         <button 
           onClick={() => window.history.back()}
           className="flex items-center text-gray-600 hover:text-gray-900"
+          aria-label="Go back"
         >
-           <ChevronLeftIcon className="h-6 w-6" />
+          <ChevronLeftIcon className="h-6 w-6" />
         </button>
       </div>
 
-
       {/* Image Slider */}
       <div className="relative h-[400px] w-full overflow-hidden">
-        {images.length > 0 ? (
-          <motion.div
-            className="relative w-full h-full"
-            drag="x"
-            dragConstraints={{ left: -400 * (images.length - 1), right: 0 }}
-            dragElastic={0.2}
-            dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-            style={{ touchAction: "none" }}
-            onDragEnd={(_, info) => handleDragEnd(info)}
-            animate={{ x: -currentImageIndex * 400 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        {imageArray.length > 0 ? (
+          <div 
+            ref={sliderRef}
+            className="relative w-full h-full touch-none select-none"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
           >
-            {images.map((url, index) => (
-              <div key={index} className="absolute w-full h-full" style={{ left: `${index * 100}%` }}>
-                <Image
-                  src={url}
-                  alt={`${medspa.medspa_name} - Image ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  priority={index === 0}
-                />
-              </div>
-            ))}
+            <div 
+              className="absolute w-full h-full flex transition-transform duration-300 ease-in-out"
+              style={{ 
+                transform: `translateX(${translateX}%)`,
+                transition: `transform ${transitionDuration} cubic-bezier(0.25, 0.46, 0.45, 0.94)`,
+              }}
+            >
+              {imageArray.map((url, index) => (
+                <div 
+                  key={index} 
+                  className="relative h-full flex-shrink-0"
+                  style={{ width: `${100 / imageArray.length}%` }}
+                >
+                  <Image
+                    src={url}
+                    alt={`${medspa.medspa_name} - Image ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    priority={index === 0}
+                    sizes="100vw"
+                    quality={90}
+                  />
+                </div>
+              ))}
+            </div>
             
             {/* Image indicators (dots) */}
-            {images.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-3 z-10">
-                {images.map((_, idx) => (
+            {imageArray.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+                {imageArray.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={(e) => {
                       e.stopPropagation();
                       changeImageIndex(idx);
                     }}
-                    className={`w-3 h-3 rounded-full ${
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       idx === currentImageIndex 
-                        ? 'bg-white' 
+                        ? 'bg-white w-3' 
                         : 'bg-white/50'
                     }`}
                     aria-label={`Go to image ${idx + 1}`}
@@ -180,34 +308,36 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               </div>
             )}
             
-            {/* Navigation arrows for larger screens */}
-            {images.length > 1 && (
+            {/* Navigation arrows */}
+            {imageArray.length > 1 && (
               <>
-                <button 
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 z-10 hidden sm:block"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const newIndex = (currentImageIndex - 1 + images.length) % images.length;
-                    changeImageIndex(newIndex);
-                  }}
-                  aria-label="Previous image"
-                >
-                  <PrevArrow />
-                </button>
-                <button 
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 z-10 hidden sm:block"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const newIndex = (currentImageIndex + 1) % images.length;
-                    changeImageIndex(newIndex);
-                  }}
-                  aria-label="Next image"
-                >
-                  <NextArrow />
-                </button>
+                {currentImageIndex > 0 && (
+                  <button 
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      changeImageIndex(currentImageIndex - 1);
+                    }}
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeftIcon className="h-5 w-5" />
+                  </button>
+                )}
+                {currentImageIndex < imageArray.length - 1 && (
+                  <button 
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      changeImageIndex(currentImageIndex + 1);
+                    }}
+                    aria-label="Next image"
+                  >
+                    <ChevronRightIcon className="h-5 w-5" />
+                  </button>
+                )}
               </>
             )}
-          </motion.div>
+          </div>
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
             <p className="text-gray-500">No image available</p>
@@ -270,7 +400,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 rel="noopener noreferrer"
                 className="flex items-center text-black hover:text-gray-800"
               >
-                <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="24" height="24"><g clip-path="url(#a)"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.27 14.1a6.5 6.5 0 0 0 3.67-3.45q-1.24.21-2.7.34-.31 1.83-.97 3.1M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.48-1.52a7 7 0 0 1-.96 0H7.5a4 4 0 0 1-.84-1.32q-.38-.89-.63-2.08a40 40 0 0 0 3.92 0q-.25 1.2-.63 2.08a4 4 0 0 1-.84 1.31zm2.94-4.76q1.66-.15 2.95-.43a7 7 0 0 0 0-2.58q-1.3-.27-2.95-.43a18 18 0 0 1 0 3.44m-1.27-3.54a17 17 0 0 1 0 3.64 39 39 0 0 1-4.3 0 17 17 0 0 1 0-3.64 39 39 0 0 1 4.3 0m1.1-1.17q1.45.13 2.69.34a6.5 6.5 0 0 0-3.67-3.44q.65 1.26.98 3.1M8.48 1.5l.01.02q.41.37.84 1.31.38.89.63 2.08a40 40 0 0 0-3.92 0q.25-1.2.63-2.08a4 4 0 0 1 .85-1.32 7 7 0 0 1 .96 0m-2.75.4a6.5 6.5 0 0 0-3.67 3.44 29 29 0 0 1 2.7-.34q.31-1.83.97-3.1M4.58 6.28q-1.66.16-2.95.43a7 7 0 0 0 0 2.58q1.3.27 2.95.43a18 18 0 0 1 0-3.44m.17 4.71q-1.45-.12-2.69-.34a6.5 6.5 0 0 0 3.67 3.44q-.65-1.27-.98-3.1" fill="#666"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h16v16H0z"/></clipPath></defs></svg>
+                <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="24" height="24"><g clip-path="url(#a)"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.27,14.1a6.5,6.5,0,0,0,3.67-3.45q-1.24.21-2.7.34-.31,1.83-.97,3.1M8,16A8,8,0,1,0,8,0a8,8,0,0,0,0,16m.48-1.52a7,7,0,0,1-.96,0H7.5a4,4,0,0,1-.84-1.32q-.38-.89-.63-2.08a40,40,0,0,0,3.92,0q-.25,1.2-.63,2.08a4,4,0,0,1-.84,1.31zm2.94-4.76q1.66-.15,2.95-.43a7,7,0,0,0,0-2.58q-1.3-.27-2.95-.43a18,18,0,0,1,0,3.44m-1.27-3.54a17,17,0,0,1,0,3.64,39,39,0,0,1-4.3,0,17,17,0,0,1,0-3.64,39,39,0,0,1,4.3,0m1.1-1.17q1.45.13,2.69.34a6.5,6.5,0,0,0-3.67-3.44q.65,1.26.98,3.1M8.48,1.5l.01.02q.41.37.84,1.31.38.89.63,2.08a40,40,0,0,0-3.92,0q.25-1.2.63-2.08a4,4,0,0,1,.85-1.32,7,7,0,0,1,.96,0m-2.75.4a6.5,6.5,0,0,0-3.67,3.44,29,29,0,0,1,2.7-.34q.31-1.83.97-3.1M4.58,6.28q-1.66.16-2.95.43a7,7,0,0,0,0,2.58q1.3.27,2.95.43a18,18,0,0,1,0-3.44m.17,4.71q-1.45-.12-2.69-.34a6.5,6.5,0,0,0,3.67,3.44q-.65-1.27-.98-3.1" fill="#666"/></g><defs><clipPath id="a"><path fill="#fff" d="M0,0H16V16H0Z"/></clipPath></defs></svg>
               </Link>
             </div>
           )}
@@ -310,7 +440,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               fill="#6b7280" 
               stroke="#6b7280" 
             >
-              <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
+              <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0 406v406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
             </svg>
             <h3 className="text-lg font-medium text-black font-sans ml-1">Pros</h3>
           </div>
@@ -364,7 +494,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               fill="#6b7280"
               stroke="#6b7280"
             >
-              <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
+              <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v406Zm0 406v406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
             </svg>
             <h3 className="text-lg font-medium text-black font-sans ml-1">Cons</h3>
           </div>
@@ -481,6 +611,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
             setIsConsultationModalOpen(true);
           }}
           className="btn bg-white hover:bg-amber-800 border border-amber-900 text-amber-900 hover:text-white hover:border-amber-800 hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
+          aria-label="Get Consultation"
         >
           <span>Get Consultation</span>
         </button>

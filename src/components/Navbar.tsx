@@ -76,6 +76,7 @@ export default function Navbar() {
               <button
                 onClick={() => setIsLoginModalOpen(true)}
                 className="flex items-center gap-2 px-4 py-2 hover:text-black transition-all duration-300"
+                aria-label="Log in"
               >
                 <LogIn size={24} className="text-[#754731] hover:text-black" />
               </button>

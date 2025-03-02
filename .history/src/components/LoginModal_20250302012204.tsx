@@ -249,7 +249,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
               onClick={showEmailForm ? handleEmailAuth : () => setShowEmailForm(true)}
               className={button({ variant: 'email' })}
               disabled={showEmailForm ? loading : false}
-              aria-label={isSignUp ? "Sign up with email" : "Login with email"}
             >
               {showEmailForm ? (
                 loading ? (
@@ -275,7 +274,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
               onClick={handleGoogleLogin}
               className={button({ variant: 'google' })}
               disabled={googleLoading}
-              aria-label="Continue with Google"
             >
               {googleLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -299,7 +297,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
             <button
               onClick={handleFacebookLogin}
               className={button({ variant: 'facebook' })}
-              aria-label="Continue with Facebook"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -309,8 +306,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
 
             <button
                 className={button({ variant: 'apple' })}
-                aria-label="Continue with Apple"
-            >
+                onClick={() => {}}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black">
                   <path d="M17.05 20.28c-.98.95-2.05.86-3.08.38-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.38C2.79 15.2 3.51 7.08 9.05 6.74c1.79.04 3.07 1.2 4.08 1.2 1 0 2.87-1.47 4.84-1.25 2.49.38 4.29 2.26 4.29 2.26-3.92 2.22-3.32 7.41.56 9.71-.89 1.34-1.93 2.69-3.77 1.62zM12.03 6.54c-.24-2.67 2.04-5.02 4.89-5.28.41 3.09-2.7 5.19-4.89 5.28z"/>
                 </svg>
@@ -323,11 +320,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
               <p className="text-gray-600 text-sm">
                 By continuing, you agree to our
               </p>
-              <button className="text-amber-900 underline text-sm" aria-label="Terms">
+              <button className="text-amber-900 underline text-sm">
                 Terms
               </button>
               <span className="text-gray-600 text-sm"> and acknowledge that you have read our </span>
-              <button className="text-amber-900 underline text-sm" aria-label="Privacy Policy">
+              <button className="text-amber-900 underline text-sm">
                 Privacy Policy
               </button>
             </div>
@@ -339,7 +336,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
                   setShowEmailForm(true);
                 }}
                 className="text-amber-900 hover:underline"
-                aria-label={isSignUp ? "Switch to login" : "Switch to sign up"}
               >
                 {isSignUp ? 'Already have an account? Log In' : 'Need an account? Sign Up'}
               </button>
@@ -428,7 +424,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
               type="submit"
               className="w-full py-3 px-4 bg-[#754731] text-white rounded-full font-medium hover:bg-[#5d3926] transition-all duration-300"
               disabled={loading}
-              aria-label={isSignUp ? "Sign up" : "Login"}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
