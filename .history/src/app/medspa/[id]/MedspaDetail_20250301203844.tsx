@@ -212,7 +212,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
       {/* MedSpa Name and Location */}
       <div className="px-4 pt-6">
         <h1 className="cormorant text-3xl font-semibold">{medspa.medspa_name}</h1>
-        <div className="flex items-center text-sm text-gray-600 mt-0.5">
+        <div className="flex items-center text-sm text-gray-600 mt-1">
           <span className="mr-2">{medspa.village}</span>
           <span>•</span>
           <span className="ml-2">{medspa.location}</span>

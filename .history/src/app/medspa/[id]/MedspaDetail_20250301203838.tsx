@@ -212,7 +212,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
       {/* MedSpa Name and Location */}
       <div className="px-4 pt-6">
         <h1 className="cormorant text-3xl font-semibold">{medspa.medspa_name}</h1>
-        <div className="flex items-center text-sm text-gray-600 mt-0.5">
+        <div className="flex items-center text-sm text-gray-600 mt-1">
           <span className="mr-2">{medspa.village}</span>
           <span>•</span>
           <span className="ml-2">{medspa.location}</span>
@@ -294,7 +294,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         {badReviews.length > 0 && (
         <div>
           <div className="flex items-center mb-2">
-            <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center mr-1">
+            <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center mr-2">
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 height="24px" 

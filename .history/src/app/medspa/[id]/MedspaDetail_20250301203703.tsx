@@ -212,7 +212,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
       {/* MedSpa Name and Location */}
       <div className="px-4 pt-6">
         <h1 className="cormorant text-3xl font-semibold">{medspa.medspa_name}</h1>
-        <div className="flex items-center text-sm text-gray-600 mt-0.5">
+        <div className="flex items-center text-sm text-gray-600 mt-1">
           <span className="mr-2">{medspa.village}</span>
           <span>•</span>
           <span className="ml-2">{medspa.location}</span>
@@ -263,18 +263,18 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         {goodReviews.length > 0 && (
         <div className="mb-6">
           <div className="flex items-center mb-2">
-            <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center mr-1">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                height="24px" 
-                viewBox="0 -960 960 960" 
-                width="24px" 
-                fill="#6b7280" 
-                stroke="#6b7280" 
-                stroke-width="0.5" 
-              >
-                <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
-              </svg>
+            <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center mr-2">
+            <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            height="20px" 
+                            viewBox="0 -960 960 960" 
+                            width="20px" 
+                            fill="#6b7280" 
+                            stroke="#6b7280" 
+                            stroke-width="0.5" 
+                          >
+                            <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
+                          </svg>
             </div>
             <h3 className="text-lg font-medium text-green-700">Pros</h3>
           </div>
@@ -294,18 +294,14 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         {badReviews.length > 0 && (
         <div>
           <div className="flex items-center mb-2">
-            <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center mr-1">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                height="24px" 
-                viewBox="0 -960 960 960" 
-                width="24px" 
-                fill="#6b7280"
-                stroke="#6b7280"
-                strokeWidth="0.5"
-              >
-                <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v-406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
-              </svg>
+            <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center mr-2">
+              <Image 
+                src="/icons/thumbdown.png" 
+                alt="Negative" 
+                width={24} 
+                height={24}
+                className="w-6 h-6 object-contain flex-shrink-0"
+              />
             </div>
             <h3 className="text-lg font-medium text-red-700">Cons</h3>
           </div>
