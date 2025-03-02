@@ -27,7 +27,7 @@ interface MedspaDetailProps {
 
 export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+  const [setDirection] = useState(0);
   const images = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
   
   // Treatments and prices
@@ -247,7 +247,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 href={medspa.website} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center text-black hover:text-blue-800"
+                className="flex items-center text-blue-600 hover:text-blue-800"
               >
                 <Globe className="h-5 w-5" />
               </Link>
@@ -328,41 +328,38 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           <div className="mt-12 mb-8">
             <h3 className="text-2xl font-bold text-gray-800 mb-6 font-sans">Best Practitioner</h3>
             
-            <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-              <div className="flex gap-4 px-4">
-                {recommendedPractitioners.map((practitioner, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recommendedPractitioners.map((practitioner, index) => (
+                <div 
+                  key={`practitioner-${index}`}
+                  className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)]"
+                >
+                  {/* Large Number Background with Blur Effect */}
                   <div 
-                    key={`practitioner-${index}`}
-                    className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)] min-w-[320px] w-[320px] flex-shrink-0 snap-start"
+                    className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#e9e1d8] blur-[1px]"
                   >
-                    {/* Large Number Background with Blur Effect */}
-                    <div 
-                      className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#e9e1d8] blur-[1px]"
+                    {index + 1}
+                  </div>
+                  
+                  {/* Content Container */}
+                  <div className="relative z-10 p-6">
+                    {/* Title */}
+                    <h4 
+                      className="text-xl font-semibold mb-3 text-[#5a4738]"
                     >
-                      {index + 1}
-                    </div>
+                      {practitioner.name}
+                    </h4>
                     
-                    {/* Content Container */}
-                    <div className="relative z-10 p-6">
-                      {/* Title */}
-                      <h4 
-                        className="text-xl font-semibold mb-3 text-[#5a4738]"
-                      >
-                        {practitioner.name}
-                      </h4>
-                      
-                      {/* Description */}
-                      <div className="text-sm">
-                        {practitioner.reason}
-                      </div>
+                    {/* Description */}
+                    <div className="text-sm">
+                      {practitioner.reason}
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
-
 
       </div>
 

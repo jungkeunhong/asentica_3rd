@@ -247,7 +247,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 href={medspa.website} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center text-black hover:text-blue-800"
+                className="flex items-center text-blue-600 hover:text-blue-800"
               >
                 <Globe className="h-5 w-5" />
               </Link>

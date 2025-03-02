@@ -7,7 +7,7 @@ import { ChevronLeftIcon} from '@heroicons/react/24/outline';
 import { MapPin, Globe } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { Medspa } from '@/types';
-import { motion, PanInfo } from 'framer-motion';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import ConsultationModal from '@/components/ConsultationModal';
 
 // Dynamically import the map component (client-side only)
@@ -62,18 +62,20 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
 
   // Handle drag end for image slider
   const handleDragEnd = (info: PanInfo) => {
-    const threshold = 100; // Drag threshold
-    const draggedDistance = info.offset.x;
+    // If there's only one image or none, don't do anything
+    if (images.length <= 1) return;
     
-    // Change image based on drag direction and distance
-    if (Math.abs(draggedDistance) > threshold) {
-      if (draggedDistance < 0 && currentImageIndex < images.length - 1) {
-        setDirection(1);
-        setCurrentImageIndex(currentImageIndex + 1);
-      } else if (draggedDistance > 0 && currentImageIndex > 0) {
-        setDirection(-1);
-        setCurrentImageIndex(currentImageIndex - 1);
-      }
+    // Swiped left (next image)
+    if (info.offset.x < -50) {
+      const newIndex = (currentImageIndex + 1) % images.length;
+      setDirection(1);
+      setCurrentImageIndex(newIndex);
+    }
+    // Swiped right (previous image)
+    else if (info.offset.x > 50) {
+      const newIndex = (currentImageIndex - 1 + images.length) % images.length;
+      setDirection(-1);
+      setCurrentImageIndex(newIndex);
     }
   };
   
@@ -108,88 +110,72 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         </Link>
       </div>
 
-      {/* Image Slider */}
-      <div className="relative h-[400px] w-full overflow-hidden">
-        {images.length > 0 ? (
-          <motion.div
-            className="relative w-full h-full"
+      {/* 이미지 슬라이더 구현 */}
+      <div className="relative w-32 h-32 overflow-hidden rounded-md">
+        {imageUrls.length > 0 ? (
+          <motion.div 
+            className="flex"
             drag="x"
-            dragConstraints={{ left: -400 * (images.length - 1), right: 0 }}
+            dragConstraints={{ left: -32 * (imageUrls.length - 1), right: 0 }}
             dragElastic={0.2}
             dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-            style={{ touchAction: "none" }}
-            onDragEnd={(_, info) => handleDragEnd(info)}
-            animate={{ x: -currentImageIndex * 400 }}
+            onDragEnd={(e, info) => {
+              const threshold = 50; // 드래그 임계값
+              const draggedDistance = info.offset.x;
+              
+              // 드래그 방향과 거리에 따라 인덱스 변경
+              if (Math.abs(draggedDistance) > threshold) {
+                if (draggedDistance < 0 && currentIndex < imageUrls.length - 1) {
+                  changeImageIndex(medspa.id, currentIndex + 1);
+                } else if (draggedDistance > 0 && currentIndex > 0) {
+                  changeImageIndex(medspa.id, currentIndex - 1);
+                }
+              }
+            }}
+            animate={{ x: -currentIndex * 128 }} // 이미지 너비에 맞게 조정
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            style={{ touchAction: "none" }} // 모바일에서 스와이프 시 전체 페이지가 움직이지 않도록 설정
           >
-            {images.map((url, index) => (
-              <div key={index} className="absolute w-full h-full" style={{ left: `${index * 100}%` }}>
-                <Image
-                  src={url}
-                  alt={`${medspa.medspa_name} - Image ${index + 1}`}
-                  fill
-                  className="object-cover"
+            {imageUrls.map((url, index) => (
+              <div key={index} className="w-32 h-32 flex-shrink-0">
+                <Image 
+                  src={url} 
+                  alt={`${medspa.medspa_name} image ${index + 1}`}
+                  width={128}
+                  height={128}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center'
+                  }}
                   priority={index === 0}
                 />
               </div>
             ))}
-            
-            {/* Image indicators (dots) */}
-            {images.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-3 z-10">
-                {images.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      changeImageIndex(idx);
-                    }}
-                    className={`w-3 h-3 rounded-full ${
-                      idx === currentImageIndex 
-                        ? 'bg-white' 
-                        : 'bg-white/50'
-                    }`}
-                    aria-label={`Go to image ${idx + 1}`}
-                  />
-                ))}
-              </div>
-            )}
-            
-            {/* Navigation arrows for larger screens */}
-            {images.length > 1 && (
-              <>
-                <button 
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 z-10 hidden sm:block"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const newIndex = (currentImageIndex - 1 + images.length) % images.length;
-                    changeImageIndex(newIndex);
-                  }}
-                  aria-label="Previous image"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <button 
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 z-10 hidden sm:block"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const newIndex = (currentImageIndex + 1) % images.length;
-                    changeImageIndex(newIndex);
-                  }}
-                  aria-label="Next image"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </>
-            )}
           </motion.div>
         ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <p className="text-gray-500">No image available</p>
+          <div className="text-gray-400">No Image</div>
+        )}
+        
+        {/* 이미지 인디케이터 (닷) */}
+        {imageUrls.length > 1 && (
+          <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
+            {imageUrls.map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  changeImageIndex(medspa.id, index);
+                }}
+                className={`w-1.5 h-1.5 rounded-full ${
+                  currentIndex === index 
+                    ? 'bg-white' 
+                    : 'bg-white/50'
+                }`}
+                aria-label={`Go to image ${index + 1}`}
+              />
+            ))}
           </div>
         )}
       </div>
@@ -242,12 +228,12 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           
           {/* Website Link - 오른쪽 정렬 */}
           {medspa.website && (
-            <div className="flex-shrink-0 mr-1">
+            <div className="flex-shrink-0 mr-2">
               <Link 
                 href={medspa.website} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center text-black hover:text-blue-800"
+                className="flex items-center text-blue-600 hover:text-blue-800"
               >
                 <Globe className="h-5 w-5" />
               </Link>
@@ -328,48 +314,45 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           <div className="mt-12 mb-8">
             <h3 className="text-2xl font-bold text-gray-800 mb-6 font-sans">Best Practitioner</h3>
             
-            <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-              <div className="flex gap-4 px-4">
-                {recommendedPractitioners.map((practitioner, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recommendedPractitioners.map((practitioner, index) => (
+                <div 
+                  key={`practitioner-${index}`}
+                  className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)]"
+                >
+                  {/* Large Number Background with Blur Effect */}
                   <div 
-                    key={`practitioner-${index}`}
-                    className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)] min-w-[320px] w-[320px] flex-shrink-0 snap-start"
+                    className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#e9e1d8] blur-[1px]"
                   >
-                    {/* Large Number Background with Blur Effect */}
-                    <div 
-                      className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#e9e1d8] blur-[1px]"
+                    {index + 1}
+                  </div>
+                  
+                  {/* Content Container */}
+                  <div className="relative z-10 p-6">
+                    {/* Title */}
+                    <h4 
+                      className="text-xl font-semibold mb-3 text-[#5a4738]"
                     >
-                      {index + 1}
-                    </div>
+                      {practitioner.name}
+                    </h4>
                     
-                    {/* Content Container */}
-                    <div className="relative z-10 p-6">
-                      {/* Title */}
-                      <h4 
-                        className="text-xl font-semibold mb-3 text-[#5a4738]"
-                      >
-                        {practitioner.name}
-                      </h4>
-                      
-                      {/* Description */}
-                      <div className="text-sm">
-                        {practitioner.reason}
-                      </div>
+                    {/* Description */}
+                    <div className="text-sm">
+                      {practitioner.reason}
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
-
 
       </div>
 
       {/* Treatments and Prices */}
       {treatments.length > 0 && (
         <div className="px-4 mt-8">
-          <h2 className="text-2xl font-semibold mb-4 font-sans">Prices</h2>
+          <h2 className="text-xl font-semibold mb-4">Prices</h2>
           <div className="space-y-3">
             {treatments.map((treatment, index) => (
               <div key={`treatment-${index}`} className="flex items-start py-2 border-b border-gray-200">

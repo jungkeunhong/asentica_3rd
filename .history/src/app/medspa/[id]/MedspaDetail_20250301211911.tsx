@@ -27,7 +27,7 @@ interface MedspaDetailProps {
 
 export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+  const [setDirection] = useState(0);
   const images = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
   
   // Treatments and prices
@@ -247,7 +247,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 href={medspa.website} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center text-black hover:text-blue-800"
+                className="flex items-center text-blue-600 hover:text-blue-800"
               >
                 <Globe className="h-5 w-5" />
               </Link>

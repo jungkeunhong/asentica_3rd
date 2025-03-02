@@ -7,7 +7,7 @@ import { ChevronLeftIcon} from '@heroicons/react/24/outline';
 import { MapPin, Globe } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { Medspa } from '@/types';
-import { motion, PanInfo } from 'framer-motion';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import ConsultationModal from '@/components/ConsultationModal';
 
 // Dynamically import the map component (client-side only)
@@ -62,18 +62,20 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
 
   // Handle drag end for image slider
   const handleDragEnd = (info: PanInfo) => {
-    const threshold = 100; // Drag threshold
-    const draggedDistance = info.offset.x;
+    // If there's only one image or none, don't do anything
+    if (images.length <= 1) return;
     
-    // Change image based on drag direction and distance
-    if (Math.abs(draggedDistance) > threshold) {
-      if (draggedDistance < 0 && currentImageIndex < images.length - 1) {
-        setDirection(1);
-        setCurrentImageIndex(currentImageIndex + 1);
-      } else if (draggedDistance > 0 && currentImageIndex > 0) {
-        setDirection(-1);
-        setCurrentImageIndex(currentImageIndex - 1);
-      }
+    // Swiped left (next image)
+    if (info.offset.x < -50) {
+      const newIndex = (currentImageIndex + 1) % images.length;
+      setDirection(1);
+      setCurrentImageIndex(newIndex);
+    }
+    // Swiped right (previous image)
+    else if (info.offset.x > 50) {
+      const newIndex = (currentImageIndex - 1 + images.length) % images.length;
+      setDirection(-1);
+      setCurrentImageIndex(newIndex);
     }
   };
   
@@ -114,25 +116,38 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           <motion.div
             className="relative w-full h-full"
             drag="x"
-            dragConstraints={{ left: -400 * (images.length - 1), right: 0 }}
-            dragElastic={0.2}
-            dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-            style={{ touchAction: "none" }}
+            dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={(_, info) => handleDragEnd(info)}
-            animate={{ x: -currentImageIndex * 400 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
-            {images.map((url, index) => (
-              <div key={index} className="absolute w-full h-full" style={{ left: `${index * 100}%` }}>
+            <AnimatePresence initial={false} custom={direction}>
+              <motion.div
+                key={currentImageIndex}
+                custom={direction}
+                initial={{ 
+                  opacity: 0,
+                  x: direction > 0 ? 300 : -300 
+                }}
+                animate={{ 
+                  opacity: 1,
+                  x: 0,
+                  transition: { duration: 0.5 }
+                }}
+                exit={{ 
+                  opacity: 0,
+                  x: direction > 0 ? -300 : 300,
+                  transition: { duration: 0.5 }
+                }}
+                className="absolute w-full h-full"
+              >
                 <Image
-                  src={url}
-                  alt={`${medspa.medspa_name} - Image ${index + 1}`}
+                  src={images[currentImageIndex]}
+                  alt={`${medspa.medspa_name} - Image ${currentImageIndex + 1}`}
                   fill
                   className="object-cover"
-                  priority={index === 0}
+                  priority
                 />
-              </div>
-            ))}
+              </motion.div>
+            </AnimatePresence>
             
             {/* Image indicators (dots) */}
             {images.length > 1 && (
@@ -247,7 +262,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 href={medspa.website} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center text-black hover:text-blue-800"
+                className="flex items-center text-blue-600 hover:text-blue-800"
               >
                 <Globe className="h-5 w-5" />
               </Link>
@@ -328,41 +343,38 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           <div className="mt-12 mb-8">
             <h3 className="text-2xl font-bold text-gray-800 mb-6 font-sans">Best Practitioner</h3>
             
-            <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-              <div className="flex gap-4 px-4">
-                {recommendedPractitioners.map((practitioner, index) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recommendedPractitioners.map((practitioner, index) => (
+                <div 
+                  key={`practitioner-${index}`}
+                  className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)]"
+                >
+                  {/* Large Number Background with Blur Effect */}
                   <div 
-                    key={`practitioner-${index}`}
-                    className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)] min-w-[320px] w-[320px] flex-shrink-0 snap-start"
+                    className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#e9e1d8] blur-[1px]"
                   >
-                    {/* Large Number Background with Blur Effect */}
-                    <div 
-                      className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#e9e1d8] blur-[1px]"
+                    {index + 1}
+                  </div>
+                  
+                  {/* Content Container */}
+                  <div className="relative z-10 p-6">
+                    {/* Title */}
+                    <h4 
+                      className="text-xl font-semibold mb-3 text-[#5a4738]"
                     >
-                      {index + 1}
-                    </div>
+                      {practitioner.name}
+                    </h4>
                     
-                    {/* Content Container */}
-                    <div className="relative z-10 p-6">
-                      {/* Title */}
-                      <h4 
-                        className="text-xl font-semibold mb-3 text-[#5a4738]"
-                      >
-                        {practitioner.name}
-                      </h4>
-                      
-                      {/* Description */}
-                      <div className="text-sm">
-                        {practitioner.reason}
-                      </div>
+                    {/* Description */}
+                    <div className="text-sm">
+                      {practitioner.reason}
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
-
 
       </div>
 

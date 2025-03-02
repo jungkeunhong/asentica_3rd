@@ -27,7 +27,7 @@ interface MedspaDetailProps {
 
 export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+  const [setDirection] = useState(0);
   const images = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
   
   // Treatments and prices
@@ -247,7 +247,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 href={medspa.website} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center text-black hover:text-blue-800"
+                className="flex items-center text-blue-600 hover:text-blue-800"
               >
                 <Globe className="h-5 w-5" />
               </Link>
@@ -266,7 +266,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         {goodReviews.length > 0 && (
         <div className="mb-6">
           <div className="flex items-center mb-2">
-            <div className="min-w-[24px] w-6 h-6 flex-shrink-0 flex items-center justify-center mr-1">
+            <div className="min-w-[28px] w-6 h-6 flex-shrink-0 flex items-center justify-center mr-1">
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 height="24px" 
@@ -333,7 +333,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                 {recommendedPractitioners.map((practitioner, index) => (
                   <div 
                     key={`practitioner-${index}`}
-                    className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)] min-w-[320px] w-[320px] flex-shrink-0 snap-start"
+                    className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f6f4] to-[#f0ebe6] shadow-[0_10px_30px_rgba(0,0,0,0.05)] min-w-[280px] w-[280px] flex-shrink-0 snap-start"
                   >
                     {/* Large Number Background with Blur Effect */}
                     <div 
