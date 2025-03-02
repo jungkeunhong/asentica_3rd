@@ -27,7 +27,6 @@ interface MedspaDetailProps {
 
 export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
   const images = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
   
   // Treatments and prices
@@ -68,10 +67,8 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
     // Change image based on drag direction and distance
     if (Math.abs(draggedDistance) > threshold) {
       if (draggedDistance < 0 && currentImageIndex < images.length - 1) {
-        setDirection(1);
         setCurrentImageIndex(currentImageIndex + 1);
       } else if (draggedDistance > 0 && currentImageIndex > 0) {
-        setDirection(-1);
         setCurrentImageIndex(currentImageIndex - 1);
       }
     }
@@ -79,8 +76,6 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   
   // Change image index directly (when clicking on dots)
   const changeImageIndex = (newIndex: number) => {
-    const newDirection = newIndex > currentImageIndex ? 1 : -1;
-    setDirection(newDirection);
     setCurrentImageIndex(newIndex);
   };
 
