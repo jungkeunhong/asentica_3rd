@@ -175,7 +175,7 @@ export default function ConsultationModal({ isOpen, onClose, medspa }: Consultat
               </div>
             ) : (
               <>
-                <h3 className="cormorant font-bold text-lg tracking-tight text-amber-900 mb-2">Request Consultation</h3>
+                <h3 className="font-bold text-lg tracking-tight text-amber-900 mb-2">Request Consultation</h3>
 
                 {error && <div className="mb-4"><p className="text-red-500">{error}</p></div>}
 
