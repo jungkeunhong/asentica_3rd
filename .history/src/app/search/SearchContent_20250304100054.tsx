@@ -15,6 +15,7 @@ import LoginModal from '@/components/LoginModal';
 import { useFavorites } from '@/context/FavoritesContext';
 import { createClient } from '@/utils/supabase/client';
 import { MedspaRatings } from "@/components/ui/medspa-ratings";
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
   ssr: false,
@@ -73,7 +74,7 @@ export default function SearchContent({
   initialMedspas,
   searchQuery,
   error,
-}: SearchContentProps) {
+}: SearchContentProps): JSX.Element {
   if (error) {
     throw error;
   }
@@ -732,10 +733,8 @@ export default function SearchContent({
     });
   };
   
-  // Clear all filters - Commented out but kept for future reference
-  /* const clearAllFilters = () => {
-    setSelectedFilter(null);
 
+    
     // If we're on a search page with a query, maintain the query
     if (searchQuery) {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
@@ -748,7 +747,11 @@ export default function SearchContent({
       top: 0,
       behavior: 'smooth'
     });
-  }; */
+  };
+
+  const handleSearch = (value: string) => {
+    console.log(value);
+  };
 
   return (
     <>
@@ -764,7 +767,7 @@ export default function SearchContent({
             <div className="w-[480px] flex-1 mx-4">
               <SearchBar 
                 initialValue={searchQuery} 
-                onSearch={(value) => console.log(value)}
+                onSearch={(value) => handleSearch(value)}
                 className="mt-0"
               />
             </div>
@@ -791,7 +794,6 @@ export default function SearchContent({
               onFilterChange={handleFilterChange}
             />
             {selectedFilter && (
-              <div></div>
             )}
           </div>
         </div>
@@ -987,7 +989,7 @@ export default function SearchContent({
                             fill="#6b7280" 
                             stroke="#6b7280" 
                           >
-                            <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
+                            <path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54 220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/>
                           </svg>
                         </div>
                         <span className="text-base text-gray-500">{medspa.good_review_short || ""}</span>

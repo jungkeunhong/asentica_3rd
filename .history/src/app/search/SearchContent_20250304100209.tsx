@@ -732,10 +732,10 @@ export default function SearchContent({
     });
   };
   
-  // Clear all filters - Commented out but kept for future reference
-  /* const clearAllFilters = () => {
+  // Clear all filters
+  const clearAllFilters = () => {
     setSelectedFilter(null);
-
+    
     // If we're on a search page with a query, maintain the query
     if (searchQuery) {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
@@ -748,7 +748,7 @@ export default function SearchContent({
       top: 0,
       behavior: 'smooth'
     });
-  }; */
+  };
 
   return (
     <>
@@ -791,7 +791,6 @@ export default function SearchContent({
               onFilterChange={handleFilterChange}
             />
             {selectedFilter && (
-              <div></div>
             )}
           </div>
         </div>
