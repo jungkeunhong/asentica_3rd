@@ -38,7 +38,7 @@ const categories = [
   },
   { 
     id: 6, 
-    name: 'Lifting', 
+    name: 'Lift', 
     image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSRtviVmg0XF1zWzbLdRClpO43y28t1tSliQ&s',
     size: 'small' 
   },
@@ -75,7 +75,7 @@ const CategoryGrid = () => {
 
   return (
     <div className="py-6">
-      <h2 className="cormorant text-4xl font-base mb-4 mt-8 text-gray-900 tracking-tight pl-5">Find NYC medspa for you</h2>
+      <h2 className="cormorant text-3xl font-base mb-4 mt-8 text-gray-900 text-center tracking-tight">Choose your treatment</h2>
       
       <div className="columns-2 gap-2 px-2">
         {categories.map((category) => {

@@ -24,11 +24,7 @@
 }
 
 @layer base {
-  h1, h2, h3 {
-    font-family: 'Gotu', sans-serif;
-  }
-
-  p, button, input, span {
+  h1, h2, h3, p, button, input, span {
     font-family: system-ui, sans-serif;
   }
 

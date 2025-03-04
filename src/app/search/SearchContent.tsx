@@ -15,6 +15,7 @@ import LoginModal from '@/components/LoginModal';
 import { useFavorites } from '@/context/FavoritesContext';
 import { createClient } from '@/utils/supabase/client';
 import { MedspaRatings } from "@/components/ui/medspa-ratings";
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
   ssr: false,
@@ -256,6 +257,150 @@ export default function SearchContent({
     }
   }, []);
 
+  // Basic stemming function to improve search matching
+  const stemWord = (word: string): string => {
+    if (!word || word.length < 3) return word;
+    
+    const stemmed = word.toLowerCase();
+    
+    // Common suffixes
+    const suffixes = [
+      'ing', 'ed', 's', 'es', 'ies', 'ly', 'ment', 'ness', 'tion', 'sion'
+    ];
+    
+    // Special cases for medical treatments
+    const specialCases: Record<string, string> = {
+      'botox': 'botox',
+      'fillers': 'filler',
+      'filling': 'filler',
+      'filled': 'filler',
+      'lasers': 'laser',
+      'lasering': 'laser',
+      'facial': 'facial',
+      'facials': 'facial',
+      'peels': 'peel',
+      'peeling': 'peel',
+      'microneedling': 'microneedle',
+      'needling': 'needle',
+      'sculpting': 'sculpt',
+      'sculpted': 'sculpt',
+      'treatment': 'treat',
+      'treatments': 'treat',
+      'treating': 'treat',
+      'treated': 'treat',
+      'removal': 'remove',
+      'removing': 'remove',
+      'removed': 'remove',
+      'injection': 'inject',
+      'injections': 'inject',
+      'injecting': 'inject',
+      'injected': 'inject'
+    };
+    
+    // Check for special cases first
+    if (specialCases[stemmed]) {
+      return specialCases[stemmed];
+    }
+    
+    // Try to remove common suffixes
+    for (const suffix of suffixes) {
+      if (stemmed.endsWith(suffix) && stemmed.length > suffix.length + 2) {
+        return stemmed.slice(0, -suffix.length);
+      }
+    }
+    
+    return stemmed;
+  };
+
+  // Function to highlight matching terms in text
+  const highlightMatches = (text: string, searchTerms: string[]): React.ReactNode => {
+    if (!text || !searchTerms.length) return text;
+    
+    const lowerText = text.toLowerCase();
+    const segments: { text: string; isMatch: boolean }[] = [];
+    let lastIndex = 0;
+    
+    // Find all matches and their positions
+    const matches: { start: number; end: number }[] = [];
+    
+    searchTerms.forEach(term => {
+      if (term.length < 2) return;
+      
+      let startIndex = 0;
+      while (startIndex < lowerText.length) {
+        const index = lowerText.indexOf(term, startIndex);
+        if (index === -1) break;
+        
+        matches.push({ start: index, end: index + term.length });
+        startIndex = index + 1;
+      }
+    });
+    
+    // Sort matches by start position
+    matches.sort((a, b) => a.start - b.start);
+    
+    // Merge overlapping matches
+    const mergedMatches: { start: number; end: number }[] = [];
+    matches.forEach(match => {
+      const lastMatch = mergedMatches[mergedMatches.length - 1];
+      
+      if (lastMatch && match.start <= lastMatch.end) {
+        // Matches overlap, merge them
+        lastMatch.end = Math.max(lastMatch.end, match.end);
+      } else {
+        // No overlap, add as new match
+        mergedMatches.push({ ...match });
+      }
+    });
+    
+    // Create segments based on matches
+    mergedMatches.forEach(match => {
+      // Add non-matching segment before current match
+      if (match.start > lastIndex) {
+        segments.push({
+          text: text.substring(lastIndex, match.start),
+          isMatch: false
+        });
+      }
+      
+      // Add matching segment
+      segments.push({
+        text: text.substring(match.start, match.end),
+        isMatch: true
+      });
+      
+      lastIndex = match.end;
+    });
+    
+    // Add remaining text after last match
+    if (lastIndex < text.length) {
+      segments.push({
+        text: text.substring(lastIndex),
+        isMatch: false
+      });
+    }
+    
+    // If no matches were found, return the original text
+    if (segments.length === 0) {
+      return text;
+    }
+    
+    // Render segments with highlights
+    return (
+      <>
+        {segments.map((segment, i) => 
+          segment.isMatch ? (
+            <mark key={i} className="bg-yellow-100 font-medium px-0.5 rounded">
+              {segment.text}
+            </mark>
+          ) : (
+            segment.text
+          )
+        )}
+      </>
+    );
+  };
+
   // 필터링된 MedSpa 목록
   const filteredMedspas = useMemo(() => {
     if (!medspas.length) return [];
@@ -264,25 +409,76 @@ export default function SearchContent({
     
     // 검색어가 있는 경우에만 검색어로 필터링
     if (searchQuery.trim()) {
-      medspasCopy = medspasCopy.filter(medspa => {
-        const searchTerms = searchQuery.toLowerCase().split(' ');
+      // 검색어를 개별 단어로 분리
+      const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term.length > 0);
+      
+      // 검색어의 stemmed 버전도 준비
+      const stemmedSearchTerms = searchTerms.map(term => stemWord(term));
+      
+      // 각 메드스파에 점수 부여
+      const scoredMedspas = medspasCopy.map(medspa => {
+        let score = 0;
+        const fieldsToSearch = [
+          medspa.medspa_name,
+          medspa.village,
+          medspa.location,
+          medspa.best_treatment,
+          medspa.treatment1,
+          medspa.treatment2,
+          medspa.treatment3,
+          medspa.treatment4,
+          medspa.treatment5,
+          medspa.treatment6
+        ];
         
-        // 각 검색어가 메드스파 정보에 포함되어 있는지 확인
-        return searchTerms.every(term => {
-          return (
-            (medspa.medspa_name && medspa.medspa_name.toLowerCase().includes(term)) ||
-            (medspa.village && medspa.village.toLowerCase().includes(term)) ||
-            (medspa.location && medspa.location.toLowerCase().includes(term)) ||
-            (medspa.best_treatment && medspa.best_treatment.toLowerCase().includes(term)) ||
-            (medspa.treatment1 && medspa.treatment1.toLowerCase().includes(term)) ||
-            (medspa.treatment2 && medspa.treatment2.toLowerCase().includes(term)) ||
-            (medspa.treatment3 && medspa.treatment3.toLowerCase().includes(term)) ||
-            (medspa.treatment4 && medspa.treatment4.toLowerCase().includes(term)) ||
-            (medspa.treatment5 && medspa.treatment5.toLowerCase().includes(term)) ||
-            (medspa.treatment6 && medspa.treatment6.toLowerCase().includes(term))
-          );
+        // 각 검색어에 대해 점수 계산
+        searchTerms.forEach((term, idx) => {
+          const stemmedTerm = stemmedSearchTerms[idx];
+          
+          fieldsToSearch.forEach(field => {
+            if (field) {
+              const fieldLower = field.toLowerCase();
+              const fieldWords = fieldLower.split(/\s+|,|\(|\)|-|\//).filter(w => w.length > 0);
+              const stemmedFieldWords = fieldWords.map(w => stemWord(w));
+              
+              // 정확한 일치 (가장 높은 점수)
+              if (fieldLower === term) {
+                score += 10;
+              }
+              // 단어 포함 (높은 점수)
+              else if (fieldLower.includes(term)) {
+                score += 5;
+              }
+              // 단어 단위 일치 (중간 점수)
+              else if (fieldWords.some(word => word === term)) {
+                score += 4;
+              }
+              // 스테밍된 단어 일치 (중간 점수)
+              else if (stemmedFieldWords.some(word => word === stemmedTerm)) {
+                score += 3;
+              }
+              // 유사 단어 (부분 일치, 낮은 점수)
+              else if (term.length > 3 && fieldLower.includes(term.substring(0, Math.ceil(term.length * 0.7)))) {
+                score += 2;
+              }
+              // 매우 짧은 검색어(2-3자)의 경우 부분 일치도 허용
+              else if (term.length >= 2 && term.length <= 3 && fieldLower.includes(term)) {
+                score += 1;
+              }
+            }
+          });
         });
+        
+        return { medspa, score };
       });
+      
+      // 점수가 0보다 큰 메드스파만 필터링하고 점수 순으로 정렬
+      const filteredScoredMedspas = scoredMedspas
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score);
+      
+      // 점수 정보 제거하고 메드스파만 반환
+      medspasCopy = filteredScoredMedspas.map(item => item.medspa);
     }
     
     // 필터 적용 (검색어 유무와 관계없이)
@@ -526,6 +722,35 @@ export default function SearchContent({
     }
   };
 
+  // Handle filter change
+  const handleFilterChange = (filter: FilterType) => {
+    setSelectedFilter(filter);
+    
+    // 필터 변경 시 스크롤 위치 초기화
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+  
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSelectedFilter(null);
+    
+    // If we're on a search page with a query, maintain the query
+    if (searchQuery) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    } else {
+      router.push('/search');
+    }
+    
+    // Reset scroll position
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <>
       <div className="relative flex flex-col min-h-screen">
@@ -564,8 +789,17 @@ export default function SearchContent({
           <div className="container mx-auto pl-3 pb-2">
             <SearchFilters 
               selectedFilter={selectedFilter}
-              onFilterChange={(filter) => setSelectedFilter(filter)}
+              onFilterChange={handleFilterChange}
             />
+            {selectedFilter && (
+              <button
+                onClick={clearAllFilters}
+                className="text-sm text-gray-600 hover:text-gray-900 flex items-center"
+              >
+                <XMarkIcon className="h-4 w-4 mr-1" />
+                Clear filters
+              </button>
+            )}
           </div>
         </div>
 
@@ -712,7 +946,7 @@ export default function SearchContent({
                         </div>
                         {/* Medspa name and village */}
                         <h3 className="cormorant text-xl font-semibold text-black break-words">
-                          {medspa.medspa_name}
+                          {searchQuery ? highlightMatches(medspa.medspa_name, searchQuery.split(' ')) : medspa.medspa_name}
                         </h3>
                         <div className="flex items-center text-gray-500 text-[12px] mb-1">
                           {userLocation && (
@@ -723,7 +957,7 @@ export default function SearchContent({
                           )}
                           <div className="flex items-center truncate">
                             <MapPin className="h-3.5 w-3.5 flex-shrink-0 mr-1" />
-                            <span className="truncate">{medspa.village}</span>
+                            <span className="truncate">{searchQuery ? highlightMatches(medspa.village, searchQuery.split(' ')) : medspa.village}</span>
                           </div>
                         </div>
  
@@ -775,7 +1009,7 @@ export default function SearchContent({
                             fill="#6b7280"
                             stroke="#6b7280"
                           >
-                            <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l-54 220 174-174v-406Zm0 406v406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
+                            <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l54 220 174-174v-406Zm0 406v406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
                           </svg>
                         </div>
                         <span className="text-base text-gray-500">{medspa.bad_review_short || ""}</span>
