@@ -399,8 +399,8 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
                 <button 
                   onClick={() => onMedspaSelect(selectedMedspa)}
                   className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:shadow-lg transform flex items-center justify-center gap-2 flex-1 h-9 rounded text-sm"
-                  title="Consultation"
-                  aria-label="Consultation"
+                  title="상담 예약"
+                  aria-label="상담 예약"
                 >
                   <span>Consultation</span>
                 </button>

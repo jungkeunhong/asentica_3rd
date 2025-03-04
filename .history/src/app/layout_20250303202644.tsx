@@ -33,9 +33,6 @@ export const metadata: Metadata = {
   description: 'Discover and book the best medical spa treatments near you.',
 };
 
-// initMixpanel 호출
-initMixpanel();
-
 export default function RootLayout({
   children,
 }: {
