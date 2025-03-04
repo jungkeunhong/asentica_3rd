@@ -45,7 +45,7 @@ export default function SearchFilters({ selectedFilter, onFilterChange }: Search
   return (
     <div className="w-full overflow-x-auto py-2">
       <div className="flex space-x-2 min-w-max items-center">
-        <div className="flex items-center text-gray-600">
+        <div className="flex items-center text-gray-600 mr-2">
           <FunnelIcon className="h-4 w-4 mr-1" />
           <span className="text-sm font-medium">:</span>
         </div>
@@ -63,10 +63,10 @@ export default function SearchFilters({ selectedFilter, onFilterChange }: Search
               size="sm"
               onClick={() => handleFilterClick(filter.value)}
               className={`
-                whitespace-nowrap rounded-full px-3 text-sm font-medium transition-all h-8
+                whitespace-nowrap rounded-full px-3 py-0.5 text-sm font-medium transition-all
                 ${selectedFilter === filter.value 
                   ? 'bg-black text-white hover:bg-gray-800 shadow-sm' 
-                  : 'bg-white text-gray-700 border-black hover:bg-gray-100 hover:border-gray-400'}
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100 hover:border-gray-400'}
               `}
             >
               {filter.icon && <span className="mr-1">{filter.icon}</span>}

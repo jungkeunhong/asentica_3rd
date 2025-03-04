@@ -24,38 +24,177 @@ interface MedspaDetailProps {
 
 export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [translateX, setTranslateX] = useState(0);
+  const [transitionDuration, setTransitionDuration] = useState('0s');
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const touchStartTimeRef = useRef<number>(0);
+  const touchEndTimeRef = useRef<number>(0);
+  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
   const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(null);
 
   // Create an array of available images
   const imageArray = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
 
-  // Add Intersection Observer to update current image index when scrolling
+  // Clean up transition timeout on unmount
   useEffect(() => {
-    const container = document.querySelector('.snap-x');
-    if (!container) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const index = Array.from(container.children).indexOf(entry.target);
-            setCurrentImageIndex(index);
-          }
-        });
-      },
-      {
-        root: container,
-        threshold: 0.5
+    return () => {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
       }
-    );
-
-    Array.from(container.children).forEach(child => {
-      observer.observe(child);
-    });
-
-    return () => observer.disconnect();
+    };
   }, []);
+
+  // Handle image change
+  const changeImageIndex = (index: number) => {
+    if (index < 0 || index >= imageArray.length) return;
+    
+    setCurrentImageIndex(index);
+    setTranslateX(-index * 100);
+    setTransitionDuration('0.3s');
+    
+    // Reset transition duration after animation completes
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+    
+    transitionTimeoutRef.current = setTimeout(() => {
+      setTransitionDuration('0s');
+    }, 300);
+  };
+
+  // Touch event handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (imageArray.length <= 1) return;
+    
+    touchStartTimeRef.current = Date.now();
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+    setTransitionDuration('0s');
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || imageArray.length <= 1) return;
+    
+    const currentX = e.touches[0].clientX;
+    const diff = currentX - startX;
+    
+    // Calculate percentage moved
+    const percentMoved = (diff / (sliderRef.current?.clientWidth || 1)) * 100;
+    
+    // Apply resistance at edges
+    let newTranslateX = -currentImageIndex * 100 + percentMoved;
+    
+    // Add resistance at the edges
+    if (newTranslateX > 0) {
+      newTranslateX = newTranslateX * 0.3; // More resistance at left edge
+    } else if (newTranslateX < -(imageArray.length - 1) * 100) {
+      const overflowAmount = newTranslateX + (imageArray.length - 1) * 100;
+      newTranslateX = -(imageArray.length - 1) * 100 + overflowAmount * 0.3; // More resistance at right edge
+    }
+    
+    setTranslateX(newTranslateX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging || imageArray.length <= 1) return;
+    
+    touchEndTimeRef.current = Date.now();
+    setIsDragging(false);
+    
+    // Calculate swipe velocity
+    const touchDuration = touchEndTimeRef.current - touchStartTimeRef.current;
+    const currentTranslateX = translateX;
+    const targetIndex = -Math.round(currentTranslateX / 100);
+    
+    // Determine if it was a fast swipe
+    const isFastSwipe = touchDuration < 250;
+    
+    // Determine direction of swipe
+    const direction = currentTranslateX > -currentImageIndex * 100 ? -1 : 1;
+    
+    let newIndex = targetIndex;
+    
+    // If it was a fast swipe, move one more in the direction of the swipe
+    if (isFastSwipe) {
+      newIndex = currentImageIndex + direction;
+    }
+    
+    // Clamp the index
+    newIndex = Math.max(0, Math.min(imageArray.length - 1, newIndex));
+    
+    // Update the current image index
+    changeImageIndex(newIndex);
+  };
+
+  // Mouse event handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (imageArray.length <= 1) return;
+    
+    touchStartTimeRef.current = Date.now();
+    setIsDragging(true);
+    setStartX(e.clientX);
+    setTransitionDuration('0s');
+    
+    // Prevent default behavior (like text selection)
+    e.preventDefault();
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || imageArray.length <= 1) return;
+    
+    const currentX = e.clientX;
+    const diff = currentX - startX;
+    
+    // Calculate percentage moved
+    const percentMoved = (diff / (sliderRef.current?.clientWidth || 1)) * 100;
+    
+    // Apply resistance at edges
+    let newTranslateX = -currentImageIndex * 100 + percentMoved;
+    
+    // Add resistance at the edges
+    if (newTranslateX > 0) {
+      newTranslateX = newTranslateX * 0.3; // More resistance at left edge
+    } else if (newTranslateX < -(imageArray.length - 1) * 100) {
+      const overflowAmount = newTranslateX + (imageArray.length - 1) * 100;
+      newTranslateX = -(imageArray.length - 1) * 100 + overflowAmount * 0.3; // More resistance at right edge
+    }
+    
+    setTranslateX(newTranslateX);
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging || imageArray.length <= 1) return;
+    
+    touchEndTimeRef.current = Date.now();
+    setIsDragging(false);
+    
+    // Calculate swipe velocity
+    const touchDuration = touchEndTimeRef.current - touchStartTimeRef.current;
+    const currentTranslateX = translateX;
+    const targetIndex = -Math.round(currentTranslateX / 100);
+    
+    // Determine if it was a fast swipe
+    const isFastSwipe = touchDuration < 250;
+    
+    // Determine direction of swipe
+    const direction = currentTranslateX > -currentImageIndex * 100 ? -1 : 1;
+    
+    let newIndex = targetIndex;
+    
+    // If it was a fast swipe, move one more in the direction of the swipe
+    if (isFastSwipe) {
+      newIndex = currentImageIndex + direction;
+    }
+    
+    // Clamp the index
+    newIndex = Math.max(0, Math.min(imageArray.length - 1, newIndex));
+    
+    // Update the current image index
+    changeImageIndex(newIndex);
+  };
 
   // Treatments and prices
   const treatments = [
@@ -124,18 +263,34 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
       </div>
 
       {/* Image Slider */}
-      <div className="relative h-[400px] w-full">
-        <div className="w-full h-full overflow-x-hidden">
+      <div className="relative h-[400px] w-full overflow-hidden">
+        {imageArray.length > 0 ? (
           <div 
-            className="flex w-full h-full snap-x snap-mandatory overflow-x-auto scrollbar-hide"
-            style={{ scrollBehavior: 'smooth' }}
+            ref={sliderRef}
+            className="relative w-full h-full touch-none select-none"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
           >
-            {imageArray.map((url, index) => (
-              <div 
-                key={index}
-                className="w-full h-full flex-shrink-0 flex-grow-0 snap-center"
-              >
-                <div className="relative w-full h-full">
+            {/* Slider track */}
+            <div 
+              className={`absolute inset-0 flex transition-transform ${transitionDuration === '0.3s' ? 'duration-300' : ''} ease-out`}
+              style={{ 
+                transform: `translateX(${translateX}%)`,
+                width: `${imageArray.length * 100}%`
+              }}
+            >
+              {/* Slider items */}
+              {imageArray.map((url, index) => (
+                <div 
+                  key={index} 
+                  className="relative h-full w-full"
+                  style={{ flexBasis: `${100 / imageArray.length}%`, flexShrink: 0, flexGrow: 0 }}
+                >
                   <Image
                     src={url}
                     alt={`${medspa.medspa_name} - Image ${index + 1}`}
@@ -146,79 +301,65 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                     quality={90}
                   />
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {/* 인디케이터 (dots) */}
-          {imageArray.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-              {imageArray.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    const container = document.querySelector('.snap-x');
-                    if (container) {
-                      container.scrollTo({
-                        left: idx * container.clientWidth,
-                        behavior: 'smooth'
-                      });
-                    }
-                    setCurrentImageIndex(idx);
-                  }}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    idx === currentImageIndex 
-                      ? 'bg-white scale-125' 
-                      : 'bg-white/50'
-                  }`}
-                  aria-label={`Go to image ${idx + 1}`}
-                />
               ))}
             </div>
-          )}
-
-          {/* 네비게이션 화살표 */}
-          {imageArray.length > 1 && (
-            <>
-              {currentImageIndex > 0 && (
-                <button 
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white z-10"
-                  onClick={() => {
-                    const container = document.querySelector('.snap-x');
-                    if (container) {
-                      container.scrollTo({
-                        left: (currentImageIndex - 1) * container.clientWidth,
-                        behavior: 'smooth'
-                      });
-                    }
-                    setCurrentImageIndex(prev => prev - 1);
-                  }}
-                  aria-label="Previous image"
-                >
-                  <ChevronLeftIcon className="h-5 w-5" />
-                </button>
-              )}
-              {currentImageIndex < imageArray.length - 1 && (
-                <button 
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white z-10"
-                  onClick={() => {
-                    const container = document.querySelector('.snap-x');
-                    if (container) {
-                      container.scrollTo({
-                        left: (currentImageIndex + 1) * container.clientWidth,
-                        behavior: 'smooth'
-                      });
-                    }
-                    setCurrentImageIndex(prev => prev + 1);
-                  }}
-                  aria-label="Next image"
-                >
-                  <ChevronRightIcon className="h-5 w-5" />
-                </button>
-              )}
-            </>
-          )}
-        </div>
+            
+            {/* Image indicators (dots) */}
+            {imageArray.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+                {imageArray.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      changeImageIndex(idx);
+                    }}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      idx === currentImageIndex 
+                        ? 'bg-white scale-125' 
+                        : 'bg-white/50'
+                    }`}
+                    aria-label={`Go to image ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+            
+            {/* Navigation arrows */}
+            {imageArray.length > 1 && (
+              <>
+                {currentImageIndex > 0 && (
+                  <button 
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      changeImageIndex(currentImageIndex - 1);
+                    }}
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeftIcon className="h-5 w-5" />
+                  </button>
+                )}
+                {currentImageIndex < imageArray.length - 1 && (
+                  <button 
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      changeImageIndex(currentImageIndex + 1);
+                    }}
+                    aria-label="Next image"
+                  >
+                    <ChevronRightIcon className="h-5 w-5" />
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            <p className="text-gray-500">No images available</p>
+          </div>
+        )}
       </div>
 
       {/* MedSpa Name and Location */}
@@ -309,11 +450,11 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         <div className="mb-6">
           <div className="flex items-center mb-2 mr-1">
             <Image 
-              src="/icons/thumb_up.png"
+              src="icons/thumb_up.png"
               alt="Thumb up"
-              width={24}
-              height={24}
-              className="text-gray-500 relative top-[1px]"
+              width={20}
+              height={20}
+              className="text-gray-500"
             />
             <h3 className="text-lg font-medium text-black font-sans ml-1">Pros</h3>
           </div>
@@ -360,11 +501,11 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         <div className="mb-6">
           <div className="flex items-center mb-2">
             <Image 
-              src="/icons/thumb_down.png"
+              src="icons/thumb_down.png"
               alt="Thumb down"
-              width={24}
-              height={24}
-              className="text-gray-500 relative top-[1px]"
+              width={20}
+              height={20}
+              className="text-gray-500"
             />
             <h3 className="text-lg font-medium text-black font-sans ml-1">Cons</h3>
           </div>

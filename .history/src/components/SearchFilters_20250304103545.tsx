@@ -45,7 +45,7 @@ export default function SearchFilters({ selectedFilter, onFilterChange }: Search
   return (
     <div className="w-full overflow-x-auto py-2">
       <div className="flex space-x-2 min-w-max items-center">
-        <div className="flex items-center text-gray-600">
+        <div className="flex items-center text-gray-600 mr-2">
           <FunnelIcon className="h-4 w-4 mr-1" />
           <span className="text-sm font-medium">:</span>
         </div>

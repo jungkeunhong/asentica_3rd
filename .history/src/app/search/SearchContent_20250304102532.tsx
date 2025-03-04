@@ -87,7 +87,6 @@ export default function SearchContent({
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const scrollThreshold = useRef(false);
-  const fifthItemRef = useRef<HTMLDivElement>(null);
   
   const router = useRouter();
   
@@ -579,43 +578,63 @@ export default function SearchContent({
     return medspasCopy;
   }, [medspas, selectedFilter, searchQuery, userLocation, findTreatmentPriceNumber]);
 
-  // Check login status on component mount
+  // 로그인 상태 확인 및 스크롤 감지 useEffect 추가
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsLoggedIn(!!session);
+    // 로그인 상태 확인
+    const checkAuth = async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.auth.getSession();
+        const isAuthenticated = !!data.session;
+        console.log('로그인 상태:', isAuthenticated);
+        setIsLoggedIn(isAuthenticated);
+        
+        // 로그인 상태가 확인되면 모달을 표시하지 않음
+        if (isAuthenticated) {
+          setShowLoginModal(false);
+          scrollThreshold.current = true; // 로그인 되었으므로 더 이상 모달 표시 안함
+        } else {
+          // 로그아웃 상태일 때는 scrollThreshold 초기화
+          scrollThreshold.current = false;
+        }
+      } catch (error) {
+        console.error('인증 상태 확인 중 오류:', error);
+        setIsLoggedIn(false); // 오류 발생 시 로그아웃 상태로 간주
+        scrollThreshold.current = false; // 오류 발생 시 scrollThreshold 초기화
+      }
     };
     
-    checkLoginStatus();
-  }, []);
-
-  // Intersection Observer to show login modal when 5th item is visible
-  useEffect(() => {
-    // Only set up observer if user is not logged in and modal hasn't been shown yet
-    if (!isLoggedIn && !scrollThreshold.current) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting) {
+    checkAuth();
+    
+    // 클라이언트 사이드에서만 실행
+    if (typeof window !== 'undefined') {
+      console.log('스크롤 이벤트 리스너 등록');
+      
+      // 스크롤 이벤트 리스너 추가
+      const handleScroll = () => {
+        // 로그인하지 않은 상태에서만 모달 표시 로직 실행
+        if (!isLoggedIn && !scrollThreshold.current) {
+          const scrollPosition = window.scrollY;
+          const windowHeight = window.innerHeight;
+          const scrollPercentage = scrollPosition / windowHeight;
+          
+          // 스크롤이 화면 높이의 80% 이상일 때 모달 표시
+          if (scrollPercentage > 0.8) {
+            console.log('스크롤 위치에 따른 로그인 모달 표시');
             setShowLoginModal(true);
-            scrollThreshold.current = true;
-            observer.disconnect(); // Disconnect after triggering once
+            scrollThreshold.current = true; // 한 번만 표시하도록 설정
           }
-        },
-        {
-          threshold: 0.5 // Trigger when 50% of the element is visible
         }
-      );
-
-      // Only observe if the fifth item ref exists
-      if (fifthItemRef.current) {
-        observer.observe(fifthItemRef.current);
-      }
-
-      return () => observer.disconnect();
+      };
+      
+      window.addEventListener('scroll', handleScroll);
+      
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
     }
   }, [isLoggedIn]);
-
+  
   // 이미지 인덱스 변경 함수
   const changeImageIndex = (medspaId: string, newIndex: number) => {
     setCurrentImageIndexes({
@@ -798,7 +817,7 @@ export default function SearchContent({
           // 목록 뷰
           <div className="container mx-auto px-4 py-2">
             <div className="flex flex-col gap-4">
-              {filteredMedspas.map((medspa, index) => {
+              {filteredMedspas.map((medspa) => {
                 console.log('Processing medspa:', medspa); // 디버깅용 로그
                 const imageUrls = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
                 const currentIndex = currentImageIndexes[medspa.id] || 0;
@@ -806,7 +825,6 @@ export default function SearchContent({
                 return (
                   <div 
                     key={medspa.id}
-                    ref={index === 4 ? fifthItemRef : null}
                     onClick={() => handleMedspaClick(medspa.id)}
                     className="flex flex-col gap-4 bg-white border-b p-4 cursor-pointer hover:border-b"
                   >
@@ -962,25 +980,27 @@ export default function SearchContent({
                       <div className="flex items-center gap-2">
                         <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
                           <Image 
-                            src="/icons/thumb_up_gray.png"
-                            alt="Thumb up"
-                            width={20}
-                            height={20}
-                            className="text-gray-500 relative top-[1px]"
-                          />
+                              src="/icons/thumb_up.png"
+                              alt="Thumb up"
+                              width={24}
+                              height={24}
+                              className="text-gray-500 relative top-[1px]"
+                            />
                         </div>
                         <span className="text-base text-gray-500">{medspa.good_review_short || ""}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                        <Image 
-                            src="/icons/thumb_down_gray.png"
-                            alt="Thumb down"
-                        
-                            width={20}
-                            height={20}
-                            className="text-gray-500 relative top-[1px]"
-                          />
+                          <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            height="20px" 
+                            viewBox="0 -960 960 960" 
+                            width="20px" 
+                            fill="#6b7280"
+                            stroke="#6b7280"
+                          >
+                            <path d="M240-840h440v520L400-40l-50-50q-7-7-11.5-19t-4.5-23v-14l44-174H120q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14Zm360 80H240L120-480v80h360l54 220 174-174v-406Zm0 406v406 406Zm80 34v-80h120v-360H680v-80h200v520H680Z"/>
+                          </svg>
                         </div>
                         <span className="text-base text-gray-500">{medspa.bad_review_short || ""}</span>
                       </div>
