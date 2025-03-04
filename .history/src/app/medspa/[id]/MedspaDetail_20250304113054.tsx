@@ -387,7 +387,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                   <div className="relative z-10 p-6">
                     {/* Title */}
                     <h4 
-                      className="text-lg leading-tight font-semibold mb-3 text-[#cc0000]"
+                      className="text-lg leading-tight font-semibold mb-3 text-[#6d3c3c]"
                     >
                       {review.review}
                     </h4>

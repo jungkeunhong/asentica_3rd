@@ -336,7 +336,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                   <div className="relative z-10 p-6">
                     {/* Title */}
                     <h4 
-                      className="text-lg leading-tight font-semibold mb-3 text-[#3c6d3c]"
+                      className="text-xl font-semibold mb-3 text-[#3c6d3c]"
                     >
                       {review.review}
                     </h4>
@@ -387,7 +387,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                   <div className="relative z-10 p-6">
                     {/* Title */}
                     <h4 
-                      className="text-lg leading-tight font-semibold mb-3 text-[#cc0000]"
+                      className="text-xl font-semibold mb-3 text-[#6d3c3c]"
                     >
                       {review.review}
                     </h4>
@@ -450,7 +450,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
       {/* Treatments and Prices */}
       {treatments.length > 0 && (
         <div className="px-4 mt-8">
-          <h2 className="text-xl font-base mb-4 font-sans">Prices</h2>
+          <h2 className="text-2xl font-base mb-4 font-sans">Prices</h2>
           <div className="space-y-3">
             {treatments.map((treatment, index) => (
               <div key={`treatment-${index}`} className="flex items-start py-2 border-b border-gray-200">

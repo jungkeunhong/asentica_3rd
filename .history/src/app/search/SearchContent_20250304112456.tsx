@@ -923,7 +923,7 @@ export default function SearchContent({
                         <h3 className="cormorant text-xl font-semibold text-black break-words leading-[1.1]">
                           {searchQuery ? highlightMatches(medspa.medspa_name, searchQuery.split(' ')) : medspa.medspa_name}
                         </h3>
-                        <div className="flex items-center text-gray-500 text-[12px] mt-1">
+                        <div className="flex items-center text-gray-500 text-[12px] ">
                           {userLocation && (
                             <span className="flex items-center whitespace-nowrap mr-2">
                               <Navigation className="h-3.5 w-3.5 text-gray-400 mr-1" />

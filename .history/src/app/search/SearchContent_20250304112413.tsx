@@ -920,10 +920,10 @@ export default function SearchContent({
                           </button>
                         </div>
                         {/* Medspa name and village */}
-                        <h3 className="cormorant text-xl font-semibold text-black break-words leading-[1.1]">
+                        <h3 className="cormorant text-xl font-semibold text-black break-words leading-[1]">
                           {searchQuery ? highlightMatches(medspa.medspa_name, searchQuery.split(' ')) : medspa.medspa_name}
                         </h3>
-                        <div className="flex items-center text-gray-500 text-[12px] mt-1">
+                        <div className="flex items-center text-gray-500 text-[12px] mb-1">
                           {userLocation && (
                             <span className="flex items-center whitespace-nowrap mr-2">
                               <Navigation className="h-3.5 w-3.5 text-gray-400 mr-1" />
@@ -958,7 +958,7 @@ export default function SearchContent({
                     
                     
                     {/* Reviews - 이미지와 왼쪽 정렬 */}
-                    <div className="space-y-1">
+                    <div className="mt-1 space-y-1">
                       <div className="flex items-center gap-2">
                         <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
                           <Image 

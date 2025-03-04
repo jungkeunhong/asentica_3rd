@@ -25,7 +25,7 @@ export function MedspaRatings({
   yelpReview 
 }: MedspaRatingsProps) {
   return (
-    <div className="flex flex-col gap-0.5 mt-2">
+    <div className="flex flex-col gap-0.5 mt-1">
       {/* Google rating */}
       <div className="flex items-center gap-1">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24">

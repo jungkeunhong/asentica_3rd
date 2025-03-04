@@ -959,7 +959,7 @@ export default function SearchContent({
                     
                     {/* Reviews - 이미지와 왼쪽 정렬 */}
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-">
                         <div className="min-w-[20px] w-5 h-5 flex-shrink-0 flex items-center justify-center">
                           <Image 
                             src="/icons/thumb_up_gray.png"
