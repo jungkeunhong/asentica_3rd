@@ -71,7 +71,7 @@ const LandingContent = () => {
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </span>
             </motion.button>
-            <p className="system-ui text-base md:text-xl font-light text-white/80 px-3 mt-6 leading-tight max-w-xl mb-8">
+            <p className="system-ui text-base md:text-xl font-light text-white/80 px-3 mt-4 leading-tight max-w-xl mb-8">
             +100 verified MedSpas and practitioners in NYC
             </p>
         </motion.div>

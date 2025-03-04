@@ -43,7 +43,7 @@ const LandingContent = () => {
         
          {/* Hero Content */}
         <motion.div 
-            className="absolute inset-x-0 top-[30%] z-20 flex flex-col items-center px-2 text-center"
+            className="absolute inset-x-0 top-[20%] z-20 flex flex-col items-center px-2 text-center"
             style={{ opacity, scale }}
         >
             <h1 className="cormorant text-4xl md:text-6xl font-light text-white mb-6 tracking-tight">
@@ -71,7 +71,7 @@ const LandingContent = () => {
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </span>
             </motion.button>
-            <p className="system-ui text-base md:text-xl font-light text-white/80 px-3 mt-6 leading-tight max-w-xl mb-8">
+            <p className="system-ui text-base md:text-xl font-light text-white/80 px-3 mt-4 leading-tight max-w-xl mb-8">
             +100 verified MedSpas and practitioners in NYC
             </p>
         </motion.div>
