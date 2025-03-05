@@ -90,7 +90,8 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
       if (onSearch) {
         onSearch(trimmedTerm);
       } else {
-        router.push(`/search?q=${encodeURIComponent(trimmedTerm)}`);
+        // Use window.location for a full page navigation to ensure it works on all devices
+        window.location.href = `/search?q=${encodeURIComponent(trimmedTerm)}`;
       }
     }
   };
@@ -128,6 +129,7 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
           onChange={handleChange}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
+              e.preventDefault();
               handleSubmit(e);
             }
           }}
@@ -148,9 +150,13 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
               <XMarkIcon className="w-5 h-5" />
             </button>
           )}
-          {!searchTerm && (
-            <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
-          )}
+          <button
+            type="submit"
+            className="p-1 text-gray-400 hover:text-gray-600"
+            aria-label="Search"
+          >
+            <MagnifyingGlassIcon className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </form>
