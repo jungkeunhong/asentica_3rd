@@ -84,7 +84,7 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
       ).slice(0, 6); // Limit to 6 suggestions
       
       setSuggestions(combinedSuggestions);
-      setShowSuggestions(false); // Disable suggestions dropdown
+      setShowSuggestions(combinedSuggestions.length > 0);
     } else {
       setShowSuggestions(false);
     }
@@ -204,26 +204,6 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
         </div>
       </div>
       
-      {/* Search suggestions dropdown */}
-      {showSuggestions && (
-        <div 
-          ref={suggestionsRef}
-          className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg"
-        >
-          <ul className="py-1 overflow-auto max-h-60">
-            {suggestions.map((suggestion, index) => (
-              <li 
-                key={index}
-                className="px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 flex items-center"
-                onClick={() => handleSuggestionClick(suggestion)}
-              >
-                <MagnifyingGlassIcon className="w-4 h-4 mr-2 text-gray-400" />
-                {suggestion}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
     </form>
   );
