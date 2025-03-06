@@ -301,7 +301,6 @@ export default function SearchContent({
       'spas': 'spa',
       'medspa': 'medspa',
       'medspas': 'medspa',
-      'med': 'med',
       'center': 'center',
       'centers': 'center',
       'aesthetic': 'aesthetic',
@@ -312,18 +311,7 @@ export default function SearchContent({
       'doctor': 'doctor',
       'doctors': 'doctor',
       'physician': 'physician',
-      'physicians': 'physician',
-      'skin': 'skin',
-      'skincare': 'skin',
-      'glow': 'glow',
-      'glowing': 'glow',
-      'rejuvenate': 'rejuvenate',
-      'rejuvenation': 'rejuvenate',
-      'elite': 'elite',
-      'pure': 'pure',
-      'radiance': 'radiance',
-      'revival': 'revival',
-      'revive': 'revival'
+      'physicians': 'physician'
     };
     
     // Check for special cases first

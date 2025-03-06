@@ -301,7 +301,6 @@ export default function SearchContent({
       'spas': 'spa',
       'medspa': 'medspa',
       'medspas': 'medspa',
-      'med': 'med',
       'center': 'center',
       'centers': 'center',
       'aesthetic': 'aesthetic',
@@ -312,18 +311,7 @@ export default function SearchContent({
       'doctor': 'doctor',
       'doctors': 'doctor',
       'physician': 'physician',
-      'physicians': 'physician',
-      'skin': 'skin',
-      'skincare': 'skin',
-      'glow': 'glow',
-      'glowing': 'glow',
-      'rejuvenate': 'rejuvenate',
-      'rejuvenation': 'rejuvenate',
-      'elite': 'elite',
-      'pure': 'pure',
-      'radiance': 'radiance',
-      'revival': 'revival',
-      'revive': 'revival'
+      'physicians': 'physician'
     };
     
     // Check for special cases first
@@ -464,38 +452,35 @@ export default function SearchContent({
         searchTerms.forEach((term, idx) => {
           const stemmedTerm = stemmedSearchTerms[idx];
           
-          fieldsToSearch.forEach((field, fieldIndex) => {
+          fieldsToSearch.forEach(field => {
             if (field) {
               const fieldLower = field.toLowerCase();
               const fieldWords = fieldLower.split(/\s+|,|\(|\)|-|\//).filter(w => w.length > 0);
               const stemmedFieldWords = fieldWords.map(w => stemWord(w));
               
-              // 메드스파 이름에 대한 가중치 부여
-              const nameMultiplier = fieldIndex === 0 ? 2 : 1; // medspa_name field has index 0
-              
               // 정확한 일치 (가장 높은 점수)
               if (fieldLower === term) {
-                score += 10 * nameMultiplier;
+                score += 10;
               }
               // 단어 포함 (높은 점수)
               else if (fieldLower.includes(term)) {
-                score += 5 * nameMultiplier;
+                score += 5;
               }
               // 단어 단위 일치 (중간 점수)
               else if (fieldWords.some(word => word === term)) {
-                score += 4 * nameMultiplier;
+                score += 4;
               }
               // 스테밍된 단어 일치 (중간 점수)
               else if (stemmedFieldWords.some(word => word === stemmedTerm)) {
-                score += 3 * nameMultiplier;
+                score += 3;
               }
               // 유사 단어 (부분 일치, 낮은 점수)
-              else if (term.length > 2 && fieldLower.includes(term.substring(0, Math.ceil(term.length * 0.7)))) {
-                score += 2 * nameMultiplier;
+              else if (term.length > 3 && fieldLower.includes(term.substring(0, Math.ceil(term.length * 0.7)))) {
+                score += 2;
               }
               // 매우 짧은 검색어(2-3자)의 경우 부분 일치도 허용
               else if (term.length >= 2 && term.length <= 3 && fieldLower.includes(term)) {
-                score += 1 * nameMultiplier;
+                score += 1;
               }
             }
           });
