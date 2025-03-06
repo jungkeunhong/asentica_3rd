@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -58,11 +58,20 @@ const categories = [
 
 const CategoryGrid = () => {
   const router = useRouter();
+  const [favorites, setFavorites] = useState<number[]>([]);
 
   const handleCategoryClick = (name: string) => {
     router.push(`/search?q=${encodeURIComponent(name.toLowerCase())}`);
   };
 
+  const toggleFavorite = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFavorites(prev => 
+      prev.includes(id) 
+        ? prev.filter(favId => favId !== id) 
+        : [...prev, id]
+    );
+  };
 
   return (
     <div className="py-6">
@@ -77,6 +86,7 @@ const CategoryGrid = () => {
             large: "h-64",
           }[category.size];
           
+          const isFavorite = favorites.includes(category.id);
           
           return (
             <div 
@@ -91,6 +101,8 @@ const CategoryGrid = () => {
                   fill
                   className="object-cover rounded-md"
                 />
+                
+
               </div>
               <p className="text-gray-900 font-medium text-sm text-center">
                 {category.name}

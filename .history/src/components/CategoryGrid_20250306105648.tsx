@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -58,6 +58,7 @@ const categories = [
 
 const CategoryGrid = () => {
   const router = useRouter();
+  const [favorites, setFavorites] = useState<number[]>([]);
 
   const handleCategoryClick = (name: string) => {
     router.push(`/search?q=${encodeURIComponent(name.toLowerCase())}`);

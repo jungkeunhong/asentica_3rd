@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -58,11 +58,20 @@ const categories = [
 
 const CategoryGrid = () => {
   const router = useRouter();
+  const [favorites, setFavorites] = useState<number[]>([]);
 
   const handleCategoryClick = (name: string) => {
     router.push(`/search?q=${encodeURIComponent(name.toLowerCase())}`);
   };
 
+  const toggleFavorite = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFavorites(prev => 
+      prev.includes(id) 
+        ? prev.filter(favId => favId !== id) 
+        : [...prev, id]
+    );
+  };
 
   return (
     <div className="py-6">
@@ -77,6 +86,7 @@ const CategoryGrid = () => {
             large: "h-64",
           }[category.size];
           
+          const isFavorite = favorites.includes(category.id);
           
           return (
             <div 
@@ -91,6 +101,29 @@ const CategoryGrid = () => {
                   fill
                   className="object-cover rounded-md"
                 />
+                
+                {/* 좋아요 버튼 */}
+                <button 
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center z-10"
+                  onClick={(e) => toggleFavorite(category.id, e)}
+                  title="Toggle favorite"
+                  aria-label="Toggle favorite"
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill={isFavorite ? "currentColor" : "none"} 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor" 
+                    className={`w-5 h-5 ${isFavorite ? 'text-red-500' : 'text-white'}`}
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+                    />
+                  </svg>
+                </button>
               </div>
               <p className="text-gray-900 font-medium text-sm text-center">
                 {category.name}
