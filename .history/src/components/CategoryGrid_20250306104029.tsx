@@ -33,25 +33,25 @@ const categories = [
   { 
     id: 5, 
     name: 'Facial', 
-    image: '/images/main_3.png',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAtU1NB5Pxk2skTajkU6OssPSYsd3DK1UuNg&s',
     size: 'small' 
   },
   { 
     id: 6, 
     name: 'Lift', 
-    image: '/images/main_4.png',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSRtviVmg0XF1zWzbLdRClpO43y28t1tSliQ&s',
     size: 'small' 
   },
   { 
     id: 7, 
     name: 'Hair Removal', 
-    image: '/images/main_7.png',
+    image: 'https://cdn-prod.medicalnewstoday.com/content/images/articles/322/322090/woman-having-laser-hair-removal-on-her-armpit.jpg',
     size: 'medium' 
   },
   { 
     id: 8, 
     name: 'LED Therapy', 
-    image: '/images/main_1.png',
+    image: 'https://sa1s3optim.patientpop.com/assets/images/provider/photos/2620529.jpg',
     size: 'small' 
   },
 ];

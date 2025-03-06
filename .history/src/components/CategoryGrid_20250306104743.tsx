@@ -45,13 +45,13 @@ const categories = [
   { 
     id: 7, 
     name: 'Hair Removal', 
-    image: '/images/main_7.png',
+    image: '/images/main_3.png',
     size: 'medium' 
   },
   { 
     id: 8, 
     name: 'LED Therapy', 
-    image: '/images/main_1.png',
+    image: '/images/main_7.png',
     size: 'small' 
   },
 ];
