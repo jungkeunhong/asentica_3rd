@@ -77,8 +77,22 @@ export default async function Page({
           lat,
           lng
         `)
-        .or(`medspa_name.ilike.%${searchQuery}%,village.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%,best_treatment.ilike.%${searchQuery}%,treatment1.ilike.%${searchQuery}%,treatment2.ilike.%${searchQuery}%,treatment3.ilike.%${searchQuery}%,treatment4.ilike.%${searchQuery}%,treatment5.ilike.%${searchQuery}%,treatment6.ilike.%${searchQuery}%,recommended_practitioner1_name.ilike.%${searchQuery}%,recommended_practitioner2_name.ilike.%${searchQuery}%,recommended_practitioner3_name.ilike.%${searchQuery}%`);
-
+        .or([
+          { medspa_name: { ilike: `%${searchQuery}%` } },
+          { village: { ilike: `%${searchQuery}%` } },
+          { location: { ilike: `%${searchQuery}%` } },
+          { best_treatment: { ilike: `%${searchQuery}%` } },
+          { treatment1: { ilike: `%${searchQuery}%` } },
+          { treatment2: { ilike: `%${searchQuery}%` } },
+          { treatment3: { ilike: `%${searchQuery}%` } },
+          { treatment4: { ilike: `%${searchQuery}%` } },
+          { treatment5: { ilike: `%${searchQuery}%` } },
+          { treatment6: { ilike: `%${searchQuery}%` } },
+          { recommended_practitioner1_name: { ilike: `%${searchQuery}%` } },
+          { recommended_practitioner2_name: { ilike: `%${searchQuery}%` } },
+          { recommended_practitioner3_name: { ilike: `%${searchQuery}%` } }
+        ]);
+      
       if (filteredError) {
         throw new Error(filteredError.message);
       }
