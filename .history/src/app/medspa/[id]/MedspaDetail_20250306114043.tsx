@@ -97,59 +97,6 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
     }
   };
 
-  // Add map selection function
-  const handleOpenMap = (address: string, businessName: string) => {
-    if (!address) return;
-    
-    // Create URLs for both map services with business name and address
-    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${businessName} ${address}`)}`;
-    const appleMapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(`${businessName} ${address}`)}`;
-    
-    // Create a native-looking map selection modal
-    const mapSelectionModal = document.createElement('div');
-    mapSelectionModal.className = 'fixed inset-0 bg-black/40 z-50 flex items-end justify-center pb-8';
-    mapSelectionModal.innerHTML = `
-      <div class="bg-white rounded-xl w-full max-w-sm mx-4 overflow-hidden">
-        <div class="p-4 text-center border-b border-gray-200">
-          <h3 class="text-lg font-medium">Open Location</h3>
-        </div>
-        <button id="apple-maps-btn" class="w-full p-4 text-center text-blue-500 border-b border-gray-200 font-medium">
-          Open in Maps
-        </button>
-        <button id="google-maps-btn" class="w-full p-4 text-center text-blue-500 border-b border-gray-200 font-medium">
-          Open in Google Maps
-        </button>
-        <button id="cancel-map-btn" class="w-full p-4 text-center font-medium">
-          Cancel
-        </button>
-      </div>
-    `;
-    
-    document.body.appendChild(mapSelectionModal);
-    
-    // Add event listeners
-    document.getElementById('apple-maps-btn')?.addEventListener('click', () => {
-      window.open(appleMapsUrl, '_blank');
-      document.body.removeChild(mapSelectionModal);
-    });
-    
-    document.getElementById('google-maps-btn')?.addEventListener('click', () => {
-      window.open(googleMapsUrl, '_blank');
-      document.body.removeChild(mapSelectionModal);
-    });
-    
-    document.getElementById('cancel-map-btn')?.addEventListener('click', () => {
-      document.body.removeChild(mapSelectionModal);
-    });
-    
-    // Close when clicking outside the modal
-    mapSelectionModal.addEventListener('click', (e) => {
-      if (e.target === mapSelectionModal) {
-        document.body.removeChild(mapSelectionModal);
-      }
-    });
-  };
-
   // FilledStar component definition
   const FilledStar = (props: React.SVGProps<SVGSVGElement>) => (
     <svg 
@@ -281,13 +228,12 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               <div className="flex items-center text-sm text-gray-600 mt-0.5">
                 <span className="mr-2">{medspa.village}</span>
                 <span>•</span>
-
-                  <button 
-                    onClick={() => handleOpenMap(medspa.location, medspa.medspa_name)}
-                    className="ml-2 text-sm text-gray-600 hover:text-amber-900 underline"
-                  >
-                    {medspa.location}
-                  </button> 
+                <button 
+                  onClick={() => handleOpenMap(medspa.location, medspa.lat, medspa.lng)}
+                  className="ml-2 text-sm text-gray-600 hover:text-amber-900 underline"
+                >
+                  {medspa.location}
+                </button>
               </div>
             </div>
 
@@ -559,16 +505,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
             />
           </div>
           <div className="mt-2 flex items-center text-gray-700">
-            <button 
-              onClick={() => handleOpenMap(medspa.location, medspa.medspa_name)}
-              className="flex items-center gap-1 text-gray-700 hover:text-amber-900 underline"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
-              <span>{medspa.location}</span>
-            </button>
+            <span>{medspa.location}</span>
           </div>
         </div>
       )}

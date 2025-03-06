@@ -560,7 +560,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           </div>
           <div className="mt-2 flex items-center text-gray-700">
             <button 
-              onClick={() => handleOpenMap(medspa.location, medspa.medspa_name)}
+              onClick={() => handleOpenMap(medspa.location, medspa.lat, medspa.lng)}
               className="flex items-center gap-1 text-gray-700 hover:text-amber-900 underline"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -98,12 +98,17 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   };
 
   // Add map selection function
-  const handleOpenMap = (address: string, businessName: string) => {
+  const handleOpenMap = (address: string, lat?: number, lng?: number) => {
     if (!address) return;
     
-    // Create URLs for both map services with business name and address
-    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${businessName} ${address}`)}`;
-    const appleMapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(`${businessName} ${address}`)}`;
+    // Create URLs for both map services
+    const googleMapsUrl = lat && lng 
+      ? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+    
+    const appleMapsUrl = lat && lng
+      ? `https://maps.apple.com/?q=${encodeURIComponent(address)}&ll=${lat},${lng}`
+      : `https://maps.apple.com/?q=${encodeURIComponent(address)}`;
     
     // Create a native-looking map selection modal
     const mapSelectionModal = document.createElement('div');
@@ -281,13 +286,12 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               <div className="flex items-center text-sm text-gray-600 mt-0.5">
                 <span className="mr-2">{medspa.village}</span>
                 <span>•</span>
-
-                  <button 
-                    onClick={() => handleOpenMap(medspa.location, medspa.medspa_name)}
-                    className="ml-2 text-sm text-gray-600 hover:text-amber-900 underline"
-                  >
-                    {medspa.location}
-                  </button> 
+                <button 
+                  onClick={() => handleOpenMap(medspa.location, medspa.lat, medspa.lng)}
+                  className="ml-2 text-sm text-gray-600 hover:text-amber-900 underline"
+                >
+                  {medspa.location}
+                </button>
               </div>
             </div>
 
@@ -560,7 +564,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           </div>
           <div className="mt-2 flex items-center text-gray-700">
             <button 
-              onClick={() => handleOpenMap(medspa.location, medspa.medspa_name)}
+              onClick={() => handleOpenMap(medspa.location, medspa.lat, medspa.lng)}
               className="flex items-center gap-1 text-gray-700 hover:text-amber-900 underline"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

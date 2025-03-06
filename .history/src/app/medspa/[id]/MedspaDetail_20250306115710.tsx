@@ -281,13 +281,25 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
               <div className="flex items-center text-sm text-gray-600 mt-0.5">
                 <span className="mr-2">{medspa.village}</span>
                 <span>•</span>
-
+                // In the location button
                   <button 
                     onClick={() => handleOpenMap(medspa.location, medspa.medspa_name)}
                     className="ml-2 text-sm text-gray-600 hover:text-amber-900 underline"
                   >
                     {medspa.location}
-                  </button> 
+                  </button>
+                
+                  // And in the map section
+                  <button 
+                    onClick={() => handleOpenMap(medspa.location, medspa.medspa_name)}
+                    className="flex items-center gap-1 text-gray-700 hover:text-amber-900 underline"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span>{medspa.location}</span>
+                  </button>
               </div>
             </div>
 
@@ -560,7 +572,7 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           </div>
           <div className="mt-2 flex items-center text-gray-700">
             <button 
-              onClick={() => handleOpenMap(medspa.location, medspa.medspa_name)}
+              onClick={() => handleOpenMap(medspa.location, medspa.lat, medspa.lng)}
               className="flex items-center gap-1 text-gray-700 hover:text-amber-900 underline"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

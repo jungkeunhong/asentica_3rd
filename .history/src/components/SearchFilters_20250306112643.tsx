@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { FunnelIcon } from '@heroicons/react/24/outline';
 
 // 필터 타입 정의 - 원래 있던 구체적인 필터 타입으로 복원
 export type FilterType = 'Price' | 'google_star' | 'google_review' | 'yelp_star' | 'yelp_review' | 'Distance' | 'Free consultation' | null;
