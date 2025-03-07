@@ -9,49 +9,49 @@ const categories = [
   { 
     id: 1, 
     name: 'Botox', 
-    image: '/images/main_8.png',
+    image: '/images/botox.jpeg',
     size: 'medium' 
   },
   { 
     id: 2, 
     name: 'Filler', 
-    image: '/images/main_6.png',
+    image: '/images/Filler.jpeg',
     size: 'small' 
   },
   { 
     id: 3, 
     name: 'Microneedling', 
-    image: '/images/main_2.png',
+    image: '/images/Microneedling.jpeg',
     size: 'small' 
   },
   { 
     id: 4, 
     name: 'PRP', 
-    image: '/images/main_5.png',
+    image: '/images/PRP.jpeg',
     size: 'small' 
   },
   { 
     id: 5, 
     name: 'Facial', 
-    image: '/images/main_3.png',
+    image: '/images/Facial.jpeg',
     size: 'small' 
   },
   { 
     id: 6, 
     name: 'Lift', 
-    image: '/images/main_4.png',
+    image: '/images/Lift.jpeg',
     size: 'small' 
   },
   { 
     id: 7, 
     name: 'Hair Removal', 
-    image: '/images/main_7.png',
+    image: '/images/Laser.jpeg',
     size: 'medium' 
   },
   { 
     id: 8, 
     name: 'LED Therapy', 
-    image: '/images/main_1.png',
+    image: '/images/LED.jpeg',
     size: 'small' 
   },
 ];
