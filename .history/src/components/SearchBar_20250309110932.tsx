@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { searchTreatments } from '@/utils/supabase/client'; // 🔹 Supabase 검색 함수 추가
+import { searchTreatments } from '@/utils/client'; // 🔹 Supabase 검색 함수 추가
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 interface SearchBarProps {
@@ -32,18 +32,6 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  
-  // Rotate through suggestions
-  const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  
-  // Update placeholder rotation to include all suggestions
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPlaceholderIndex((prevIndex) => (prevIndex + 1) % ALL_SUGGESTIONS.length);
-    }, 3000); // Change every 3 seconds
-    
-    return () => clearInterval(interval);
-  }, []);
 
   // Load recent searches from localStorage on component mount
   useEffect(() => {
@@ -79,10 +67,7 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
 
     const fetchSuggestions = async () => {
       const results = await searchTreatments(searchTerm);
-      // Filter out items with undefined or null treatment_name before mapping
-      setSuggestions(results
-        .filter(item => item && item.treatment_name)
-        .map(item => item.treatment_name)); // Extract names from results
+      setSuggestions(results.map((item) => item.treatment_name)); // Extract names from results
     };
 
     const debounceTimeout = setTimeout(fetchSuggestions, 300);
@@ -142,7 +127,7 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
               handleSubmit(e);
             }
           }}
-          placeholder={`Search ${ALL_SUGGESTIONS[placeholderIndex]}...`}
+          placeholder="Search treatments or medspas..."
           className="w-full h-10 pl-4 pr-12 bg-white rounded-3xl border border-gray-400 focus:outline-none focus:border-primary-500 text-base"
           aria-label="Search treatments or medspas"
           autoComplete="off"

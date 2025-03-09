@@ -372,7 +372,88 @@ export default function SearchContent({
     return <div>{standardPrice}</div>;
   };
   // Basic stemming function to improve search matching
-    // Function to highlight matching terms in text
+  const stemWord = (word: string): string => {
+    if (!word || word.length < 3) return word;
+    
+    const stemmed = word.toLowerCase();
+    
+    // Common suffixes
+    const suffixes = [
+      'ing', 'ed', 's', 'es', 'ies', 'ly', 'ment', 'ness', 'tion', 'sion'
+    ];
+    
+    // Special cases for medical treatments
+    const specialCases: Record<string, string> = {
+      'botox': 'botox',
+      'fillers': 'filler',
+      'filling': 'filler',
+      'filled': 'filler',
+      'lasers': 'laser',
+      'lasering': 'laser',
+      'facial': 'facial',
+      'facials': 'facial',
+      'peels': 'peel',
+      'peeling': 'peel',
+      'microneedling': 'microneedle',
+      'needling': 'needle',
+      'sculpting': 'sculpt',
+      'sculpted': 'sculpt',
+      'treatment': 'treat',
+      'treatments': 'treat',
+      'treating': 'treat',
+      'treated': 'treat',
+      'removal': 'remove',
+      'removing': 'remove',
+      'removed': 'remove',
+      'injection': 'inject',
+      'injections': 'inject',
+      'injecting': 'inject',
+      'injected': 'inject',
+      'clinic': 'clinic',
+      'clinics': 'clinic',
+      'spa': 'spa',
+      'spas': 'spa',
+      'medspa': 'medspa',
+      'medspas': 'medspa',
+      'med': 'med',
+      'center': 'center',
+      'centers': 'center',
+      'aesthetic': 'aesthetic',
+      'aesthetics': 'aesthetic',
+      'beauty': 'beauty',
+      'medical': 'medical',
+      'medicine': 'medical',
+      'doctor': 'doctor',
+      'doctors': 'doctor',
+      'physician': 'physician',
+      'physicians': 'physician',
+      'skin': 'skin',
+      'skincare': 'skin',
+      'glow': 'glow',
+      'glowing': 'glow',
+      'rejuvenate': 'rejuvenate',
+      'rejuvenation': 'rejuvenate',
+      'elite': 'elite',
+      'pure': 'pure',
+      'radiance': 'radiance',
+      'revival': 'revival',
+      'revive': 'revival'
+    };
+    
+    // Check for special cases first
+    if (specialCases[stemmed]) {
+      return specialCases[stemmed];
+    }
+    
+    // Try to remove common suffixes
+    for (const suffix of suffixes) {
+      if (stemmed.endsWith(suffix) && stemmed.length > suffix.length + 2) {
+        return stemmed.slice(0, -suffix.length);
+      }
+    }
+    
+    return stemmed;
+  };
 
   // Function to highlight matching terms in text
   const highlightMatches = (text: string, searchTerms: string[]): React.ReactNode => {
@@ -503,7 +584,7 @@ export default function SearchContent({
   const filteredMedspas = useMemo(() => {
     if (!medspas.length) return [];
     
-    const medspasCopy = [...medspas];
+    let medspasCopy = [...medspas];
     
     // 🔹 Filtered & Sorted Medspa Results
     if (selectedFilter) {

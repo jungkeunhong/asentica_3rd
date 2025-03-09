@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { searchTreatments } from '@/utils/supabase/client'; // 🔹 Supabase 검색 함수 추가
+import { searchTreatments } from '@/utils/client'; // 🔹 Supabase 검색 함수 추가
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 interface SearchBarProps {
@@ -29,21 +29,9 @@ const ALL_SUGGESTIONS = [...POPULAR_TREATMENTS, ...POPULAR_MEDSPAS];
 
 const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState(initialValue);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [debouncedTerm, setDebouncedTerm] = useState(initialValue);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  
-  // Rotate through suggestions
-  const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  
-  // Update placeholder rotation to include all suggestions
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPlaceholderIndex((prevIndex) => (prevIndex + 1) % ALL_SUGGESTIONS.length);
-    }, 3000); // Change every 3 seconds
-    
-    return () => clearInterval(interval);
-  }, []);
 
   // Load recent searches from localStorage on component mount
   useEffect(() => {
@@ -60,36 +48,37 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
   // Save search term to recent searches
   const saveToRecentSearches = (term: string) => {
     if (!term.trim()) return;
-
+    
     const updatedSearches = [
       term,
-      ...recentSearches.filter((s) => s.toLowerCase() !== term.toLowerCase()),
+      ...recentSearches.filter(s => s.toLowerCase() !== term.toLowerCase())
     ].slice(0, 5);
-
+    
     setRecentSearches(updatedSearches);
     localStorage.setItem('recentSearches', JSON.stringify(updatedSearches));
   };
 
-  // 🔹 Fetch search suggestions from Supabase using FTS
+  // Debounce search term to avoid too many searches while typing
+  // Remove or modify the debounce effect
   useEffect(() => {
-    if (searchTerm.trim().length < 2) {
-      setSuggestions([]);
-      return;
-    }
-
-    const fetchSuggestions = async () => {
-      const results = await searchTreatments(searchTerm);
-      // Filter out items with undefined or null treatment_name before mapping
-      setSuggestions(results
-        .filter(item => item && item.treatment_name)
-        .map(item => item.treatment_name)); // Extract names from results
-    };
-
-    const debounceTimeout = setTimeout(fetchSuggestions, 300);
-    return () => clearTimeout(debounceTimeout);
+    // We'll keep the debounce for setting the term, but not for triggering search
+    const timer = setTimeout(() => {
+      setDebouncedTerm(searchTerm);
+    }, 300);
+  
+    return () => clearTimeout(timer);
   }, [searchTerm]);
-
-  // 🔹 Handle search submission
+  
+  // Modify the effect that triggers search
+  useEffect(() => {
+    // Only trigger search if initialValue changes (from URL)
+    // This prevents auto-search while typing
+    if (initialValue !== '' && initialValue !== debouncedTerm) {
+      setDebouncedTerm(initialValue);
+    }
+  }, [initialValue, debouncedTerm]);
+  
+  // The handleSubmit function will now be the only way to trigger a search
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedTerm = searchTerm.trim();
@@ -98,35 +87,35 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
       if (onSearch) {
         onSearch(trimmedTerm);
       } else {
+        // Use window.location for a full page navigation
         window.location.href = `/search?q=${encodeURIComponent(trimmedTerm)}`;
       }
     }
   };
 
-  // 🔹 Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    const value = e.target.value;
+    setSearchTerm(value);
   };
 
-  // 🔹 Clear search input
   const clearSearch = () => {
     setSearchTerm('');
-    setSuggestions([]);
     if (onSearch) {
       onSearch('');
     }
   };
 
-  // 🔹 Handle clicking on a suggestion
-  const handleSuggestionClick = (suggestion: string) => {
-    setSearchTerm(suggestion);
-    saveToRecentSearches(suggestion);
-    if (onSearch) {
-      onSearch(suggestion);
-    } else {
-      window.location.href = `/search?q=${encodeURIComponent(suggestion)}`;
-    }
-  };
+  // Rotate through suggestions
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  
+  // Update placeholder rotation to include all suggestions
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPlaceholderIndex((prevIndex) => (prevIndex + 1) % ALL_SUGGESTIONS.length);
+    }, 3000); // Change every 3 seconds
+    
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className={`relative ${className}`}>
@@ -144,6 +133,7 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
           }}
           placeholder={`Search ${ALL_SUGGESTIONS[placeholderIndex]}...`}
           className="w-full h-10 pl-4 pr-12 bg-white rounded-3xl border border-gray-400 focus:outline-none focus:border-primary-500 text-base"
+          style={{ fontSize: '16px', color: 'black' }}
           aria-label="Search treatments or medspas"
           autoComplete="off"
         />
@@ -158,24 +148,11 @@ const SearchBar = ({ initialValue = '', className = '', onSearch }: SearchBarPro
               <XMarkIcon className="w-5 h-5" />
             </button>
           )}
-          {!searchTerm && <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />}
+          {!searchTerm && (
+            <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
+          )}
         </div>
       </div>
-
-      {/* 🔹 Show search suggestions */}
-      {suggestions.length > 0 && (
-        <ul className="absolute left-0 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-md z-50">
-          {suggestions.map((suggestion, index) => (
-            <li
-              key={index}
-              onClick={() => handleSuggestionClick(suggestion)}
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-            >
-              {suggestion}
-            </li>
-          ))}
-        </ul>
-      )}
     </form>
   );
 };

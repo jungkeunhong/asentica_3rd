@@ -49,7 +49,6 @@ const mapOptions = {
 };
 
 export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps) {
-  // Add router for navigation
   const router = useRouter();
   
   // Google Maps API 로드
@@ -58,13 +57,8 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
     libraries: ['places']
   });
   
-  // Remove this duplicate line
   // Add router for navigation
 
-  // Handle navigation to medspa detail page
-  const handleNavigateToMedspaDetail = (medspa: Medspa) => {
-    router.push(`/medspa/${medspa.id}`);
-  };
 
   // 지도 인스턴스 참조
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -315,12 +309,18 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
         
         {/* 메드스파 마커들 */}
         {renderMarkers()}
+        
       </GoogleMap>
+      
+      // Handle navigation to medspa detail page
+      const handleNavigateToMedspaDetail = (medspa: Medspa) => {
+        router.push(`/medspa/${medspa.id}`);
+      };
       
       {/* Custom InfoWindow */}
       {selectedMedspa && infoWindowPosition && (
         <>
-          {/* Modal backdrop for closing InfoWindow when clicked outside */}
+          {/* Modal backdrop */}
           <div 
             className="fixed inset-0 bg-transparent z-10" 
             onClick={handleInfoWindowClose}

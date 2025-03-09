@@ -503,7 +503,7 @@ export default function SearchContent({
   const filteredMedspas = useMemo(() => {
     if (!medspas.length) return [];
     
-    const medspasCopy = [...medspas];
+    let medspasCopy = [...medspas];
     
     // 🔹 Filtered & Sorted Medspa Results
     if (selectedFilter) {

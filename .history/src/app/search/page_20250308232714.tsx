@@ -61,6 +61,18 @@ export default async function Page({
           recommended_practitioner2_reason,
           recommended_practitioner3_name,
           recommended_practitioner3_reason,
+          treatment1,
+          price1,
+          treatment2,
+          price2,
+          treatment3,
+          price3,
+          treatment4,
+          price4,
+          treatment5,
+          price5,
+          treatment6,
+          price6,
           image_url1,
           image_url2,
           image_url3,
@@ -86,15 +98,6 @@ export default async function Page({
       } else {
         priceData = filteredPriceData;
         console.log(`💰 Found ${priceData?.length || 0} price records for query: "${searchQuery}"`);
-        // Add more detailed logging about the price data
-        if (priceData && priceData.length > 0) {
-          console.log('Sample price data:', priceData[0]);
-          // Log medspa names in price data to help with debugging matching issues
-          const medspaNamesInPriceData = [...new Set(priceData.map(p => p.medspa_name))];
-          console.log('Medspa names in price data:', medspaNamesInPriceData);
-        } else {
-          console.log('No price data found for the query');
-        }
       }
     } else {
       // If no search query, get all medspas
@@ -129,6 +132,18 @@ export default async function Page({
           recommended_practitioner2_reason,
           recommended_practitioner3_name,
           recommended_practitioner3_reason,
+          treatment1,
+          price1,
+          treatment2,
+          price2,
+          treatment3,
+          price3,
+          treatment4,
+          price4,
+          treatment5,
+          price5,
+          treatment6,
+          price6,
           image_url1,
           image_url2,
           image_url3,

@@ -87,15 +87,16 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
     { name: medspa.recommended_practitioner3_name, reason: medspa.recommended_practitioner3_reason },
   ].filter(p => p.name && p.reason);
 
-    // Handle phone call
-    const handleCall = (phoneNumber: string | undefined, e: React.MouseEvent) => {
-      e.stopPropagation(); // Prevent navigation to medspa detail
-      if (phoneNumber) {
-        window.location.href = `tel:${phoneNumber}`;
-      } else {
-        alert('Phone number not available');
-      }
-    };
+  const handleCall = (phoneNumber: string | undefined, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent any parent click events
+    if (phoneNumber && typeof phoneNumber === 'string') {
+      // Format phone number if needed
+      const formattedNumber = phoneNumber.replace(/\D/g, '');
+      window.location.href = `tel:${formattedNumber}`;
+    } else {
+      console.log('No phone number available');
+    }
+  };
 
   // Add map selection function
   const handleOpenMap = (address: string, businessName: string) => {

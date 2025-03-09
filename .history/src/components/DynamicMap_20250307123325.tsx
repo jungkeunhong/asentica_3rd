@@ -7,8 +7,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { MapPin, Navigation, Phone, Heart } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
-import { useRouter } from 'next/navigation';
-
+import { MedspaRatings } from "@/components/ui/medspa-ratings";
 // 지도 컨테이너 스타일
 const containerStyle = {
   width: '100%',
@@ -49,22 +48,11 @@ const mapOptions = {
 };
 
 export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps) {
-  // Add router for navigation
-  const router = useRouter();
-  
   // Google Maps API 로드
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
     libraries: ['places']
   });
-  
-  // Remove this duplicate line
-  // Add router for navigation
-
-  // Handle navigation to medspa detail page
-  const handleNavigateToMedspaDetail = (medspa: Medspa) => {
-    router.push(`/medspa/${medspa.id}`);
-  };
 
   // 지도 인스턴스 참조
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -315,6 +303,7 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
         
         {/* 메드스파 마커들 */}
         {renderMarkers()}
+        
       </GoogleMap>
       
       {/* Custom InfoWindow */}
@@ -328,12 +317,11 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
           
           {/* Custom InfoWindow */}
           <div 
-            className="absolute z-20 bg-white rounded-lg shadow-lg info-window cursor-pointer"
+            className="absolute z-20 bg-white rounded-lg shadow-lg info-window"
             style={{
               left: `${infoWindowPosition.x}px`,
               top: `${infoWindowPosition.y}px`
             }}
-            onClick={() => handleNavigateToMedspaDetail(selectedMedspa)}
           >
             <div className="p-3">
               <div className="relative h-32 w-full mb-2">
@@ -407,7 +395,7 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
               <div className="flex flex-row gap-2 mt-2">
                 <button 
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent navigation to medspa detail
+                    e.preventDefault();
                     window.location.href = `tel:${selectedMedspa.number}`;
                   }}
                   className="btn bg-amber-800 hover:bg-amber-900 text-white border-none hover:shadow-lg transform flex items-center justify-center gap-2 w-12 h-9 rounded"
@@ -417,10 +405,7 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
                   <Phone size={16} />
                 </button>
                 <button 
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent navigation to medspa detail
-                    onMedspaSelect(selectedMedspa);
-                  }}
+                  onClick={() => onMedspaSelect(selectedMedspa)}
                   className="btn bg-white hover:bg-amber-800 border border-amber-800 text-amber-800 hover:text-white hover:shadow-lg transform flex items-center justify-center gap-2 flex-1 h-9 rounded text-sm"
                   title="Consultation"
                   aria-label="Consultation"

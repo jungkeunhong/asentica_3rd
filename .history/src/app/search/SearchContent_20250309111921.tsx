@@ -288,17 +288,16 @@ export default function SearchContent({
   const findTreatmentPrice = (medspa: Medspa, query: string) => {
     try {
       // Only use price data from price_test table
-      if (priceData && priceData.length > 0 && query && query.trim()) {
+      if (priceData.length > 0 && query.trim()) {
         const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
         
         // Find prices for this medspa that match the search query
         const matchingPrices = priceData.filter(price => 
-          price && price.medspa_name && medspa.medspa_name && 
           price.medspa_name.toLowerCase() === medspa.medspa_name.toLowerCase() &&
           searchTerms.some(term => 
-            (price.treatment_name && price.treatment_name.toLowerCase().includes(term)) ||
-            (price.treatment_category && price.treatment_category.toLowerCase().includes(term)) ||
-            (price.efficacy && price.efficacy.toLowerCase().includes(term))
+            price.treatment_name.toLowerCase().includes(term) ||
+            price.treatment_category.toLowerCase().includes(term) ||
+            price.efficacy.toLowerCase().includes(term)
           )
         );
         
@@ -350,16 +349,14 @@ export default function SearchContent({
     
 
     // Format the price data object
-    const formattedPrice = new Intl.NumberFormat('en-US').format(Number(priceData.standard_price || 0));
-    const standardUnit = priceData.standard_unit ? priceData.standard_unit.toLowerCase() : 'unit';
-    const standardPrice = `$${formattedPrice} per ${standardUnit}`;
+    const formattedPrice = new Intl.NumberFormat('en-US').format(Number(priceData.standard_price));
+    const standardPrice = `$${formattedPrice} per ${priceData.standard_unit.toLowerCase()}`;
 
     
     // Check if member price exists
     if (priceData.member_price) {
       const formattedMemberPrice = new Intl.NumberFormat('en-US').format(Number(priceData.member_price));
-      const memberUnit = priceData.member_unit ? priceData.member_unit.toLowerCase() : 'unit';
-      const memberPrice = `$${formattedMemberPrice} per ${memberUnit}`;
+      const memberPrice = `$${formattedMemberPrice} per ${priceData.member_unit.toLowerCase()}`;
       
       return (
         <div>
@@ -372,7 +369,88 @@ export default function SearchContent({
     return <div>{standardPrice}</div>;
   };
   // Basic stemming function to improve search matching
-    // Function to highlight matching terms in text
+  const stemWord = (word: string): string => {
+    if (!word || word.length < 3) return word;
+    
+    const stemmed = word.toLowerCase();
+    
+    // Common suffixes
+    const suffixes = [
+      'ing', 'ed', 's', 'es', 'ies', 'ly', 'ment', 'ness', 'tion', 'sion'
+    ];
+    
+    // Special cases for medical treatments
+    const specialCases: Record<string, string> = {
+      'botox': 'botox',
+      'fillers': 'filler',
+      'filling': 'filler',
+      'filled': 'filler',
+      'lasers': 'laser',
+      'lasering': 'laser',
+      'facial': 'facial',
+      'facials': 'facial',
+      'peels': 'peel',
+      'peeling': 'peel',
+      'microneedling': 'microneedle',
+      'needling': 'needle',
+      'sculpting': 'sculpt',
+      'sculpted': 'sculpt',
+      'treatment': 'treat',
+      'treatments': 'treat',
+      'treating': 'treat',
+      'treated': 'treat',
+      'removal': 'remove',
+      'removing': 'remove',
+      'removed': 'remove',
+      'injection': 'inject',
+      'injections': 'inject',
+      'injecting': 'inject',
+      'injected': 'inject',
+      'clinic': 'clinic',
+      'clinics': 'clinic',
+      'spa': 'spa',
+      'spas': 'spa',
+      'medspa': 'medspa',
+      'medspas': 'medspa',
+      'med': 'med',
+      'center': 'center',
+      'centers': 'center',
+      'aesthetic': 'aesthetic',
+      'aesthetics': 'aesthetic',
+      'beauty': 'beauty',
+      'medical': 'medical',
+      'medicine': 'medical',
+      'doctor': 'doctor',
+      'doctors': 'doctor',
+      'physician': 'physician',
+      'physicians': 'physician',
+      'skin': 'skin',
+      'skincare': 'skin',
+      'glow': 'glow',
+      'glowing': 'glow',
+      'rejuvenate': 'rejuvenate',
+      'rejuvenation': 'rejuvenate',
+      'elite': 'elite',
+      'pure': 'pure',
+      'radiance': 'radiance',
+      'revival': 'revival',
+      'revive': 'revival'
+    };
+    
+    // Check for special cases first
+    if (specialCases[stemmed]) {
+      return specialCases[stemmed];
+    }
+    
+    // Try to remove common suffixes
+    for (const suffix of suffixes) {
+      if (stemmed.endsWith(suffix) && stemmed.length > suffix.length + 2) {
+        return stemmed.slice(0, -suffix.length);
+      }
+    }
+    
+    return stemmed;
+  };
 
   // Function to highlight matching terms in text
   const highlightMatches = (text: string, searchTerms: string[]): React.ReactNode => {
@@ -503,7 +581,7 @@ export default function SearchContent({
   const filteredMedspas = useMemo(() => {
     if (!medspas.length) return [];
     
-    const medspasCopy = [...medspas];
+    let medspasCopy = [...medspas];
     
     // 🔹 Filtered & Sorted Medspa Results
     if (selectedFilter) {

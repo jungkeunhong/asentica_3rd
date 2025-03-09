@@ -58,13 +58,8 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
     libraries: ['places']
   });
   
-  // Remove this duplicate line
   // Add router for navigation
 
-  // Handle navigation to medspa detail page
-  const handleNavigateToMedspaDetail = (medspa: Medspa) => {
-    router.push(`/medspa/${medspa.id}`);
-  };
 
   // 지도 인스턴스 참조
   const mapRef = useRef<google.maps.Map | null>(null);

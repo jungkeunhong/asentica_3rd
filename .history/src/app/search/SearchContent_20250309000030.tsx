@@ -288,17 +288,16 @@ export default function SearchContent({
   const findTreatmentPrice = (medspa: Medspa, query: string) => {
     try {
       // Only use price data from price_test table
-      if (priceData && priceData.length > 0 && query && query.trim()) {
+      if (priceData.length > 0 && query.trim()) {
         const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
         
         // Find prices for this medspa that match the search query
         const matchingPrices = priceData.filter(price => 
-          price && price.medspa_name && medspa.medspa_name && 
           price.medspa_name.toLowerCase() === medspa.medspa_name.toLowerCase() &&
           searchTerms.some(term => 
-            (price.treatment_name && price.treatment_name.toLowerCase().includes(term)) ||
-            (price.treatment_category && price.treatment_category.toLowerCase().includes(term)) ||
-            (price.efficacy && price.efficacy.toLowerCase().includes(term))
+            price.treatment_name.toLowerCase().includes(term) ||
+            price.treatment_category.toLowerCase().includes(term) ||
+            price.efficacy.toLowerCase().includes(term)
           )
         );
         
@@ -327,9 +326,7 @@ export default function SearchContent({
         const priceStr = priceResult.standard_price;
         if (!priceStr) return Infinity;
         
-        // Convert to string to ensure match works
-        const priceStrValue = String(priceStr);
-        const priceMatch = priceStrValue.match(/\$?(\d+)/);
+        const priceMatch = priceStr.match(/\$?(\d+)/);
         return priceMatch ? parseInt(priceMatch[1], 10) : Infinity;
       }
       
@@ -350,29 +347,107 @@ export default function SearchContent({
     
 
     // Format the price data object
-    const formattedPrice = new Intl.NumberFormat('en-US').format(Number(priceData.standard_price || 0));
-    const standardUnit = priceData.standard_unit ? priceData.standard_unit.toLowerCase() : 'unit';
-    const standardPrice = `$${formattedPrice} per ${standardUnit}`;
-
+    const standardPrice = `$${priceData.standard_price} ${priceData.standard_unit}`;
+    const standardNote = priceData.standard_price_note ? ` (${priceData.standard_price_note})` : '';
     
     // Check if member price exists
     if (priceData.member_price) {
-      const formattedMemberPrice = new Intl.NumberFormat('en-US').format(Number(priceData.member_price));
-      const memberUnit = priceData.member_unit ? priceData.member_unit.toLowerCase() : 'unit';
-      const memberPrice = `$${formattedMemberPrice} per ${memberUnit}`;
+      const memberPrice = `$${priceData.member_price} ${priceData.member_unit}`;
+      const memberNote = priceData.member_price_note ? ` (${priceData.member_price_note})` : '';
       
       return (
         <div>
-          <div>{standardPrice}</div>
-          <div className="text-sm text-green-600">Member: {memberPrice}</div>
+          <div>{standardPrice}{standardNote}</div>
+          <div className="text-sm text-green-600">Member: {memberPrice}{memberNote}</div>
         </div>
       );
     }
     
-    return <div>{standardPrice}</div>;
+    return <div>{standardPrice}{standardNote}</div>;
   };
   // Basic stemming function to improve search matching
-    // Function to highlight matching terms in text
+  const stemWord = (word: string): string => {
+    if (!word || word.length < 3) return word;
+    
+    const stemmed = word.toLowerCase();
+    
+    // Common suffixes
+    const suffixes = [
+      'ing', 'ed', 's', 'es', 'ies', 'ly', 'ment', 'ness', 'tion', 'sion'
+    ];
+    
+    // Special cases for medical treatments
+    const specialCases: Record<string, string> = {
+      'botox': 'botox',
+      'fillers': 'filler',
+      'filling': 'filler',
+      'filled': 'filler',
+      'lasers': 'laser',
+      'lasering': 'laser',
+      'facial': 'facial',
+      'facials': 'facial',
+      'peels': 'peel',
+      'peeling': 'peel',
+      'microneedling': 'microneedle',
+      'needling': 'needle',
+      'sculpting': 'sculpt',
+      'sculpted': 'sculpt',
+      'treatment': 'treat',
+      'treatments': 'treat',
+      'treating': 'treat',
+      'treated': 'treat',
+      'removal': 'remove',
+      'removing': 'remove',
+      'removed': 'remove',
+      'injection': 'inject',
+      'injections': 'inject',
+      'injecting': 'inject',
+      'injected': 'inject',
+      'clinic': 'clinic',
+      'clinics': 'clinic',
+      'spa': 'spa',
+      'spas': 'spa',
+      'medspa': 'medspa',
+      'medspas': 'medspa',
+      'med': 'med',
+      'center': 'center',
+      'centers': 'center',
+      'aesthetic': 'aesthetic',
+      'aesthetics': 'aesthetic',
+      'beauty': 'beauty',
+      'medical': 'medical',
+      'medicine': 'medical',
+      'doctor': 'doctor',
+      'doctors': 'doctor',
+      'physician': 'physician',
+      'physicians': 'physician',
+      'skin': 'skin',
+      'skincare': 'skin',
+      'glow': 'glow',
+      'glowing': 'glow',
+      'rejuvenate': 'rejuvenate',
+      'rejuvenation': 'rejuvenate',
+      'elite': 'elite',
+      'pure': 'pure',
+      'radiance': 'radiance',
+      'revival': 'revival',
+      'revive': 'revival'
+    };
+    
+    // Check for special cases first
+    if (specialCases[stemmed]) {
+      return specialCases[stemmed];
+    }
+    
+    // Try to remove common suffixes
+    for (const suffix of suffixes) {
+      if (stemmed.endsWith(suffix) && stemmed.length > suffix.length + 2) {
+        return stemmed.slice(0, -suffix.length);
+      }
+    }
+    
+    return stemmed;
+  };
 
   // Function to highlight matching terms in text
   const highlightMatches = (text: string, searchTerms: string[]): React.ReactNode => {
@@ -463,49 +538,84 @@ export default function SearchContent({
     );
   };
 
-  // 🔹 State for loading status during search
-  const [loading, setLoading] = useState(false);
-
-  // 🔹 Fetch search results from Supabase when searchQuery changes
-  useEffect(() => {
-    const fetchSearchResults = async () => {
-      if (!searchQuery.trim()) {
-        return; // Keep using initialMedspas if no search query
-      }
-
-      setLoading(true);
-      const supabase = createClient();
-      
-      try {
-        const { data, error } = await supabase
-          .from('medspa_nyc')
-          .select('*')
-          .or(`medspa_name.ilike.%${searchQuery}%, best_treatment.ilike.%${searchQuery}%, village.ilike.%${searchQuery}%, location.ilike.%${searchQuery}%`)
-          .limit(20);
-
-        if (error) {
-          console.error('Error fetching search results:', error);
-        } else if (data) {
-          console.log('🔍 Search results:', data.length);
-          setMedspas(data);
-        }
-      } catch (err) {
-        console.error('Error in search:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSearchResults();
-  }, [searchQuery]);
-
   // 필터링된 MedSpa 목록
   const filteredMedspas = useMemo(() => {
     if (!medspas.length) return [];
     
-    const medspasCopy = [...medspas];
+    let medspasCopy = [...medspas];
     
-    // 🔹 Filtered & Sorted Medspa Results
+    // 검색어가 있는 경우에만 검색어로 필터링
+    if (searchQuery.trim()) {
+      // 검색어를 개별 단어로 분리
+      const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term.length > 0);
+      
+      // 검색어의 stemmed 버전도 준비
+      const stemmedSearchTerms = searchTerms.map(term => stemWord(term));
+      
+      // 각 메드스파에 점수 부여
+      const scoredMedspas = medspasCopy.map(medspa => {
+        let score = 0;
+        const fieldsToSearch = [
+          medspa.medspa_name,
+          medspa.village,
+          medspa.location,
+          medspa.best_treatment,
+        ];
+        
+        // 각 검색어에 대해 점수 계산
+        searchTerms.forEach((term, idx) => {
+          const stemmedTerm = stemmedSearchTerms[idx];
+          
+          fieldsToSearch.forEach((field, fieldIndex) => {
+            if (field) {
+              const fieldLower = field.toLowerCase();
+              const fieldWords = fieldLower.split(/\s+|,|\(|\)|-|\//).filter(w => w.length > 0);
+              const stemmedFieldWords = fieldWords.map(w => stemWord(w));
+              
+              // 메드스파 이름에 대한 가중치 부여
+              const nameMultiplier = fieldIndex === 0 ? 2 : 1; // medspa_name field has index 0
+              
+              // 정확한 일치 (가장 높은 점수)
+              if (fieldLower === term) {
+                score += 10 * nameMultiplier;
+              }
+              // 단어 포함 (높은 점수)
+              else if (fieldLower.includes(term)) {
+                score += 5 * nameMultiplier;
+              }
+              // 단어 단위 일치 (중간 점수)
+              else if (fieldWords.some(word => word === term)) {
+                score += 4 * nameMultiplier;
+              }
+              // 스테밍된 단어 일치 (중간 점수)
+              else if (stemmedFieldWords.some(word => word === stemmedTerm)) {
+                score += 3 * nameMultiplier;
+              }
+              // 유사 단어 (부분 일치, 낮은 점수)
+              else if (term.length > 2 && fieldLower.includes(term.substring(0, Math.ceil(term.length * 0.7)))) {
+                score += 2 * nameMultiplier;
+              }
+              // 매우 짧은 검색어(2-3자)의 경우 부분 일치도 허용
+              else if (term.length >= 2 && term.length <= 3 && fieldLower.includes(term)) {
+                score += 1 * nameMultiplier;
+              }
+            }
+          });
+        });
+        
+        return { medspa, score };
+      });
+      
+      // 점수가 0보다 큰 메드스파만 필터링하고 점수 순으로 정렬
+      const filteredScoredMedspas = scoredMedspas
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score);
+      
+      // 점수 정보 제거하고 메드스파만 반환
+      medspasCopy = filteredScoredMedspas.map(item => item.medspa);
+    }
+    
+    // 필터 적용 (검색어 유무와 관계없이)
     if (selectedFilter) {
       console.log(`Applying filter: ${selectedFilter} to ${medspasCopy.length} medspas`);
       
@@ -802,12 +912,6 @@ export default function SearchContent({
             {selectedFilter && (
               <div></div>
             )}
-            {/* Loading indicator */}
-            {loading && (
-              <div className="text-center text-gray-600 py-1">
-                <p>Searching...</p>
-              </div>
-            )}
           </div>
         </div>
 
@@ -989,7 +1093,7 @@ export default function SearchContent({
                           
                           return (
                             <>
-                              {formatPriceDisplay(priceData)}
+                              {searchQuery} - {formatPriceDisplay(priceData)}
                             </>
                           );
                         })()}

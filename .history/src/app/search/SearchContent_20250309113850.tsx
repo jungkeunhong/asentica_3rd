@@ -15,6 +15,7 @@ import {  MapPin, Navigation, Phone, Heart } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
 import { createClient } from '@/utils/supabase/client';
 import { MedspaRatings } from "@/components/ui/medspa-ratings";
+import { PriceDisplay } from '@/components/ui/price-display';
 
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
   ssr: false,
@@ -987,11 +988,7 @@ export default function SearchContent({
                           console.log('Price data for', medspa.medspa_name, ':', priceData);
                           if (!priceData) return null;
                           
-                          return (
-                            <>
-                              {formatPriceDisplay(priceData)}
-                            </>
-                          );
+                          return <PriceDisplay priceData={priceData} />;
                         })()}
                       </span>
                     </div>
