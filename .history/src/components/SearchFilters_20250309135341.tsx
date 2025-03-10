@@ -1,8 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Sliders } from 'lucide-react';
+import FilterModal from './FilterModal';
+import { createClient } from '@/utils/supabase/client';
 
 // 필터 타입 정의 - 원래 있던 구체적인 필터 타입으로 복원
 export type FilterType = 'Price' | 'google_star' | 'google_review' | 'yelp_star' | 'yelp_review' | 'Distance' | 'Free consultation' | null;
@@ -21,9 +24,6 @@ export interface FilterState {
   yelpStars: number[];
   villages: string[];
   facilities: string[];
-  distance: number | null;
-  treatmentCategories: string[];
-  efficacies: string[];
 }
 
 // 필터 목록 - 원래 있던 구체적인 필터 목록으로 복원
@@ -37,14 +37,36 @@ const filters: FilterItem[] = [
   { label: 'Free consultation', value: 'Free consultation' },
 ];
 
+// Fallback villages in case fetching fails
+const fallbackVillages = [
+  'Upper East Side',
+  'Midtown',
+  'SoHo',
+  'Chelsea',
+  'Greenwich Village',
+  'Tribeca',
+  'Financial District',
+  'Flatiron'
+];
+
 // SearchFilters 컴포넌트 Props 타입
 interface SearchFiltersProps {
   selectedFilter: FilterType;
   onFilterChange: (filter: FilterType) => void;
-  onOpenFilterModal?: () => void;
+  onApplyAdvancedFilters?: (filters: FilterState) => void;
 }
 
-export default function SearchFilters({ selectedFilter, onFilterChange, onOpenFilterModal }: SearchFiltersProps) {
+export default function SearchFilters({ selectedFilter, onFilterChange, onApplyAdvancedFilters }: SearchFiltersProps) {
+  // 필터 모달 상태
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState<FilterState>({
+    priceRange: [0, 1000],
+    googleStars: [],
+    yelpStars: [],
+    villages: [],
+    facilities: []
+  });
+
   // 필터 선택 핸들러
   const handleFilterClick = (filter: FilterType) => {
     // 이미 선택된 필터를 다시 클릭하면 선택 해제
@@ -52,6 +74,14 @@ export default function SearchFilters({ selectedFilter, onFilterChange, onOpenFi
       onFilterChange(null);
     } else {
       onFilterChange(filter);
+    }
+  };
+
+  // 고급 필터 적용 핸들러
+  const handleApplyFilters = (filters: FilterState) => {
+    setAdvancedFilters(filters);
+    if (onApplyAdvancedFilters) {
+      onApplyAdvancedFilters(filters);
     }
   };
 
@@ -68,10 +98,11 @@ export default function SearchFilters({ selectedFilter, onFilterChange, onOpenFi
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onOpenFilterModal?.()}
+            onClick={() => setIsFilterModalOpen(true)}
             className="whitespace-nowrap rounded-full px-3 text-sm font-medium transition-all h-8 bg-white text-gray-700 border-black hover:bg-gray-100 hover:border-gray-400"
           >
             <Sliders size={14} className="mr-1" />
+            Filters
           </Button>
         </motion.div>
         
@@ -101,6 +132,15 @@ export default function SearchFilters({ selectedFilter, onFilterChange, onOpenFi
           </motion.div>
         ))}
       </div>
+
+      {/* 필터 모달 */}
+      <FilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        onApplyFilters={handleApplyFilters}
+        availableVillages={sampleVillages}
+        initialFilters={advancedFilters}
+      />
     </div>
   );
 }

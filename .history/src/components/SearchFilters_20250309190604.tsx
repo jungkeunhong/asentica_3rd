@@ -1,8 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Sliders } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 // 필터 타입 정의 - 원래 있던 구체적인 필터 타입으로 복원
 export type FilterType = 'Price' | 'google_star' | 'google_review' | 'yelp_star' | 'yelp_review' | 'Distance' | 'Free consultation' | null;
@@ -35,6 +37,18 @@ const filters: FilterItem[] = [
   { label: 'Yelp Rating', value: 'yelp_star' },
   { label: 'Yelp Reviews', value: 'yelp_review' },
   { label: 'Free consultation', value: 'Free consultation' },
+];
+
+// Fallback villages in case fetching fails
+const fallbackVillages = [
+  'Upper East Side',
+  'Midtown',
+  'SoHo',
+  'Chelsea',
+  'Greenwich Village',
+  'Tribeca',
+  'Financial District',
+  'Flatiron'
 ];
 
 // SearchFilters 컴포넌트 Props 타입

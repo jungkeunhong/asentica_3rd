@@ -119,15 +119,12 @@ export default function SearchContent({
   const [selectedFilter, setSelectedFilter] = useState<FilterType>(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Partial<FilterState>>({});
-  const [advancedFilters] = useState<FilterState>({
+  const [advancedFilters, setAdvancedFilters] = useState<FilterState>({
     priceRange: [0, 1000],
     googleStars: [],
     yelpStars: [],
     villages: [],
     facilities: [],
-    distance: null,
-    treatmentCategories: [],
-    efficacies: []
   });
 
   // Favorites context
@@ -310,69 +307,75 @@ export default function SearchContent({
     return distanceKm * 0.621371;
   };
 
-  const findRelevantTreatments = (medspa: Medspa): PriceData[] => {
+  const findTreatmentPrice = (medspa: Medspa, query: string) => {
     try {
-      if (!priceData || !medspa.medspa_name) return [];
-
-      // Get treatments based on active filters
-      const treatmentCategories = activeFilters.treatmentCategories ?? [];
-      const efficacies = activeFilters.efficacies ?? [];
-      const hasFilteredCategories = treatmentCategories.length > 0;
-      const hasFilteredEfficacies = efficacies.length > 0;
-
-      if (hasFilteredCategories || hasFilteredEfficacies) {
-        return priceData.filter(price => 
-          price.medspa_name?.toLowerCase() === medspa.medspa_name.toLowerCase() && (
-            // Match treatment categories
-            (hasFilteredCategories &&
-              price.treatment_category &&
-              treatmentCategories.map(c => c.toLowerCase()).includes(price.treatment_category.toLowerCase())) ||
-            // Match efficacies
-            (hasFilteredEfficacies &&
-              price.efficacy &&
-              efficacies.map(e => e.toLowerCase()).includes(price.efficacy.toLowerCase()))
-          )
-        );
-      }
-
-      // If no filters but has search query, find matching treatments
-      if (searchQuery) {
-        const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term.length > 0);
-        return priceData.filter(price => 
-          price.medspa_name?.toLowerCase() === medspa.medspa_name.toLowerCase() &&
+      // Only use price data from price_test table
+      if (priceData && priceData.length > 0 && query && query.trim()) {
+        const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+        
+        // Find prices for this medspa that match the search query
+        const matchingPrices = priceData.filter(price => 
+          price && price.medspa_name && medspa.medspa_name && 
+          price.medspa_name.toLowerCase() === medspa.medspa_name.toLowerCase() &&
           searchTerms.some(term => 
             (price.treatment_name && price.treatment_name.toLowerCase().includes(term)) ||
             (price.treatment_category && price.treatment_category.toLowerCase().includes(term)) ||
             (price.efficacy && price.efficacy.toLowerCase().includes(term))
           )
         );
+        
+        console.log(`Found ${matchingPrices.length} matching prices for ${medspa.medspa_name} with query: ${query}`);
+        
+        if (matchingPrices.length > 0) {
+          // 여러 가격이 있을 경우 가장 관련성 높은 것을 선택
+          // 1. 정확한 treatment_name 일치
+          // 2. 정확한 treatment_category 일치
+          // 3. 정확한 efficacy 일치
+          // 4. 첫 번째 결과
+          
+          // 정확한 treatment_name 일치 검색
+          const exactNameMatch = matchingPrices.find(price => 
+            price.treatment_name && searchTerms.some(term => 
+              price.treatment_name.toLowerCase() === term.toLowerCase()
+            )
+          );
+          
+          if (exactNameMatch) {
+            console.log(`Found exact treatment name match: ${exactNameMatch.treatment_name}`);
+            return exactNameMatch;
+          }
+          
+          // 정확한 category 일치 검색
+          const exactCategoryMatch = matchingPrices.find(price => 
+            price.treatment_category && searchTerms.some(term => 
+              price.treatment_category.toLowerCase() === term.toLowerCase()
+            )
+          );
+          
+          if (exactCategoryMatch) {
+            console.log(`Found exact category match: ${exactCategoryMatch.treatment_category}`);
+            return exactCategoryMatch;
+          }
+          
+          // 첫 번째 결과 반환
+          console.log(`Using first match: ${matchingPrices[0].treatment_name}`);
+          return matchingPrices[0];
+        }
       }
-
-      return [];
+      
+      // If no match found, return null instead of empty string
+      console.log('No matching price found for', medspa.medspa_name, 'with query:', query);
+      return null;
     } catch (error) {
-      console.error('Error finding relevant treatments:', error);
-      return [];
+      console.error('Error finding treatment price:', error);
+      return null;
     }
   };
 
-  const getRandomTreatment = (medspa: Medspa): PriceData | null => {
-    const relevantTreatments = findRelevantTreatments(medspa);
-    if (relevantTreatments.length === 0) return null;
-    
-    // Get a random treatment from the relevant ones
-    const randomIndex = Math.floor(Math.random() * relevantTreatments.length);
-    return relevantTreatments[randomIndex];
-  };
-
-  // Update the existing findTreatmentPrice function to use the new logic
-  const findTreatmentPrice = (medspa: Medspa): PriceData | null => {
-    return getRandomTreatment(medspa);
-  };
-
   // Helper function to find treatment price as a number for sorting
-  const findTreatmentPriceNumber = useCallback((medspa: Medspa): number => {
+  const findTreatmentPriceNumber = useCallback((medspa: Medspa, query: string): number => {
     try {
-      const priceResult = findTreatmentPrice(medspa);
+      const priceResult = findTreatmentPrice(medspa, query);
       
       // If it's a PriceData object
       if (typeof priceResult === 'object' && priceResult !== null) {
@@ -391,7 +394,8 @@ export default function SearchContent({
       console.error('Error converting price to number:', error);
       return Infinity;
     }
-  }, [findTreatmentPrice]);
+  }, []);
+  // Helper function to find treatment price as a number for sorting
 
   // Add this function to format price display
   const formatPriceDisplay = (priceData: PriceData | string) => {
@@ -677,7 +681,7 @@ export default function SearchContent({
         const [minPrice, maxPrice] = advancedFilters.priceRange;
         if (minPrice > 0 || maxPrice < 1000) {
           medspasCopy = medspasCopy.filter(medspa => {
-            const price = findTreatmentPriceNumber(medspa);
+            const price = findTreatmentPriceNumber(medspa, searchQuery);
             return price >= minPrice && price <= maxPrice;
           });
         }
@@ -729,8 +733,8 @@ export default function SearchContent({
         case 'Price':
           // 가격 기준 정렬 (낮은 가격순)
           return medspasCopy.sort((a, b) => {
-            const priceA = findTreatmentPriceNumber(a);
-            const priceB = findTreatmentPriceNumber(b);
+            const priceA = findTreatmentPriceNumber(a, searchQuery);
+            const priceB = findTreatmentPriceNumber(b, searchQuery);
             return priceA - priceB;
           });
           
@@ -1217,20 +1221,14 @@ export default function SearchContent({
                     {/* Treatment Price */}                    
                     <div className="text-left mt-2">
                       <span className="text-2xl font-bold text-black">
-                        {(() => {
-                          const priceData = getRandomTreatment(medspa);
+                        {searchQuery && (() => {
+                          const priceData = findTreatmentPrice(medspa, searchQuery);
+                          console.log('Price data for', medspa.medspa_name, ':', priceData);
                           if (!priceData) return null;
                           
                           return (
                             <>
-                              <div className="text-base font-light mb-1">
-                                {priceData.treatment_name}
-                                {priceData.treatment_category && (
-                                  <span className="text-sm text-gray-500 ml-2">
-                                    ({priceData.treatment_category})
-                                  </span>
-                                )}
-                              </div>
+                              <div className="text-base font-light mb-1">{priceData.treatment_name}</div>
                               {formatPriceDisplay(priceData)}
                             </>
                           );

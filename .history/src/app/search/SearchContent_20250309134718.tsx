@@ -15,7 +15,6 @@ import {  MapPin, Navigation, Phone, Heart } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
 import { createClient } from '@/utils/supabase/client';
 import { MedspaRatings } from "@/components/ui/medspa-ratings";
-import FilterModal from '@/components/FilterModal';
 
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
   ssr: false,
@@ -77,18 +76,6 @@ interface SearchContentProps {
   error?: Error;
 }
 
-// 필터 상태 인터페이스 정의
-interface FilterState {
-  priceRange: [number, number];
-  googleStars: number[];
-  yelpStars: number[];
-  villages: string[];
-  facilities: string[];
-  distance: number | null;
-  treatmentCategories: string[];
-  efficacies: string[];
-}
-
 export default function SearchContent({
   initialMedspas,
   searchQuery,
@@ -117,17 +104,12 @@ export default function SearchContent({
   const [mapLoading, setMapLoading] = useState(false);
   const [currentImageIndexes, setCurrentImageIndexes] = useState<{[key: string]: number}>({});
   const [selectedFilter, setSelectedFilter] = useState<FilterType>(null);
-  const [showFilterModal, setShowFilterModal] = useState(false);
-  const [activeFilters, setActiveFilters] = useState<Partial<FilterState>>({});
-  const [advancedFilters] = useState<FilterState>({
-    priceRange: [0, 1000],
-    googleStars: [],
-    yelpStars: [],
-    villages: [],
-    facilities: [],
-    distance: null,
-    treatmentCategories: [],
-    efficacies: []
+  const [advancedFilters, setAdvancedFilters] = useState({
+    priceRange: [0, 1000] as [number, number],
+    googleStars: [] as number[],
+    yelpStars: [] as number[],
+    villages: [] as string[],
+    facilities: [] as string[]
   });
 
   // Favorites context
@@ -310,69 +292,75 @@ export default function SearchContent({
     return distanceKm * 0.621371;
   };
 
-  const findRelevantTreatments = (medspa: Medspa): PriceData[] => {
+  const findTreatmentPrice = (medspa: Medspa, query: string) => {
     try {
-      if (!priceData || !medspa.medspa_name) return [];
-
-      // Get treatments based on active filters
-      const treatmentCategories = activeFilters.treatmentCategories ?? [];
-      const efficacies = activeFilters.efficacies ?? [];
-      const hasFilteredCategories = treatmentCategories.length > 0;
-      const hasFilteredEfficacies = efficacies.length > 0;
-
-      if (hasFilteredCategories || hasFilteredEfficacies) {
-        return priceData.filter(price => 
-          price.medspa_name?.toLowerCase() === medspa.medspa_name.toLowerCase() && (
-            // Match treatment categories
-            (hasFilteredCategories &&
-              price.treatment_category &&
-              treatmentCategories.map(c => c.toLowerCase()).includes(price.treatment_category.toLowerCase())) ||
-            // Match efficacies
-            (hasFilteredEfficacies &&
-              price.efficacy &&
-              efficacies.map(e => e.toLowerCase()).includes(price.efficacy.toLowerCase()))
-          )
-        );
-      }
-
-      // If no filters but has search query, find matching treatments
-      if (searchQuery) {
-        const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term.length > 0);
-        return priceData.filter(price => 
-          price.medspa_name?.toLowerCase() === medspa.medspa_name.toLowerCase() &&
+      // Only use price data from price_test table
+      if (priceData && priceData.length > 0 && query && query.trim()) {
+        const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+        
+        // Find prices for this medspa that match the search query
+        const matchingPrices = priceData.filter(price => 
+          price && price.medspa_name && medspa.medspa_name && 
+          price.medspa_name.toLowerCase() === medspa.medspa_name.toLowerCase() &&
           searchTerms.some(term => 
             (price.treatment_name && price.treatment_name.toLowerCase().includes(term)) ||
             (price.treatment_category && price.treatment_category.toLowerCase().includes(term)) ||
             (price.efficacy && price.efficacy.toLowerCase().includes(term))
           )
         );
+        
+        console.log(`Found ${matchingPrices.length} matching prices for ${medspa.medspa_name} with query: ${query}`);
+        
+        if (matchingPrices.length > 0) {
+          // 여러 가격이 있을 경우 가장 관련성 높은 것을 선택
+          // 1. 정확한 treatment_name 일치
+          // 2. 정확한 treatment_category 일치
+          // 3. 정확한 efficacy 일치
+          // 4. 첫 번째 결과
+          
+          // 정확한 treatment_name 일치 검색
+          const exactNameMatch = matchingPrices.find(price => 
+            price.treatment_name && searchTerms.some(term => 
+              price.treatment_name.toLowerCase() === term.toLowerCase()
+            )
+          );
+          
+          if (exactNameMatch) {
+            console.log(`Found exact treatment name match: ${exactNameMatch.treatment_name}`);
+            return exactNameMatch;
+          }
+          
+          // 정확한 category 일치 검색
+          const exactCategoryMatch = matchingPrices.find(price => 
+            price.treatment_category && searchTerms.some(term => 
+              price.treatment_category.toLowerCase() === term.toLowerCase()
+            )
+          );
+          
+          if (exactCategoryMatch) {
+            console.log(`Found exact category match: ${exactCategoryMatch.treatment_category}`);
+            return exactCategoryMatch;
+          }
+          
+          // 첫 번째 결과 반환
+          console.log(`Using first match: ${matchingPrices[0].treatment_name}`);
+          return matchingPrices[0];
+        }
       }
-
-      return [];
+      
+      // If no match found, return null instead of empty string
+      console.log('No matching price found for', medspa.medspa_name, 'with query:', query);
+      return null;
     } catch (error) {
-      console.error('Error finding relevant treatments:', error);
-      return [];
+      console.error('Error finding treatment price:', error);
+      return null;
     }
   };
 
-  const getRandomTreatment = (medspa: Medspa): PriceData | null => {
-    const relevantTreatments = findRelevantTreatments(medspa);
-    if (relevantTreatments.length === 0) return null;
-    
-    // Get a random treatment from the relevant ones
-    const randomIndex = Math.floor(Math.random() * relevantTreatments.length);
-    return relevantTreatments[randomIndex];
-  };
-
-  // Update the existing findTreatmentPrice function to use the new logic
-  const findTreatmentPrice = (medspa: Medspa): PriceData | null => {
-    return getRandomTreatment(medspa);
-  };
-
   // Helper function to find treatment price as a number for sorting
-  const findTreatmentPriceNumber = useCallback((medspa: Medspa): number => {
+  const findTreatmentPriceNumber = useCallback((medspa: Medspa, query: string): number => {
     try {
-      const priceResult = findTreatmentPrice(medspa);
+      const priceResult = findTreatmentPrice(medspa, query);
       
       // If it's a PriceData object
       if (typeof priceResult === 'object' && priceResult !== null) {
@@ -391,7 +379,8 @@ export default function SearchContent({
       console.error('Error converting price to number:', error);
       return Infinity;
     }
-  }, [findTreatmentPrice]);
+  }, []);
+  // Helper function to find treatment price as a number for sorting
 
   // Add this function to format price display
   const formatPriceDisplay = (priceData: PriceData | string) => {
@@ -550,134 +539,20 @@ export default function SearchContent({
     fetchSearchResults();
   }, [searchQuery]);
 
-  // Get unique villages for the filter
-  const availableVillages = useMemo(() => {
-    const villages = medspas
-      .map(medspa => medspa.village)
-      .filter((village): village is string => 
-        typeof village === 'string' && village.trim() !== ''
-      );
-    return [...new Set(villages)].sort();
-  }, [medspas]);
-  
   // 필터링된 MedSpa 목록
   const filteredMedspas = useMemo(() => {
     if (!medspas.length) return [];
     
     let medspasCopy = [...medspas];
-    console.log('Initial medspas count:', medspasCopy.length);
-    console.log('Active filters:', activeFilters);
-    console.log('Price data available:', priceData?.length || 0);
     
-    // Apply location filters if any from activeFilters
-    if (activeFilters.villages && activeFilters.villages.length > 0) {
-      medspasCopy = medspasCopy.filter(medspa => 
-        medspa.village && activeFilters.villages?.includes(medspa.village)
-      );
-      console.log(`Filtered to ${medspasCopy.length} medspas by location`);
-    }
-    
-    // Filter by treatment categories
-    if (activeFilters.treatmentCategories && activeFilters.treatmentCategories.length > 0) {
-      console.log('Filtering by treatment categories:', activeFilters.treatmentCategories);
-      console.log('Total price data records:', priceData.length);
-      
-      // Create a Set of medspa names that have the selected treatment categories
-      const medspaNames = new Set<string>();
-      
-      // Convert treatment categories to lowercase for case-insensitive comparison
-      const selectedCategories = activeFilters.treatmentCategories.map(cat => cat.toLowerCase());
-      
-      // Loop through price data to find matching treatment categories
-      priceData.forEach(price => {
-        if (price.treatment_category && 
-            selectedCategories.includes(price.treatment_category.toLowerCase()) &&
-            price.medspa_name) {
-          console.log(`Found match: ${price.medspa_name} - ${price.treatment_category}`);
-          medspaNames.add(price.medspa_name);
-        }
-      });
-      
-      console.log('Medspas with selected categories:', Array.from(medspaNames));
-      
-      // Filter medspas by these names
-      if (medspaNames.size > 0) {
-        const beforeCount = medspasCopy.length;
-        medspasCopy = medspasCopy.filter(medspa => {
-          const hasMatch = medspa.medspa_name && medspaNames.has(medspa.medspa_name);
-          if (!hasMatch) {
-            console.log(`Filtered out: ${medspa.medspa_name}`);
-          }
-          return hasMatch;
-        });
-        console.log(`Filtered from ${beforeCount} to ${medspasCopy.length} medspas by treatment categories`);
-      }
-    }
-    
-    // Filter by efficacies
-    if (activeFilters.efficacies && activeFilters.efficacies.length > 0) {
-      console.log('Filtering by efficacies:', activeFilters.efficacies);
-      
-      // Create a Set of medspa names that have the selected efficacies
-      const medspaNames = new Set<string>();
-      
-      // Convert efficacies to lowercase for case-insensitive comparison
-      const selectedEfficacies = activeFilters.efficacies.map(eff => eff.toLowerCase());
-      
-      // Loop through price data to find matching efficacies
-      priceData.forEach(price => {
-        if (price.efficacy && 
-            selectedEfficacies.includes(price.efficacy.toLowerCase()) &&
-            price.medspa_name) {
-          console.log(`Found efficacy match: ${price.medspa_name} - ${price.efficacy}`);
-          medspaNames.add(price.medspa_name);
-        }
-      });
-      
-      console.log('Medspas with selected efficacies:', Array.from(medspaNames));
-      
-      // Filter medspas by these names
-      if (medspaNames.size > 0) {
-        const beforeCount = medspasCopy.length;
-        medspasCopy = medspasCopy.filter(medspa => {
-          const hasMatch = medspa.medspa_name && medspaNames.has(medspa.medspa_name);
-          if (!hasMatch) {
-            console.log(`Filtered out by efficacy: ${medspa.medspa_name}`);
-          }
-          return hasMatch;
-        });
-        console.log(`Filtered from ${beforeCount} to ${medspasCopy.length} medspas by efficacies`);
-      }
-    }
-    
-    // Apply distance filter
-    if (activeFilters.distance !== null && activeFilters.distance !== undefined && userLocation) {
-      console.log('Filtering by distance:', activeFilters.distance);
-      
-      medspasCopy = medspasCopy.filter(medspa => {
-        if (!medspa.lat || !medspa.lng) return false;
-        
-        const distance = calculateDistance(
-          userLocation.lat, 
-          userLocation.lng, 
-          medspa.lat, 
-          medspa.lng
-        );
-        
-        return distance <= activeFilters.distance!;
-      });
-      
-      console.log(`Filtered to ${medspasCopy.length} medspas by distance`);
-    }
-    
-    // Apply advanced filters
+    // Apply advanced filters first
     if (advancedFilters) {
       // Filter by price range
       if (advancedFilters.priceRange && advancedFilters.priceRange.length === 2) {
         const [minPrice, maxPrice] = advancedFilters.priceRange;
         if (minPrice > 0 || maxPrice < 1000) {
           medspasCopy = medspasCopy.filter(medspa => {
-            const price = findTreatmentPriceNumber(medspa);
+            const price = findTreatmentPriceNumber(medspa, searchQuery);
             return price >= minPrice && price <= maxPrice;
           });
         }
@@ -699,8 +574,8 @@ export default function SearchContent({
         });
       }
       
-      // Filter by villages/locations from advancedFilters if activeFilters doesn't have villages
-      if (!activeFilters.villages && advancedFilters.villages && advancedFilters.villages.length > 0) {
+      // Filter by villages/locations
+      if (advancedFilters.villages && advancedFilters.villages.length > 0) {
         medspasCopy = medspasCopy.filter(medspa => {
           return advancedFilters.villages.includes(medspa.village);
         });
@@ -729,8 +604,8 @@ export default function SearchContent({
         case 'Price':
           // 가격 기준 정렬 (낮은 가격순)
           return medspasCopy.sort((a, b) => {
-            const priceA = findTreatmentPriceNumber(a);
-            const priceB = findTreatmentPriceNumber(b);
+            const priceA = findTreatmentPriceNumber(a, searchQuery);
+            const priceB = findTreatmentPriceNumber(b, searchQuery);
             return priceA - priceB;
           });
           
@@ -817,7 +692,7 @@ export default function SearchContent({
     
     // 필터가 없거나 기본 케이스
     return medspasCopy;
-  }, [medspas, selectedFilter, searchQuery, userLocation, findTreatmentPriceNumber, advancedFilters, activeFilters, priceData, calculateDistance]);
+  }, [medspas, selectedFilter, searchQuery, userLocation, findTreatmentPriceNumber]);
 
   // Check login status on component mount
   useEffect(() => {
@@ -893,7 +768,7 @@ export default function SearchContent({
       } else if (medspa.lat !== undefined && medspa.lng !== undefined) {
         // lat, lng 값 유효성 검사
         const isValidLat = !isNaN(medspa.lat) && medspa.lat >= -90 && medspa.lat <= 90;
-        const isValidLng = medspa.lng !== null && medspa.lng !== undefined && !isNaN(medspa.lng);
+        const isValidLng = !isNaN(medspa.lng) && medspa.lng >= -180 && medspa.lng <= 180;
         
         if (isValidLat && isValidLng) {
           coords = { lat: medspa.lat, lng: medspa.lng };
@@ -953,15 +828,6 @@ export default function SearchContent({
     });
   };
   
-  // Handle apply filters from FilterModal
-  const handleApplyFilters = (filters: Partial<FilterState>) => {
-    console.log('Received filters in handleApplyFilters:', filters);
-    console.log('Treatment categories received:', filters.treatmentCategories);
-    console.log('Efficacies received:', filters.efficacies);
-    setActiveFilters(filters);
-    console.log('Active filters after update:', activeFilters);
-  };
-  
   // Clear all filters - Commented out but kept for future reference
   /* const clearAllFilters = () => {
     setSelectedFilter(null);
@@ -979,13 +845,6 @@ export default function SearchContent({
       behavior: 'smooth'
     });
   }; */
-
-  console.log('Received priceData:', {
-    totalRecords: priceData.length,
-    sampleRecords: priceData.slice(0, 3),
-    uniqueTreatmentCategories: [...new Set(priceData.map(p => p.treatment_category))],
-    uniqueMedspas: [...new Set(priceData.map(p => p.medspa_name))]
-  });
 
   return (
     <>
@@ -1027,13 +886,10 @@ export default function SearchContent({
             </button>
           </div>
           <div className="container mx-auto pl-3 pb-2">
-            <div className="flex items-center gap-2">
-              <SearchFilters 
-                selectedFilter={selectedFilter}
-                onFilterChange={handleFilterChange}
-                onOpenFilterModal={() => setShowFilterModal(true)}
-              />
-            </div>
+            <SearchFilters 
+              selectedFilter={selectedFilter}
+              onFilterChange={handleFilterChange}
+            />
             {selectedFilter && (
               <div></div>
             )}
@@ -1217,20 +1073,14 @@ export default function SearchContent({
                     {/* Treatment Price */}                    
                     <div className="text-left mt-2">
                       <span className="text-2xl font-bold text-black">
-                        {(() => {
-                          const priceData = getRandomTreatment(medspa);
+                        {searchQuery && (() => {
+                          const priceData = findTreatmentPrice(medspa, searchQuery);
+                          console.log('Price data for', medspa.medspa_name, ':', priceData);
                           if (!priceData) return null;
                           
                           return (
                             <>
-                              <div className="text-base font-light mb-1">
-                                {priceData.treatment_name}
-                                {priceData.treatment_category && (
-                                  <span className="text-sm text-gray-500 ml-2">
-                                    ({priceData.treatment_category})
-                                  </span>
-                                )}
-                              </div>
+                              <div className="text-base font-light mb-1">{priceData.treatment_name}</div>
                               {formatPriceDisplay(priceData)}
                             </>
                           );
@@ -1315,14 +1165,6 @@ export default function SearchContent({
           onLoginSuccess={handleLoginSuccess}
         />
       )}
-      
-      <FilterModal
-        isOpen={showFilterModal}
-        onClose={() => setShowFilterModal(false)}
-        onApplyFilters={handleApplyFilters}
-        availableVillages={availableVillages}
-        initialFilters={activeFilters}
-      />
     </>
   );
 }

@@ -1,17 +1,17 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import {  MapPin, Navigation, Phone, Heart } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import SearchBar from '@/components/SearchBar';
 import SearchFilters, { FilterType } from '@/components/SearchFilters';
+import ConsultationModal from '@/components/ConsultationModal';
+import LoginModal from '@/components/LoginModal';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import ConsultationModal from '@/components/ConsultationModal';
-import LoginModal from '@/components/LoginModal';
+import Image from 'next/image';
+import Link from 'next/link';
+import {  MapPin, Navigation, Phone, Heart } from 'lucide-react';
 import { useFavorites } from '@/context/FavoritesContext';
 import { createClient } from '@/utils/supabase/client';
 import { MedspaRatings } from "@/components/ui/medspa-ratings";
@@ -40,18 +40,6 @@ interface Medspa {
   free_consultation?: string;
   good_review_short?: string;
   bad_review_short?: string;
-  treatment1?: string;
-  treatment2?: string;
-  treatment3?: string;
-  treatment4?: string;
-  treatment5?: string;
-  treatment6?: string;
-  price1?: string;
-  price2?: string;
-  price3?: string;
-  price4?: string;
-  price5?: string;
-  price6?: string;
   image_url1: string;
   image_url2: string; 
   image_url3: string;
@@ -63,15 +51,35 @@ interface Medspa {
   };
 }
 
+interface PriceData {
+  id: string;
+  medspa_name: string;
+  treatment_category: string;
+  efficacy: string;
+  treatment_name: string;
+  treatment_description: string;
+  standard_price: string;
+  standard_unit: string;
+  standard_price_note: string;
+  duration: string;
+  member_price: string;
+  member_unit: string;
+  member_price_note: string;
+  package_duration: string;
+  additional_info: string;
+  contact: string;
+}
 interface SearchContentProps {
   initialMedspas: Medspa[];
   searchQuery: string;
+  priceData?: PriceData[];
   error?: Error;
 }
 
 export default function SearchContent({
   initialMedspas,
   searchQuery,
+  priceData = [],
   error,
 }: SearchContentProps) {
   if (error) {
@@ -141,8 +149,22 @@ export default function SearchContent({
     }
   };
 
-  // 사용자 위치 상태
-  // ... existing code ...
+  useEffect(() => {
+    const fetchPrices = async () => {
+      const supabase = createClient();
+      
+      const { data, error } = await supabase.from('price_test').select('*');
+      
+      if (error) {
+        console.error('Error fetching price data:', error);
+        return;
+      }
+  
+      console.log('✅ Full price_test data:', data); // Check if ANY data exists
+    };
+  
+    fetchPrices();
+  }, []);
 
   // 사용자 위치 상태
   useEffect(() => {
@@ -263,126 +285,127 @@ export default function SearchContent({
     return distanceKm * 0.621371;
   };
 
-  // Helper function to find treatment price based on search query
   const findTreatmentPrice = (medspa: Medspa, query: string) => {
     try {
-      const treatments = [
-        { treatment: medspa.treatment1, price: medspa.price1 },
-        { treatment: medspa.treatment2, price: medspa.price2 },
-        { treatment: medspa.treatment3, price: medspa.price3 },
-        { treatment: medspa.treatment4, price: medspa.price4 },
-        { treatment: medspa.treatment5, price: medspa.price5 },
-        { treatment: medspa.treatment6, price: medspa.price6 },
-      ];
-      const matchingTreatment = treatments.find(t => 
-        t.treatment && typeof t.treatment === 'string' && t.treatment.toLowerCase().includes(query.toLowerCase())
-      );
-
-      return matchingTreatment?.price || '';
+      // Only use price data from price_test table
+      if (priceData && priceData.length > 0 && query && query.trim()) {
+        const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+        
+        // Find prices for this medspa that match the search query
+        const matchingPrices = priceData.filter(price => 
+          price && price.medspa_name && medspa.medspa_name && 
+          price.medspa_name.toLowerCase() === medspa.medspa_name.toLowerCase() &&
+          searchTerms.some(term => 
+            (price.treatment_name && price.treatment_name.toLowerCase().includes(term)) ||
+            (price.treatment_category && price.treatment_category.toLowerCase().includes(term)) ||
+            (price.efficacy && price.efficacy.toLowerCase().includes(term))
+          )
+        );
+        
+        console.log(`Found ${matchingPrices.length} matching prices for ${medspa.medspa_name} with query: ${query}`);
+        
+        if (matchingPrices.length > 0) {
+          // 여러 가격이 있을 경우 가장 관련성 높은 것을 선택
+          // 1. 정확한 treatment_name 일치
+          // 2. 정확한 treatment_category 일치
+          // 3. 정확한 efficacy 일치
+          // 4. 첫 번째 결과
+          
+          // 정확한 treatment_name 일치 검색
+          const exactNameMatch = matchingPrices.find(price => 
+            price.treatment_name && searchTerms.some(term => 
+              price.treatment_name.toLowerCase() === term.toLowerCase()
+            )
+          );
+          
+          if (exactNameMatch) {
+            console.log(`Found exact treatment name match: ${exactNameMatch.treatment_name}`);
+            return exactNameMatch;
+          }
+          
+          // 정확한 category 일치 검색
+          const exactCategoryMatch = matchingPrices.find(price => 
+            price.treatment_category && searchTerms.some(term => 
+              price.treatment_category.toLowerCase() === term.toLowerCase()
+            )
+          );
+          
+          if (exactCategoryMatch) {
+            console.log(`Found exact category match: ${exactCategoryMatch.treatment_category}`);
+            return exactCategoryMatch;
+          }
+          
+          // 첫 번째 결과 반환
+          console.log(`Using first match: ${matchingPrices[0].treatment_name}`);
+          return matchingPrices[0];
+        }
+      }
+      
+      // If no match found, return null instead of empty string
+      console.log('No matching price found for', medspa.medspa_name, 'with query:', query);
+      return null;
     } catch (error) {
       console.error('Error finding treatment price:', error);
-      return '';
+      return null;
     }
   };
-  
+
   // Helper function to find treatment price as a number for sorting
   const findTreatmentPriceNumber = useCallback((medspa: Medspa, query: string): number => {
     try {
-      const priceStr = findTreatmentPrice(medspa, query);
-      if (!priceStr) return Infinity; // 가격 정보가 없으면 맨 뒤로
+      const priceResult = findTreatmentPrice(medspa, query);
       
-      // 가격 문자열에서 숫자만 추출 (예: "$100" -> 100)
-      const priceMatch = priceStr.match(/\$?(\d+)/);
-      return priceMatch ? parseInt(priceMatch[1], 10) : Infinity;
+      // If it's a PriceData object
+      if (typeof priceResult === 'object' && priceResult !== null) {
+        const priceStr = priceResult.standard_price;
+        if (!priceStr) return Infinity;
+        
+        // Convert to string to ensure match works
+        const priceStrValue = String(priceStr);
+        const priceMatch = priceStrValue.match(/\$?(\d+)/);
+        return priceMatch ? parseInt(priceMatch[1], 10) : Infinity;
+      }
+      
+      // If no price found
+      return Infinity;
     } catch (error) {
       console.error('Error converting price to number:', error);
       return Infinity;
     }
   }, []);
+  // Helper function to find treatment price as a number for sorting
 
-  // Basic stemming function to improve search matching
-  const stemWord = (word: string): string => {
-    if (!word || word.length < 3) return word;
-    
-    const stemmed = word.toLowerCase();
-    
-    // Common suffixes
-    const suffixes = [
-      'ing', 'ed', 's', 'es', 'ies', 'ly', 'ment', 'ness', 'tion', 'sion'
-    ];
-    
-    // Special cases for medical treatments
-    const specialCases: Record<string, string> = {
-      'botox': 'botox',
-      'fillers': 'filler',
-      'filling': 'filler',
-      'filled': 'filler',
-      'lasers': 'laser',
-      'lasering': 'laser',
-      'facial': 'facial',
-      'facials': 'facial',
-      'peels': 'peel',
-      'peeling': 'peel',
-      'microneedling': 'microneedle',
-      'needling': 'needle',
-      'sculpting': 'sculpt',
-      'sculpted': 'sculpt',
-      'treatment': 'treat',
-      'treatments': 'treat',
-      'treating': 'treat',
-      'treated': 'treat',
-      'removal': 'remove',
-      'removing': 'remove',
-      'removed': 'remove',
-      'injection': 'inject',
-      'injections': 'inject',
-      'injecting': 'inject',
-      'injected': 'inject',
-      'clinic': 'clinic',
-      'clinics': 'clinic',
-      'spa': 'spa',
-      'spas': 'spa',
-      'medspa': 'medspa',
-      'medspas': 'medspa',
-      'med': 'med',
-      'center': 'center',
-      'centers': 'center',
-      'aesthetic': 'aesthetic',
-      'aesthetics': 'aesthetic',
-      'beauty': 'beauty',
-      'medical': 'medical',
-      'medicine': 'medical',
-      'doctor': 'doctor',
-      'doctors': 'doctor',
-      'physician': 'physician',
-      'physicians': 'physician',
-      'skin': 'skin',
-      'skincare': 'skin',
-      'glow': 'glow',
-      'glowing': 'glow',
-      'rejuvenate': 'rejuvenate',
-      'rejuvenation': 'rejuvenate',
-      'elite': 'elite',
-      'pure': 'pure',
-      'radiance': 'radiance',
-      'revival': 'revival',
-      'revive': 'revival'
-    };
-    
-    // Check for special cases first
-    if (specialCases[stemmed]) {
-      return specialCases[stemmed];
+  // Add this function to format price display
+  const formatPriceDisplay = (priceData: PriceData | string) => {
+    if (typeof priceData === 'string') {
+      return priceData; // Return the string as is
     }
     
-    // Try to remove common suffixes
-    for (const suffix of suffixes) {
-      if (stemmed.endsWith(suffix) && stemmed.length > suffix.length + 2) {
-        return stemmed.slice(0, -suffix.length);
-      }
+
+    // Format the price data object
+    const formattedPrice = new Intl.NumberFormat('en-US').format(Number(priceData.standard_price || 0));
+    const standardUnit = priceData.standard_unit ? priceData.standard_unit.toLowerCase() : 'unit';
+    const standardPrice = `$${formattedPrice} per ${standardUnit}`;
+
+    
+    // Check if member price exists
+    if (priceData.member_price) {
+      const formattedMemberPrice = new Intl.NumberFormat('en-US').format(Number(priceData.member_price));
+      const memberUnit = priceData.member_unit ? priceData.member_unit.toLowerCase() : 'unit';
+      const memberPrice = `$${formattedMemberPrice} per ${memberUnit}`;
+      
+      return (
+        <div>
+          <div>{standardPrice}</div>
+          <div className="text-sm text-green-600">Member: {memberPrice}</div>
+        </div>
+      );
     }
     
-    return stemmed;
+    return <div>{standardPrice}</div>;
   };
+  // Basic stemming function to improve search matching
+    // Function to highlight matching terms in text
 
   // Function to highlight matching terms in text
   const highlightMatches = (text: string, searchTerms: string[]): React.ReactNode => {
@@ -473,90 +496,49 @@ export default function SearchContent({
     );
   };
 
+  // 🔹 State for loading status during search
+  const [loading, setLoading] = useState(false);
+
+  // 🔹 Fetch search results from Supabase when searchQuery changes
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      if (!searchQuery.trim()) {
+        return; // Keep using initialMedspas if no search query
+      }
+
+      setLoading(true);
+      const supabase = createClient();
+      
+      try {
+        const { data, error } = await supabase
+          .from('medspa_nyc')
+          .select('*')
+          .or(`medspa_name.ilike.%${searchQuery}%, best_treatment.ilike.%${searchQuery}%, village.ilike.%${searchQuery}%, location.ilike.%${searchQuery}%`)
+          .limit(20);
+
+        if (error) {
+          console.error('Error fetching search results:', error);
+        } else if (data) {
+          console.log('🔍 Search results:', data.length);
+          setMedspas(data);
+        }
+      } catch (err) {
+        console.error('Error in search:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSearchResults();
+  }, [searchQuery]);
+
   // 필터링된 MedSpa 목록
   const filteredMedspas = useMemo(() => {
     if (!medspas.length) return [];
     
-    let medspasCopy = [...medspas];
+    const medspasCopy = [...medspas];
     
-    // 검색어가 있는 경우에만 검색어로 필터링
-    if (searchQuery.trim()) {
-      // 검색어를 개별 단어로 분리
-      const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term.length > 0);
-      
-      // 검색어의 stemmed 버전도 준비
-      const stemmedSearchTerms = searchTerms.map(term => stemWord(term));
-      
-      // 각 메드스파에 점수 부여
-      const scoredMedspas = medspasCopy.map(medspa => {
-        let score = 0;
-        const fieldsToSearch = [
-          medspa.medspa_name,
-          medspa.village,
-          medspa.location,
-          medspa.best_treatment,
-          medspa.treatment1,
-          medspa.treatment2,
-          medspa.treatment3,
-          medspa.treatment4,
-          medspa.treatment5,
-          medspa.treatment6,
-        ];
-        
-        // 각 검색어에 대해 점수 계산
-        searchTerms.forEach((term, idx) => {
-          const stemmedTerm = stemmedSearchTerms[idx];
-          
-          fieldsToSearch.forEach((field, fieldIndex) => {
-            if (field) {
-              const fieldLower = field.toLowerCase();
-              const fieldWords = fieldLower.split(/\s+|,|\(|\)|-|\//).filter(w => w.length > 0);
-              const stemmedFieldWords = fieldWords.map(w => stemWord(w));
-              
-              // 메드스파 이름에 대한 가중치 부여
-              const nameMultiplier = fieldIndex === 0 ? 2 : 1; // medspa_name field has index 0
-              
-              // 정확한 일치 (가장 높은 점수)
-              if (fieldLower === term) {
-                score += 10 * nameMultiplier;
-              }
-              // 단어 포함 (높은 점수)
-              else if (fieldLower.includes(term)) {
-                score += 5 * nameMultiplier;
-              }
-              // 단어 단위 일치 (중간 점수)
-              else if (fieldWords.some(word => word === term)) {
-                score += 4 * nameMultiplier;
-              }
-              // 스테밍된 단어 일치 (중간 점수)
-              else if (stemmedFieldWords.some(word => word === stemmedTerm)) {
-                score += 3 * nameMultiplier;
-              }
-              // 유사 단어 (부분 일치, 낮은 점수)
-              else if (term.length > 2 && fieldLower.includes(term.substring(0, Math.ceil(term.length * 0.7)))) {
-                score += 2 * nameMultiplier;
-              }
-              // 매우 짧은 검색어(2-3자)의 경우 부분 일치도 허용
-              else if (term.length >= 2 && term.length <= 3 && fieldLower.includes(term)) {
-                score += 1 * nameMultiplier;
-              }
-            }
-          });
-        });
-        
-        return { medspa, score };
-      });
-      
-      // 점수가 0보다 큰 메드스파만 필터링하고 점수 순으로 정렬
-      const filteredScoredMedspas = scoredMedspas
-        .filter(item => item.score > 0)
-        .sort((a, b) => b.score - a.score);
-      
-      // 점수 정보 제거하고 메드스파만 반환
-      medspasCopy = filteredScoredMedspas.map(item => item.medspa);
-    }
-    
-    // 필터 적용 (검색어 유무와 관계없이)
+    // 🔹 Filtered & Sorted Medspa Results
     if (selectedFilter) {
       console.log(`Applying filter: ${selectedFilter} to ${medspasCopy.length} medspas`);
       
@@ -853,6 +835,12 @@ export default function SearchContent({
             {selectedFilter && (
               <div></div>
             )}
+            {/* Loading indicator */}
+            {loading && (
+              <div className="text-center text-gray-600 py-1">
+                <p>Searching...</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1024,17 +1012,25 @@ export default function SearchContent({
                       </div>
                     </div>
                     
-                    {/* Treatment Price */}
+                    {/* Treatment Price */}                    
                     <div className="text-left mt-2">
                       <span className="text-2xl font-bold text-black">
-                        {findTreatmentPrice(medspa, searchQuery) && (
-                          <>
-                            {searchQuery} - {findTreatmentPrice(medspa, searchQuery)}
-                          </>
-                        )}
+                        {searchQuery && (() => {
+                          const priceData = findTreatmentPrice(medspa, searchQuery);
+                          console.log('Price data for', medspa.medspa_name, ':', priceData);
+                          if (!priceData) return null;
+                          
+                          return (
+                            <>
+                              <div className="text-lg font-semibold mb-1">{priceData.treatment_name}</div>
+                              {formatPriceDisplay(priceData)}
+                            </>
+                          );
+                        })()}
                       </span>
                     </div>
-                    
+
+
                     
                     {/* Reviews - 이미지와 왼쪽 정렬 */}
                     <div className="space-y-1">

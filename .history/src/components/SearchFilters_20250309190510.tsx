@@ -1,8 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Sliders } from 'lucide-react';
+import FilterModal from './FilterModal';
+import { createClient } from '@/utils/supabase/client';
 
 // 필터 타입 정의 - 원래 있던 구체적인 필터 타입으로 복원
 export type FilterType = 'Price' | 'google_star' | 'google_review' | 'yelp_star' | 'yelp_review' | 'Distance' | 'Free consultation' | null;
@@ -37,14 +40,73 @@ const filters: FilterItem[] = [
   { label: 'Free consultation', value: 'Free consultation' },
 ];
 
+// Fallback villages in case fetching fails
+const fallbackVillages = [
+  'Upper East Side',
+  'Midtown',
+  'SoHo',
+  'Chelsea',
+  'Greenwich Village',
+  'Tribeca',
+  'Financial District',
+  'Flatiron'
+];
+
 // SearchFilters 컴포넌트 Props 타입
 interface SearchFiltersProps {
   selectedFilter: FilterType;
   onFilterChange: (filter: FilterType) => void;
+  onApplyAdvancedFilters?: (filters: FilterState) => void;
   onOpenFilterModal?: () => void;
 }
 
-export default function SearchFilters({ selectedFilter, onFilterChange, onOpenFilterModal }: SearchFiltersProps) {
+export default function SearchFilters({ selectedFilter, onFilterChange, onApplyAdvancedFilters, onOpenFilterModal }: SearchFiltersProps) {
+  // 필터 모달 상태
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [availableVillages, setAvailableVillages] = useState<string[]>(fallbackVillages);
+  const [advancedFilters, setAdvancedFilters] = useState({
+    priceRange: [0, 1000] as [number, number],
+    googleStars: [] as number[],
+    yelpStars: [] as number[],
+    villages: [] as string[],
+    facilities: [] as string[],
+    distance: null as number | null,
+    treatmentCategories: [] as string[],
+    efficacies: [] as string[]
+  });
+  
+  // Fetch unique villages from Supabase
+  useEffect(() => {
+    const fetchVillages = async () => {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('medspa_nyc')
+          .select('village')
+          .not('village', 'is', null);
+        
+        if (error) {
+          console.error('Error fetching villages:', error);
+          return;
+        }
+        
+        if (data && data.length > 0) {
+          // Extract unique villages and sort them
+          const uniqueVillages = [...new Set(data.map(item => item.village))]
+            .filter(village => village && village.trim() !== '')
+            .sort();
+          
+          console.log('Fetched villages from medspa_nyc:', uniqueVillages);
+          setAvailableVillages(uniqueVillages);
+        }
+      } catch (error) {
+        console.error('Error in fetchVillages:', error);
+      }
+    };
+    
+    fetchVillages();
+  }, []);
+
   // 필터 선택 핸들러
   const handleFilterClick = (filter: FilterType) => {
     // 이미 선택된 필터를 다시 클릭하면 선택 해제
@@ -52,6 +114,14 @@ export default function SearchFilters({ selectedFilter, onFilterChange, onOpenFi
       onFilterChange(null);
     } else {
       onFilterChange(filter);
+    }
+  };
+
+  // 고급 필터 적용 핸들러
+  const handleApplyFilters = (filters: FilterState) => {
+    setAdvancedFilters(filters);
+    if (onApplyAdvancedFilters) {
+      onApplyAdvancedFilters(filters);
     }
   };
 
@@ -101,6 +171,15 @@ export default function SearchFilters({ selectedFilter, onFilterChange, onOpenFi
           </motion.div>
         ))}
       </div>
+
+      {/* 필터 모달 */}
+      <FilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        onApplyFilters={handleApplyFilters}
+        availableVillages={availableVillages}
+        initialFilters={advancedFilters}
+      />
     </div>
   );
 }

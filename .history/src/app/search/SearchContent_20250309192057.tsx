@@ -315,22 +315,17 @@ export default function SearchContent({
       if (!priceData || !medspa.medspa_name) return [];
 
       // Get treatments based on active filters
-      const treatmentCategories = activeFilters.treatmentCategories ?? [];
-      const efficacies = activeFilters.efficacies ?? [];
-      const hasFilteredCategories = treatmentCategories.length > 0;
-      const hasFilteredEfficacies = efficacies.length > 0;
-
-      if (hasFilteredCategories || hasFilteredEfficacies) {
+      if (activeFilters.treatmentCategories?.length || activeFilters.efficacies?.length) {
         return priceData.filter(price => 
           price.medspa_name?.toLowerCase() === medspa.medspa_name.toLowerCase() && (
             // Match treatment categories
-            (hasFilteredCategories &&
+            (activeFilters.treatmentCategories?.length > 0 &&
               price.treatment_category &&
-              treatmentCategories.map(c => c.toLowerCase()).includes(price.treatment_category.toLowerCase())) ||
+              activeFilters.treatmentCategories.map(c => c.toLowerCase()).includes(price.treatment_category.toLowerCase())) ||
             // Match efficacies
-            (hasFilteredEfficacies &&
+            (activeFilters.efficacies?.length > 0 &&
               price.efficacy &&
-              efficacies.map(e => e.toLowerCase()).includes(price.efficacy.toLowerCase()))
+              activeFilters.efficacies.map(e => e.toLowerCase()).includes(price.efficacy.toLowerCase()))
           )
         );
       }
@@ -365,14 +360,14 @@ export default function SearchContent({
   };
 
   // Update the existing findTreatmentPrice function to use the new logic
-  const findTreatmentPrice = (medspa: Medspa): PriceData | null => {
+  const findTreatmentPrice = (medspa: Medspa, query: string): PriceData | null => {
     return getRandomTreatment(medspa);
   };
 
   // Helper function to find treatment price as a number for sorting
-  const findTreatmentPriceNumber = useCallback((medspa: Medspa): number => {
+  const findTreatmentPriceNumber = useCallback((medspa: Medspa, query: string): number => {
     try {
-      const priceResult = findTreatmentPrice(medspa);
+      const priceResult = findTreatmentPrice(medspa, query);
       
       // If it's a PriceData object
       if (typeof priceResult === 'object' && priceResult !== null) {
@@ -391,7 +386,8 @@ export default function SearchContent({
       console.error('Error converting price to number:', error);
       return Infinity;
     }
-  }, [findTreatmentPrice]);
+  }, []);
+  // Helper function to find treatment price as a number for sorting
 
   // Add this function to format price display
   const formatPriceDisplay = (priceData: PriceData | string) => {
@@ -677,7 +673,7 @@ export default function SearchContent({
         const [minPrice, maxPrice] = advancedFilters.priceRange;
         if (minPrice > 0 || maxPrice < 1000) {
           medspasCopy = medspasCopy.filter(medspa => {
-            const price = findTreatmentPriceNumber(medspa);
+            const price = findTreatmentPriceNumber(medspa, searchQuery);
             return price >= minPrice && price <= maxPrice;
           });
         }
@@ -729,8 +725,8 @@ export default function SearchContent({
         case 'Price':
           // 가격 기준 정렬 (낮은 가격순)
           return medspasCopy.sort((a, b) => {
-            const priceA = findTreatmentPriceNumber(a);
-            const priceB = findTreatmentPriceNumber(b);
+            const priceA = findTreatmentPriceNumber(a, searchQuery);
+            const priceB = findTreatmentPriceNumber(b, searchQuery);
             return priceA - priceB;
           });
           
