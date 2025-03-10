@@ -28,13 +28,13 @@ interface FilterModalProps {
 
 // Default price range values
 const DEFAULT_MIN_PRICE = 0;
-const DEFAULT_MAX_PRICE = 10000;
+const DEFAULT_MAX_PRICE = 1000;
 
 // Star rating options
-const STAR_RATINGS = [4.5, 3.5, 2.5, 1.5];
+const STAR_RATINGS = [1, 2, 3, 4, 5];
 
 // Distance options in miles
-const DISTANCE_OPTIONS = [2, 5, 10, 15, 20, 30];
+const DISTANCE_OPTIONS = [1, 2, 5, 10, 15, 20];
 
 // Predefined treatment categories and efficacies
 const TREATMENT_CATEGORIES = [
@@ -77,13 +77,13 @@ const TREATMENT_CATEGORIES = [
 ];
 
 const EFFICACIES = [
-  'Skin Rejuvenation & Anti-Aging',
   'Volume Enhancement',
-  'Wrinkle Reduction',
+  'Skin Rejuvenation & Anti-Aging',
   'Skin Tightening & Lifting',
-  'Facials & Hydration',
   'Aesthetic & Cosmetic Enhancements',
+  'Wrinkle Reduction',
   'Hair & Scalp Treatments',
+  'Facials & Hydration',
   'Medical & Wellness Treatments'
 ];
 
@@ -109,8 +109,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
   // State for expanded sections
   const [expandedSections, setExpandedSections] = useState({
     treatmentCategories: false,
-    efficacies: false,
-    villages: false
+    efficacies: false
   });
 
   // Available options are now constants, no need for state
@@ -185,21 +184,15 @@ const FilterModal: React.FC<FilterModalProps> = ({
     const index = currentRatings.indexOf(rating);
     
     if (index === -1) {
-      // Remove any existing ratings that are lower than the selected one
-      const newRatings = currentRatings.filter(r => r > rating);
-      newRatings.push(rating);
-      if (type === 'google') {
-        setFilters({ ...filters, googleStars: newRatings });
-      } else {
-        setFilters({ ...filters, yelpStars: newRatings });
-      }
+      currentRatings.push(rating);
     } else {
       currentRatings.splice(index, 1);
-      if (type === 'google') {
-        setFilters({ ...filters, googleStars: currentRatings });
-      } else {
-        setFilters({ ...filters, yelpStars: currentRatings });
-      }
+    }
+    
+    if (type === 'google') {
+      setFilters({ ...filters, googleStars: currentRatings });
+    } else {
+      setFilters({ ...filters, yelpStars: currentRatings });
     }
   };
 
@@ -259,8 +252,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black bg-opacity-50 pt-16">
       <div className="relative w-full max-w-lg bg-white rounded-lg shadow-xl max-h-[90vh] overflow-auto">
-        {/* Header - Made sticky */}
-        <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b bg-white">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b">
           <button 
             onClick={onClose}
             className="p-2 rounded-full hover:bg-gray-100"
@@ -268,7 +261,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
           >
             <X size={20} />
           </button>
-          <h2 className="text-lg font-medium text-amber-900">Filter</h2>
+          <h2 className="text-lg font-medium text-amber-900">Filter by</h2>
           <button 
             onClick={handleReset}
             className="text-amber-900 font-medium"
@@ -358,13 +351,13 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 <button
                   key={`google-${rating}`}
                   onClick={() => toggleStarRating(rating, 'google')}
-                  className={`px-4 py-1.5 rounded-full border ${
+                  className={`px-4 py-2 rounded-full border ${
                     filters.googleStars.includes(rating)
                       ? 'bg-amber-900 text-white border-amber-900'
                       : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
                   }`}
                 >
-                  {rating} stars
+                  {rating}★
                 </button>
               ))}
             </div>
@@ -378,13 +371,13 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 <button
                   key={`yelp-${rating}`}
                   onClick={() => toggleStarRating(rating, 'yelp')}
-                  className={`px-4 py-1.5 rounded-full border ${
+                  className={`px-4 py-2 rounded-full border ${
                     filters.yelpStars.includes(rating)
                       ? 'bg-amber-900 text-white border-amber-900'
                       : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
                   }`}
                 >
-                  {rating} stars
+                  {rating}★
                 </button>
               ))}
             </div>
@@ -393,7 +386,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
           {/* Efficacies */}
           <div className="space-y-4 border-t pt-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium text-amber-900">Effects</h3>
+              <h3 className="text-lg font-medium text-amber-900">Efficacies</h3>
               <button 
                 onClick={() => toggleExpandedSection('efficacies')}
                 className="text-amber-900"
@@ -416,9 +409,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
                         type="checkbox"
                         checked={filters.efficacies.includes(efficacy)}
                         onChange={() => toggleTreatmentOption(efficacy, 'efficacies')}
-                        className="appearance-none w-5 h-5 rounded border border-gray-300 bg-white checked:border-amber-900 checked:bg-amber-900 relative
-                        checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:transform checked:after:-translate-x-1/2 checked:after:-translate-y-1/2
-                        checked:after:content-['✓'] checked:after:text-white checked:after:text-sm focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
+                        className="w-5 h-5 rounded border-2 border-black text-amber-900 bg-white focus:ring-amber-900"
+                        aria-label={`Select ${efficacy}`}
                       />
                     </div>
                   ))
@@ -426,12 +418,12 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 <div className="text-gray-500">Loading efficacies...</div>
               )}
               
-              {availableOptions.efficacies.length > 5 && (
+              {!expandedSections.efficacies && availableOptions.efficacies.length > 5 && (
                 <button 
                   onClick={() => toggleExpandedSection('efficacies')}
                   className="text-amber-900 text-sm font-medium mt-2"
                 >
-                  {expandedSections.efficacies ? 'Show less' : '...more'}
+                  ...more
                 </button>
               )}
             </div>
@@ -440,7 +432,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
           {/* Treatment Categories */}
           <div className="space-y-4 border-t pt-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium text-amber-900">Treatment</h3>
+              <h3 className="text-lg font-medium text-amber-900">Treatment Categories</h3>
               <button 
                 onClick={() => toggleExpandedSection('treatmentCategories')}
                 className="text-amber-900"
@@ -463,9 +455,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
                         type="checkbox"
                         checked={filters.treatmentCategories.includes(category)}
                         onChange={() => toggleTreatmentOption(category, 'treatmentCategories')}
-                        className="appearance-none w-5 h-5 rounded border border-gray-300 bg-white checked:border-amber-900 checked:bg-amber-900 relative
-                        checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:transform checked:after:-translate-x-1/2 checked:after:-translate-y-1/2
-                        checked:after:content-['✓'] checked:after:text-white checked:after:text-sm focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
+                        className="w-5 h-5 rounded border-2 border-black text-amber-900 bg-white focus:ring-amber-900"
+                        aria-label={`Select ${category}`}
                       />
                     </div>
                   ))
@@ -473,12 +464,12 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 <div className="text-gray-500">Loading treatment categories...</div>
               )}
               
-              {availableOptions.treatmentCategories.length > 5 && (
+              {!expandedSections.treatmentCategories && availableOptions.treatmentCategories.length > 5 && (
                 <button 
                   onClick={() => toggleExpandedSection('treatmentCategories')}
                   className="text-amber-900 text-sm font-medium mt-2"
                 >
-                  {expandedSections.treatmentCategories ? 'Show less' : '...more'}
+                  ...more
                 </button>
               )}
             </div>
@@ -487,45 +478,24 @@ const FilterModal: React.FC<FilterModalProps> = ({
           {/* Villages/Locations */}
           {availableVillages.length > 0 && (
             <div className="space-y-4 border-t pt-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-amber-900">Location</h3>
-                <button 
-                  onClick={() => toggleExpandedSection('villages')}
-                  className="text-amber-900"
-                >
-                  {expandedSections.villages ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                </button>
-              </div>
+              <h3 className="text-lg font-medium text-amber-900">Location</h3>
               
               <div className="space-y-2">
-                {availableVillages
-                  .slice(0, expandedSections.villages ? undefined : 5)
-                  .map((village) => (
-                    <div key={village} className="flex items-center justify-between">
-                      <label htmlFor={`village-${village}`} className="flex-1 cursor-pointer">
-                        {village}
-                      </label>
-                      <input
-                        id={`village-${village}`}
-                        type="checkbox"
-                        checked={filters.villages.includes(village)}
-                        onChange={() => toggleVillage(village)}
-                        className="appearance-none w-5 h-5 rounded border border-gray-300 bg-white checked:border-amber-900 checked:bg-amber-900 relative
-                        checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:transform checked:after:-translate-x-1/2 checked:after:-translate-y-1/2
-                        checked:after:content-['✓'] checked:after:text-white checked:after:text-sm focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
-                        aria-label={`Select ${village}`}
-                      />
-                    </div>
-                  ))}
-                
-                {availableVillages.length > 5 && (
-                  <button 
-                    onClick={() => toggleExpandedSection('villages')}
-                    className="text-amber-900 text-sm font-medium mt-2"
-                  >
-                    {expandedSections.villages ? 'Show less' : '...more'}
-                  </button>
-                )}
+                {availableVillages.map((village) => (
+                  <div key={village} className="flex items-center justify-between">
+                    <label htmlFor={`village-${village}`} className="flex-1 cursor-pointer">
+                      {village}
+                    </label>
+                    <input
+                      id={`village-${village}`}
+                      type="checkbox"
+                      checked={filters.villages.includes(village)}
+                      onChange={() => toggleVillage(village)}
+                      className="w-5 h-5 rounded border-2 border-black text-amber-900 bg-white focus:ring-amber-900"
+                      aria-label={`Select ${village}`}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           )}

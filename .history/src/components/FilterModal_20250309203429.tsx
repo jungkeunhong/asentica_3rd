@@ -416,9 +416,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                         type="checkbox"
                         checked={filters.efficacies.includes(efficacy)}
                         onChange={() => toggleTreatmentOption(efficacy, 'efficacies')}
-                        className="appearance-none w-5 h-5 rounded border border-gray-300 bg-white checked:border-amber-900 checked:bg-amber-900 relative
-                        checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:transform checked:after:-translate-x-1/2 checked:after:-translate-y-1/2
-                        checked:after:content-['✓'] checked:after:text-white checked:after:text-sm focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
+                        className="appearance-none w-5 h-5 rounded border-2 border-amber-900 bg-white checked:border-amber-900 checked:bg-amber-900 focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
                       />
                     </div>
                   ))
@@ -463,9 +461,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                         type="checkbox"
                         checked={filters.treatmentCategories.includes(category)}
                         onChange={() => toggleTreatmentOption(category, 'treatmentCategories')}
-                        className="appearance-none w-5 h-5 rounded border border-gray-300 bg-white checked:border-amber-900 checked:bg-amber-900 relative
-                        checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:transform checked:after:-translate-x-1/2 checked:after:-translate-y-1/2
-                        checked:after:content-['✓'] checked:after:text-white checked:after:text-sm focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
+                        className="appearance-none w-5 h-5 rounded border-2 border-amber-900 bg-white checked:border-amber-900 checked:bg-amber-900 focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
                       />
                     </div>
                   ))
@@ -510,9 +506,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                         type="checkbox"
                         checked={filters.villages.includes(village)}
                         onChange={() => toggleVillage(village)}
-                        className="appearance-none w-5 h-5 rounded border border-gray-300 bg-white checked:border-amber-900 checked:bg-amber-900 relative
-                        checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:transform checked:after:-translate-x-1/2 checked:after:-translate-y-1/2
-                        checked:after:content-['✓'] checked:after:text-white checked:after:text-sm focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
+                        className="appearance-none w-5 h-5 rounded border-1.52 border-gray-500 bg-white checked:border-amber-900 checked:bg-amber-900 focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
                         aria-label={`Select ${village}`}
                       />
                     </div>

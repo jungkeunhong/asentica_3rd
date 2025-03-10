@@ -77,13 +77,13 @@ const TREATMENT_CATEGORIES = [
 ];
 
 const EFFICACIES = [
-  'Skin Rejuvenation & Anti-Aging',
   'Volume Enhancement',
-  'Wrinkle Reduction',
+  'Skin Rejuvenation & Anti-Aging',
   'Skin Tightening & Lifting',
-  'Facials & Hydration',
   'Aesthetic & Cosmetic Enhancements',
+  'Wrinkle Reduction',
   'Hair & Scalp Treatments',
+  'Facials & Hydration',
   'Medical & Wellness Treatments'
 ];
 
@@ -109,8 +109,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
   // State for expanded sections
   const [expandedSections, setExpandedSections] = useState({
     treatmentCategories: false,
-    efficacies: false,
-    villages: false
+    efficacies: false
   });
 
   // Available options are now constants, no need for state
@@ -268,7 +267,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
           >
             <X size={20} />
           </button>
-          <h2 className="text-lg font-medium text-amber-900">Filter</h2>
+          <h2 className="text-lg font-medium text-amber-900">Filter by</h2>
           <button 
             onClick={handleReset}
             className="text-amber-900 font-medium"
@@ -393,7 +392,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
           {/* Efficacies */}
           <div className="space-y-4 border-t pt-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium text-amber-900">Effects</h3>
+              <h3 className="text-lg font-medium text-amber-900">Efficacies</h3>
               <button 
                 onClick={() => toggleExpandedSection('efficacies')}
                 className="text-amber-900"
@@ -416,9 +415,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                         type="checkbox"
                         checked={filters.efficacies.includes(efficacy)}
                         onChange={() => toggleTreatmentOption(efficacy, 'efficacies')}
-                        className="appearance-none w-5 h-5 rounded border border-gray-300 bg-white checked:border-amber-900 checked:bg-amber-900 relative
-                        checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:transform checked:after:-translate-x-1/2 checked:after:-translate-y-1/2
-                        checked:after:content-['✓'] checked:after:text-white checked:after:text-sm focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
+                        className="w-5 h-5 rounded border-2 border-amber-900 text-amber-900 bg-white focus:ring-amber-900"
                       />
                     </div>
                   ))
@@ -440,7 +437,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
           {/* Treatment Categories */}
           <div className="space-y-4 border-t pt-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium text-amber-900">Treatment</h3>
+              <h3 className="text-lg font-medium text-amber-900">Treatment Categories</h3>
               <button 
                 onClick={() => toggleExpandedSection('treatmentCategories')}
                 className="text-amber-900"
@@ -463,9 +460,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                         type="checkbox"
                         checked={filters.treatmentCategories.includes(category)}
                         onChange={() => toggleTreatmentOption(category, 'treatmentCategories')}
-                        className="appearance-none w-5 h-5 rounded border border-gray-300 bg-white checked:border-amber-900 checked:bg-amber-900 relative
-                        checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:transform checked:after:-translate-x-1/2 checked:after:-translate-y-1/2
-                        checked:after:content-['✓'] checked:after:text-white checked:after:text-sm focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
+                        className="w-5 h-5 rounded border-2 border-amber-900 text-amber-900 bg-white focus:ring-amber-900"
                       />
                     </div>
                   ))
@@ -487,45 +482,24 @@ const FilterModal: React.FC<FilterModalProps> = ({
           {/* Villages/Locations */}
           {availableVillages.length > 0 && (
             <div className="space-y-4 border-t pt-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-amber-900">Location</h3>
-                <button 
-                  onClick={() => toggleExpandedSection('villages')}
-                  className="text-amber-900"
-                >
-                  {expandedSections.villages ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                </button>
-              </div>
+              <h3 className="text-lg font-medium text-amber-900">Location</h3>
               
               <div className="space-y-2">
-                {availableVillages
-                  .slice(0, expandedSections.villages ? undefined : 5)
-                  .map((village) => (
-                    <div key={village} className="flex items-center justify-between">
-                      <label htmlFor={`village-${village}`} className="flex-1 cursor-pointer">
-                        {village}
-                      </label>
-                      <input
-                        id={`village-${village}`}
-                        type="checkbox"
-                        checked={filters.villages.includes(village)}
-                        onChange={() => toggleVillage(village)}
-                        className="appearance-none w-5 h-5 rounded border border-gray-300 bg-white checked:border-amber-900 checked:bg-amber-900 relative
-                        checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:transform checked:after:-translate-x-1/2 checked:after:-translate-y-1/2
-                        checked:after:content-['✓'] checked:after:text-white checked:after:text-sm focus:ring-amber-900 focus:ring-2 focus:ring-offset-2"
-                        aria-label={`Select ${village}`}
-                      />
-                    </div>
-                  ))}
-                
-                {availableVillages.length > 5 && (
-                  <button 
-                    onClick={() => toggleExpandedSection('villages')}
-                    className="text-amber-900 text-sm font-medium mt-2"
-                  >
-                    {expandedSections.villages ? 'Show less' : '...more'}
-                  </button>
-                )}
+                {availableVillages.map((village) => (
+                  <div key={village} className="flex items-center justify-between">
+                    <label htmlFor={`village-${village}`} className="flex-1 cursor-pointer">
+                      {village}
+                    </label>
+                    <input
+                      id={`village-${village}`}
+                      type="checkbox"
+                      checked={filters.villages.includes(village)}
+                      onChange={() => toggleVillage(village)}
+                      className="w-5 h-5 rounded border-2 border-black text-amber-900 bg-white focus:ring-amber-900"
+                      aria-label={`Select ${village}`}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           )}
