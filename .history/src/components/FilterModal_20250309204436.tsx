@@ -90,8 +90,8 @@ const EFFICACIES = [
   'Medical & Wellness Treatments'
 ];
 
-// Update the constant to reverse order
-const REVIEW_COUNT_OPTIONS = [500, 300, 100, 50, 20];
+// Add new constants
+const REVIEW_COUNT_OPTIONS = [20, 50, 100, 300, 500];
 
 const FilterModal: React.FC<FilterModalProps> = ({ 
   isOpen, 
@@ -398,7 +398,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
             </div>
           </div>
 
-          {/* Google Review Count Section */}
+          {/* Google Review Count - New Section */}
           <div className="space-y-2 border-t pt-4">
             <h3 className="text-lg font-medium text-amber-900">Google Reviews</h3>
             <div className="flex flex-wrap gap-2">
@@ -412,7 +412,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                       : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
                   }`}
                 >
-                  {count}+
+                  {count}+ reviews
                 </button>
               ))}
             </div>
@@ -438,7 +438,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
             </div>
           </div>
 
-          {/* Yelp Review Count Section */}
+          {/* Yelp Review Count - New Section */}
           <div className="space-y-2 border-t pt-4">
             <h3 className="text-lg font-medium text-amber-900">Yelp Reviews</h3>
             <div className="flex flex-wrap gap-2">
@@ -452,7 +452,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                       : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
                   }`}
                 >
-                  {count}+
+                  {count}+ reviews
                 </button>
               ))}
             </div>

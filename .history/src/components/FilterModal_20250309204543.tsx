@@ -90,8 +90,8 @@ const EFFICACIES = [
   'Medical & Wellness Treatments'
 ];
 
-// Update the constant to reverse order
-const REVIEW_COUNT_OPTIONS = [500, 300, 100, 50, 20];
+// Add new constants
+const REVIEW_COUNT_OPTIONS = [20, 50, 100, 300, 500];
 
 const FilterModal: React.FC<FilterModalProps> = ({ 
   isOpen, 
