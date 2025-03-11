@@ -92,7 +92,7 @@ export default function SearchFilters({ selectedFilter, onFilterChange, onOpenFi
                 whitespace-nowrap rounded-full px-3 text-sm font-medium transition-all h-8
                 ${selectedFilter === filter.value 
                   ? 'bg-black text-white hover:bg-gray-800 shadow-sm' 
-                  : 'bg-white text-gray-700 border-gray-400 hover:bg-gray-100 hover:border-gray-400'}
+                  : 'bg-white text-gray-700 border-black hover:bg-gray-100 hover:border-gray-400'}
               `}
             >
               {filter.icon && <span className="mr-1">{filter.icon}</span>}

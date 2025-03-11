@@ -48,19 +48,10 @@ export default async function Page({
         .or(`treatment_name.ilike.%${searchQuery}%,treatment_category.ilike.%${searchQuery}%,efficacy.ilike.%${searchQuery}%`);
       
       if (priceError) {
-        console.error("Error fetching price data:", {
-          error: priceError,
-          message: priceError.message,
-          details: priceError.details,
-          hint: priceError.hint
-        });
+        console.error("Error fetching price data:", priceError);
       } else {
         priceData = filteredPriceData;
-        console.log('Price data fetch result:', {
-          hasData: !!filteredPriceData,
-          count: filteredPriceData?.length || 0,
-          sample: filteredPriceData?.[0]
-        });
+        console.log(`💰 Found ${priceData?.length || 0} price records for query: "${searchQuery}"`);
         // Add more detailed logging about the price data
         if (priceData && priceData.length > 0) {
           console.log('Sample price data:', priceData[0]);

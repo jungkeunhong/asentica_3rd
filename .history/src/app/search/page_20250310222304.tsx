@@ -108,6 +108,12 @@ export default async function Page({
       lng: m.lng
     })));
     
+    console.log('Price data being passed to SearchContent:', {
+      totalCount: priceData?.length,
+      firstFewItems: priceData?.slice(0, 3),
+      sampleMedspaName: priceData?.[0]?.medspa_name
+    });
+    
     return <SearchContent 
       initialMedspas={medspaData || []} 
       searchQuery={searchQuery} 

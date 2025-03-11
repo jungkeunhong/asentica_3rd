@@ -54,7 +54,6 @@ interface Medspa {
 
 interface PriceData {
   id: string;
-  medspa_id: string;
   medspa_name: string;
   treatment_category: string;
   efficacy: string;
@@ -71,7 +70,6 @@ interface PriceData {
   additional_info: string;
   contact: string;
 }
-
 interface SearchContentProps {
   initialMedspas: Medspa[];
   searchQuery: string;

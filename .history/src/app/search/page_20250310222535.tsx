@@ -65,7 +65,7 @@ export default async function Page({
         if (priceData && priceData.length > 0) {
           console.log('Sample price data:', priceData[0]);
           // Log medspa names in price data to help with debugging matching issues
-          const medspaNamesInPriceData = [...new Set(priceData.map(p => p.medspa_name))];
+          const medspaNamesInPriceData = [...new Set(priceData.map(p => p.medspa_name_internal))];
           console.log('Medspa names in price data:', medspaNamesInPriceData);
         } else {
           console.log('No price data found for the query');
@@ -95,7 +95,7 @@ export default async function Page({
         console.log(`💰 Loaded ${priceData?.length || 0} price records`);
         // Log medspa names in price data to help with debugging matching issues
         if (priceData && priceData.length > 0) {
-          const medspaNamesInPriceData = [...new Set(priceData.map(p => p.medspa_name))];
+          const medspaNamesInPriceData = [...new Set(priceData.map(p => p.medspa_name_internal))];
           console.log('Medspa names in price data:', medspaNamesInPriceData);
         }
       }
@@ -103,7 +103,7 @@ export default async function Page({
     
     console.log("✅ Supabase data:", medspaData?.map(m => ({
       id: m.id,
-      name: m.medspa_name,
+      name: m.medspa_name_internal,
       lat: m.lat,
       lng: m.lng
     })));

@@ -33,7 +33,7 @@ export default async function Page({
       const { data: filteredData, error: filteredError } = await supabase
         .from('medspa_nyc')
         .select('*')
-        .or(`medspa_name.ilike.%${searchQuery}%,village.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%,best_treatment.ilike.%${searchQuery}%,treatment1.ilike.%${searchQuery}%,treatment2.ilike.%${searchQuery}%,treatment3.ilike.%${searchQuery}%,treatment4.ilike.%${searchQuery}%,treatment5.ilike.%${searchQuery}%,treatment6.ilike.%${searchQuery}%,recommended_practitioner1_name.ilike.%${searchQuery}%,recommended_practitioner2_name.ilike.%${searchQuery}%,recommended_practitioner3_name.ilike.%${searchQuery}%`);
+        .or(`medspa_name_internal.ilike.%${searchQuery}%,village.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%,best_treatment.ilike.%${searchQuery}%,treatment1.ilike.%${searchQuery}%,treatment2.ilike.%${searchQuery}%,treatment3.ilike.%${searchQuery}%,treatment4.ilike.%${searchQuery}%,treatment5.ilike.%${searchQuery}%,treatment6.ilike.%${searchQuery}%,recommended_practitioner1_name.ilike.%${searchQuery}%,recommended_practitioner2_name.ilike.%${searchQuery}%,recommended_practitioner3_name.ilike.%${searchQuery}%`);
 
       if (filteredError) {
         throw new Error(filteredError.message);
@@ -65,7 +65,7 @@ export default async function Page({
         if (priceData && priceData.length > 0) {
           console.log('Sample price data:', priceData[0]);
           // Log medspa names in price data to help with debugging matching issues
-          const medspaNamesInPriceData = [...new Set(priceData.map(p => p.medspa_name))];
+          const medspaNamesInPriceData = [...new Set(priceData.map(p => p.medspa_name_internal))];
           console.log('Medspa names in price data:', medspaNamesInPriceData);
         } else {
           console.log('No price data found for the query');
@@ -95,7 +95,7 @@ export default async function Page({
         console.log(`💰 Loaded ${priceData?.length || 0} price records`);
         // Log medspa names in price data to help with debugging matching issues
         if (priceData && priceData.length > 0) {
-          const medspaNamesInPriceData = [...new Set(priceData.map(p => p.medspa_name))];
+          const medspaNamesInPriceData = [...new Set(priceData.map(p => p.medspa_name_internal))];
           console.log('Medspa names in price data:', medspaNamesInPriceData);
         }
       }
@@ -103,7 +103,7 @@ export default async function Page({
     
     console.log("✅ Supabase data:", medspaData?.map(m => ({
       id: m.id,
-      name: m.medspa_name,
+      name: m.medspa_name_internal,
       lat: m.lat,
       lng: m.lng
     })));

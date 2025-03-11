@@ -308,7 +308,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
         {/* Filter Content */}
         <div className="p-4 space-y-3">
           {/* Price Range */}
-          <div className="space-y-1">
+          <div className="space-y-3">
             <h3 className="text-lg font-medium text-amber-900">Price range</h3>            
             
             {/* Price Slider */}
