@@ -7,7 +7,7 @@ import ConsultationModal from '@/components/ConsultationModal';
 import LoginModal from '@/components/LoginModal';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -1318,17 +1318,13 @@ export default function SearchContent({
         />
       )}
       
-      <AnimatePresence>
-        {showFilterModal && (
-          <FilterModal
-            isOpen={showFilterModal}
-            onClose={() => setShowFilterModal(false)}
-            onApplyFilters={handleApplyFilters}
-            availableVillages={availableVillages}
-            initialFilters={activeFilters}
-          />
-        )}
-      </AnimatePresence>
+      <FilterModal
+        isOpen={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        onApplyFilters={handleApplyFilters}
+        availableVillages={availableVillages}
+        initialFilters={activeFilters}
+      />
     </>
   );
 }
