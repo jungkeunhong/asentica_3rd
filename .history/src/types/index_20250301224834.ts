@@ -6,14 +6,11 @@ export interface Medspa {
   address?: string; // 데이터베이스에 없는 필드이므로 선택적으로 변경
   number?: string;
   website?: string;
-  instagram?: string;
   verified?: boolean;
   google_star?: number;
   google_review?: number;
-  google_map_link?: string;
   yelp_star?: number;
   yelp_review?: number;
-  yelp_url?: string;
   best_treatment?: string;
   best_treatment1?: string;
   best_treatment2?: string;
@@ -62,28 +59,4 @@ export interface Medspa {
     lng: number;
   };
   name?: string; // 일부 코드에서 name 속성을 사용하는 것으로 보임
-  review1_author?: string;
-  review1_author_photo?: string;
-  review1_text?: string;
-  review1_date?: string;
-  review2_rating?: number;
-  review2_author?: string;
-  review2_author_photo?: string;
-  review2_text?: string;
-  review2_date?: string;
-  review3_rating?: number;
-  review3_author?: string;
-  review3_author_photo?: string;
-  review3_text?: string;
-  review3_date?: string;
-  review4_rating?: number;
-  review4_author?: string;
-  review4_author_photo?: string;
-  review4_text?: string;
-  review4_date?: string;
-  review5_rating?: number;
-  review5_author?: string;
-  review5_author_photo?: string;
-  review5_text?: string;
-  review5_date?: string;
 }

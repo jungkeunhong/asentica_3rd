@@ -1289,7 +1289,7 @@ export default function SearchContent({
                     <div className="flex flex-row gap-3">
                       <button 
                         onClick={(e) => handleCall(medspa.number, e)}
-                        className="btn bg-amber-900 hover:bg-amber-950 text-white border-none hover:shadow-lg transform flex items-center justify-center gap-2 w-12"
+                        className="btn bg-amber-950 hover:bg-amber-950 text-white border-none hover:shadow-lg transform flex items-center justify-center gap-2 w-12"
                         title="call"
                         aria-label="call"
                       >

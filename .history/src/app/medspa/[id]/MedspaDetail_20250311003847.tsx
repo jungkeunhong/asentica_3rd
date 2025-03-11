@@ -22,6 +22,65 @@ interface MedspaDetailProps {
   medspa: Medspa;
 }
 
+interface Medspa {
+  id: string;
+  medspa_name: string;
+  village: string;
+  location: string;
+  address?: string;
+  number?: string;
+  google_star?: number;
+  google_review?: number;
+  yelp_star?: number;
+  yelp_review?: number;
+  best_treatment?: string;
+  free_consultation?: string;
+  good_review_short?: string;
+  bad_review_short?: string;
+  image_url1: string;
+  image_url2: string; 
+  image_url3: string;
+  lat?: number;
+  lng?: number;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  google_map_link?: string;
+  yelp_url?: string;
+  website?: string;
+  treatment1?: string;
+  treatment2?: string;
+  treatment3?: string;
+  treatment4?: string;
+  treatment5?: string;
+  treatment6?: string;
+  price1?: string;
+  price2?: string;
+  price3?: string;
+  price4?: string;
+  price5?: string;
+  price6?: string;
+  good_review_deepdive1?: string;
+  good_review_deepdive1_explanation?: string;
+  good_review_deepdive2?: string;
+  good_review_deepdive2_explanation?: string;
+  good_review_deepdive3?: string;
+  good_review_deepdive3_explanation?: string;
+  bad_review_deepdive1?: string;
+  bad_review_deepdive1_explanation?: string;
+  bad_review_deepdive2?: string;
+  bad_review_deepdive2_explanation?: string;
+  bad_review_deepdive3?: string;
+  bad_review_deepdive3_explanation?: string;
+  recommended_practitioner1_name?: string;
+  recommended_practitioner1_reason?: string;
+  recommended_practitioner2_name?: string;
+  recommended_practitioner2_reason?: string;
+  recommended_practitioner3_name?: string;
+  recommended_practitioner3_reason?: string;
+}
+
 export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
@@ -343,27 +402,14 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
             )}
           </div>
           
-          {/* Instagram and Website Links */}
-          <div className="flex items-center">
-            {medspa.instagram && (
-              <Link 
-                href={medspa.instagram} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center text-black hover:text-gray-800 px-1"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#666">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-                </svg>
-              </Link>
-            )}
-
-            {medspa.website && (
+          {/* Website Link - 오른쪽 정렬 */}
+          {medspa.website && (
+            <div className="flex-shrink-0 mr-1">
               <Link 
                 href={medspa.website} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center text-black hover:text-gray-800 px-1"
+                className="flex items-center text-black hover:text-gray-800"
               >
                 <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="24" height="24">
                   <g clipPath="url(#a)">
@@ -376,8 +422,8 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
                   </defs>
                 </svg>
               </Link>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
       {/* Best Treatments Section */}
@@ -610,93 +656,11 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
           </div>
         </div>
       )}
-
-      {/* Reviews Section */}
-      <div className="px-4 mt-8">
-        <h2 className="text-xl font-base mb-4 font-sans">Recent Google reviews</h2>
-        <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide scroll-smooth">
-          <div className="flex gap-4 px-1">
-            {[1, 2, 3, 4, 5].map((num) => {
-              const review = {
-                author: medspa[`review${num}_author` as keyof Medspa] as string,
-                authorPhoto: medspa[`review${num}_author_photo` as keyof Medspa] as string,
-                text: medspa[`review${num}_text` as keyof Medspa] as string,
-                date: medspa[`review${num}_date` as keyof Medspa] as string,
-                rating: medspa[`review${num}_rating` as keyof Medspa] as number,
-              };
-
-              if (!review.text) return null;
-
-              return (
-                <div
-                  key={`review-${num}`}
-                  className="relative overflow-hidden group rounded-2xl transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-[#f8f8f8] to-[#eaeaea] min-w-[280px] w-[280px] flex-shrink-0 snap-start"
-                >
-                  {/* Large Number Background with Blur Effect */}
-                  <div 
-                    className="absolute -left-4 top-0 text-[180px] font-bold leading-none opacity-40 select-none text-[#e9e9e9] blur-[1px]"
-                  >
-                    {num}
-                  </div>
-
-                  {/* Content Container */}
-                  <div className="relative z-10 p-6">
-                    {/* Author Info */}
-                    <div className="flex items-center gap-3 mb-3">
-                      {review.authorPhoto && (
-                        <Image
-                          src={review.authorPhoto}
-                          alt={review.author || 'Reviewer'}
-                          width={40}
-                          height={40}
-                          className="rounded-full"
-                        />
-                      )}
-                      <div>
-                        <div className="font-medium text-gray-900">{review.author}</div>
-                        <div className="text-sm text-gray-500">{review.date}</div>
-                      </div>
-                    </div>
-
-                    {/* Review Text with Expand/Collapse */}
-                    <ReviewText text={review.text} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
       <ConsultationModal 
         isOpen={isConsultationModalOpen} 
         onClose={() => setIsConsultationModalOpen(false)} 
         medspa={selectedMedspa}
       />
-    </div>
-  );
-}
-
-// ReviewText component for handling expandable text
-function ReviewText({ text }: { text: string }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const maxLength = 150; // Approximately 3 lines of text
-
-  if (text.length <= maxLength) {
-    return <p className="text-sm text-gray-700">{text}</p>;
-  }
-
-  return (
-    <div className="text-sm text-gray-700">
-      <p>
-        {isExpanded ? text : `${text.slice(0, maxLength)}...`}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="ml-1 text-amber-900 hover:text-amber-700 font-medium"
-        >
-          {isExpanded ? 'Show less' : 'Read more'}
-        </button>
-      </p>
     </div>
   );
 }

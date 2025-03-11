@@ -1249,7 +1249,7 @@ export default function SearchContent({
                     {/* Review Preview - New Section */}
                     {medspa.review1_text && (
                       <div className="text-left text-gray-600 text-sm ">
-                        &quot;{medspa.review1_text.slice(0, 50)}...
+                        "{medspa.review1_text.slice(0, 50)}...
                         {medspa.review1_text.length > 20 && (
                           <span className="text-amber-900 font-medium ml-1 cursor-pointer">Read more</span>
                         )}

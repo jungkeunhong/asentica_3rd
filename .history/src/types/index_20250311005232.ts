@@ -6,7 +6,6 @@ export interface Medspa {
   address?: string; // 데이터베이스에 없는 필드이므로 선택적으로 변경
   number?: string;
   website?: string;
-  instagram?: string;
   verified?: boolean;
   google_star?: number;
   google_review?: number;

@@ -51,8 +51,6 @@ interface Medspa {
     lng: number;
   };
   review1_text?: string;
-  google_map_link?: string;
-  yelp_url?: string;
 }
 
 interface PriceData {
@@ -113,7 +111,7 @@ export default function SearchContent({
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const scrollThreshold = useRef(false);
-  const tenthItemRef = useRef<HTMLDivElement>(null);
+  const fifthItemRef = useRef<HTMLDivElement>(null);
   
   const router = useRouter();
   
@@ -835,7 +833,7 @@ export default function SearchContent({
     checkLoginStatus();
   }, []);
 
-  // Intersection Observer to show login modal when 10th item is visible
+  // Intersection Observer to show login modal when 5th item is visible
   useEffect(() => {
     // Only set up observer if user is not logged in and modal hasn't been shown yet
     if (!isLoggedIn && !scrollThreshold.current) {
@@ -848,14 +846,13 @@ export default function SearchContent({
           }
         },
         {
-          threshold: 0.5, // Trigger when 50% of the element is visible
-          rootMargin: '100px' // Add some margin to trigger slightly before the element is fully visible
+          threshold: 0.5 // Trigger when 50% of the element is visible
         }
       );
 
-      // Only observe if the tenth item ref exists
-      if (tenthItemRef.current) {
-        observer.observe(tenthItemRef.current);
+      // Only observe if the fifth item ref exists
+      if (fifthItemRef.current) {
+        observer.observe(fifthItemRef.current);
       }
 
       return () => observer.disconnect();
@@ -1081,7 +1078,7 @@ export default function SearchContent({
                 return (
                   <div 
                     key={medspa.id}
-                    ref={index === 9 ? tenthItemRef : null}
+                    ref={index === 4 ? fifthItemRef : null}
                     onClick={() => handleMedspaClick(medspa.id)}
                     className="flex flex-col gap-4 bg-white border-b p-4 cursor-pointer hover:border-b"
                   >
@@ -1215,9 +1212,7 @@ export default function SearchContent({
                           googleStar={medspa.google_star} 
                           googleReview={medspa.google_review} 
                           yelpStar={medspa.yelp_star} 
-                          yelpReview={medspa.yelp_review}
-                          google_map_link={medspa.google_map_link}
-                          yelp_url={medspa.yelp_url}
+                          yelpReview={medspa.yelp_review} 
                         />
                       </div>
                     </div>
@@ -1248,8 +1243,8 @@ export default function SearchContent({
 
                     {/* Review Preview - New Section */}
                     {medspa.review1_text && (
-                      <div className="text-left text-gray-600 text-sm ">
-                        &quot;{medspa.review1_text.slice(0, 50)}...
+                      <div className="text-left text-gray-600 text-sm mt-2">
+                        "{medspa.review1_text.slice(0, 50)}...
                         {medspa.review1_text.length > 20 && (
                           <span className="text-amber-900 font-medium ml-1 cursor-pointer">Read more</span>
                         )}
@@ -1303,7 +1298,7 @@ export default function SearchContent({
                           setSelectedMedspa(medspa);
                           setIsConsultationModalOpen(true);
                         }}
-                        className="btn bg-white hover:bg-amber-900 border border-amber-900 text-amber-900 hover:text-white hover:border-amber-900 hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
+                        className="btn bg-white hover:bg-amber-800 border border-amber-900 text-amber-900 hover:text-white hover:border-amber-800 hover:shadow-lg transform flex items-center justify-center gap-2 flex-1"
                       >
                         <span>Get Consultation</span>
                       </button>

@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 interface MedspaRatingsProps {
   googleStar?: number;
   googleReview?: number;
