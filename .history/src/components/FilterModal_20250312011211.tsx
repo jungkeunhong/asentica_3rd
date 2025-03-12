@@ -24,7 +24,7 @@ interface FilterState {
 interface FilterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApplyFilters: (filters: FilterState) => void;
+  onApplyFilters: (filters: Partial<FilterState>) => void;
   availableVillages: string[];
   initialFilters?: Partial<FilterState>;
 }
@@ -270,8 +270,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
     console.log('Treatment categories selected:', filters.treatmentCategories);
     console.log('Efficacies selected:', filters.efficacies);
     
-    // Create a clean copy of the filters - ensure it's a complete FilterState, not partial
-    const cleanedFilters: FilterState = { ...filters };
+    // Create a clean copy of the filters
+    const cleanedFilters: Partial<FilterState> = { ...filters };
     
     // Log the filter values being applied
     console.log('Google Reviews filter:', cleanedFilters.googleReviews);
@@ -381,13 +381,13 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 <button
                   key={`distance-${distance}`}
                   onClick={() => handleDistanceChange(distance)}
-                  className={`px-2 py-1 rounded-full border text-sm ${
+                  className={`px-4 py-1 rounded-full border ${
                     filters.distance === distance
                       ? 'bg-amber-900 text-white border-amber-900'
                       : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
                   }`}
                 >
-                  {distance}mi
+                  {distance} {distance === 1 ? 'mile' : 'miles'}
                 </button>
               ))}
             </div>
@@ -401,13 +401,13 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 <button
                   key={`google-${rating}`}
                   onClick={() => toggleStarRating(rating, 'google')}
-                  className={`px-2 py-1 rounded-full border text-sm ${
+                  className={`px-2 py-1 rounded-full border ${
                     filters.googleStars.includes(rating)
                       ? 'bg-amber-900 text-white border-amber-900'
                       : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
                   }`}
                 >
-                  {rating}+
+                  {rating} stars
                 </button>
               ))}
             </div>
@@ -421,7 +421,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 <button
                   key={`google-review-${count}`}
                   onClick={() => handleReviewCountChange(count, 'google')}
-                  className={`px-2 py-1 rounded-full border text-sm ${
+                  className={`px-2 py-1 rounded-full border ${
                     filters.googleReviews === count
                       ? 'bg-amber-900 text-white border-amber-900'
                       : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
@@ -441,13 +441,13 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 <button
                   key={`yelp-${rating}`}
                   onClick={() => toggleStarRating(rating, 'yelp')}
-                  className={`px-2 py-1 rounded-full border text-sm ${
+                  className={`px-2 py-1 rounded-full border ${
                     filters.yelpStars.includes(rating)
                       ? 'bg-amber-900 text-white border-amber-900'
                       : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
                   }`}
                 >
-                  {rating}+
+                  {rating} stars
                 </button>
               ))}
             </div>
@@ -461,7 +461,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 <button
                   key={`yelp-review-${count}`}
                   onClick={() => handleReviewCountChange(count, 'yelp')}
-                  className={`px-2 py-1 rounded-full border text-sm ${
+                  className={`px-2 py-1 rounded-full border ${
                     filters.yelpReviews === count
                       ? 'bg-amber-900 text-white border-amber-900'
                       : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
@@ -479,7 +479,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
             <div className="flex gap-2">
               <button
                 onClick={() => handleFreeConsultationChange(true)}
-                className={`px-2 py-1 rounded-full border text-sm ${
+                className={`px-4 py-1 rounded-full border ${
                   filters.freeConsultation === true
                     ? 'bg-amber-900 text-white border-amber-900'
                     : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
@@ -489,7 +489,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
               </button>
               <button
                 onClick={() => handleFreeConsultationChange(false)}
-                className={`px-2 py-1 rounded-full border text-sm ${
+                className={`px-4 py-1 rounded-full border ${
                   filters.freeConsultation === false
                     ? 'bg-amber-900 text-white border-amber-900'
                     : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'

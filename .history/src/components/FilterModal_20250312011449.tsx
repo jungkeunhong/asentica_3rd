@@ -270,8 +270,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
     console.log('Treatment categories selected:', filters.treatmentCategories);
     console.log('Efficacies selected:', filters.efficacies);
     
-    // Create a clean copy of the filters - ensure it's a complete FilterState, not partial
-    const cleanedFilters: FilterState = { ...filters };
+    // Create a clean copy of the filters
+    const cleanedFilters: Partial<FilterState> = { ...filters };
     
     // Log the filter values being applied
     console.log('Google Reviews filter:', cleanedFilters.googleReviews);
@@ -407,7 +407,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                       : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
                   }`}
                 >
-                  {rating}+
+                  {rating}★
                 </button>
               ))}
             </div>
@@ -447,7 +447,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                       : 'bg-white text-gray-700 border-gray-300 hover:border-amber-900'
                   }`}
                 >
-                  {rating}+
+                  {rating}★
                 </button>
               ))}
             </div>
