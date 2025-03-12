@@ -363,13 +363,12 @@ export default function SearchContent({
   };
 
   // Update the existing findTreatmentPrice function to use the new logic
+  const findTreatmentPrice = (medspa: Medspa): PriceData | null => {
+    return getRandomTreatment(medspa);
+  };
+
   // Helper function to find treatment price as a number for sorting
   const findTreatmentPriceNumber = useCallback((medspa: Medspa): number => {
-    // Define findTreatmentPrice inside the useCallback to avoid dependency issues
-    const findTreatmentPrice = (medspa: Medspa): PriceData | null => {
-      return getRandomTreatment(medspa);
-    };
-    
     try {
       const priceResult = findTreatmentPrice(medspa);
       
@@ -390,7 +389,7 @@ export default function SearchContent({
       console.error('Error converting price to number:', error);
       return Infinity;
     }
-  }, [getRandomTreatment]);
+  }, [findTreatmentPrice]);
 
   // Add this function to format price display
   const formatPriceDisplay = (priceData: PriceData | string) => {
@@ -833,7 +832,7 @@ export default function SearchContent({
     
     // 필터가 없거나 기본 케이스
     return medspasCopy;
-  }, [medspas, selectedFilter, userLocation, findTreatmentPriceNumber, activeFilters, priceData, calculateDistance]);
+  }, [medspas, selectedFilter, searchQuery, userLocation, findTreatmentPriceNumber, activeFilters, priceData, calculateDistance]);
 
   // Check login status on component mount
   useEffect(() => {

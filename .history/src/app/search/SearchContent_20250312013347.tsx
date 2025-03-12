@@ -833,7 +833,7 @@ export default function SearchContent({
     
     // 필터가 없거나 기본 케이스
     return medspasCopy;
-  }, [medspas, selectedFilter, userLocation, findTreatmentPriceNumber, activeFilters, priceData, calculateDistance]);
+  }, [medspas, selectedFilter, searchQuery, userLocation, findTreatmentPriceNumber, activeFilters, priceData, calculateDistance]);
 
   // Check login status on component mount
   useEffect(() => {
