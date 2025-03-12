@@ -668,7 +668,7 @@ export default function SearchContent({
       console.log(`Filtered to ${medspasCopy.length} medspas by distance`);
     }
     
-    // Apply filters
+    // Apply advanced filters
     if (activeFilters) {
       // Filter by price range
       if (activeFilters.priceRange && activeFilters.priceRange.length === 2) {
@@ -726,13 +726,22 @@ export default function SearchContent({
       }
       
       // Filter by free consultation
-      if (activeFilters.freeConsultation !== null && activeFilters.freeConsultation !== undefined) {
+      if (activeFilters.freeConsultation !== null) {
         console.log(`Filtering by free consultation: ${activeFilters.freeConsultation}`);
         medspasCopy = medspasCopy.filter(medspa => {
           const hasConsultation = medspa.free_consultation === 'Yes';
           return activeFilters.freeConsultation === hasConsultation;
         });
         console.log(`Filtered to ${medspasCopy.length} medspas by free consultation`);
+      }
+      
+      // Filter by villages/locations from activeFilters
+      if (activeFilters.villages && activeFilters.villages.length > 0) {
+        console.log(`Filtering by villages:`, activeFilters.villages);
+        medspasCopy = medspasCopy.filter(medspa => {
+          return medspa.village && activeFilters.villages!.includes(medspa.village);
+        });
+        console.log(`Filtered to ${medspasCopy.length} medspas by villages`);
       }
     }
     

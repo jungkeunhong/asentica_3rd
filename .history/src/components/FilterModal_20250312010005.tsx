@@ -24,7 +24,7 @@ interface FilterState {
 interface FilterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApplyFilters: (filters: Partial<FilterState>) => void;
+  onApplyFilters: (filters: FilterState) => void;
   availableVillages: string[];
   initialFilters?: Partial<FilterState>;
 }
@@ -197,24 +197,19 @@ const FilterModal: React.FC<FilterModalProps> = ({
     const index = currentRatings.indexOf(rating);
     
     if (index === -1) {
-      // If this rating is not already selected, select it and remove any lower ratings
-      const newRatings = [rating]; // Just select this rating
-      
+      // Remove any existing ratings that are lower than the selected one
+      const newRatings = currentRatings.filter(r => r > rating);
+      newRatings.push(rating);
       if (type === 'google') {
-        console.log(`Setting Google star rating to ${rating}+`);
         setFilters({ ...filters, googleStars: newRatings });
       } else {
-        console.log(`Setting Yelp star rating to ${rating}+`);
         setFilters({ ...filters, yelpStars: newRatings });
       }
     } else {
-      // If this rating is already selected, deselect it
       currentRatings.splice(index, 1);
       if (type === 'google') {
-        console.log(`Removing Google star rating ${rating}`);
         setFilters({ ...filters, googleStars: currentRatings });
       } else {
-        console.log(`Removing Yelp star rating ${rating}`);
         setFilters({ ...filters, yelpStars: currentRatings });
       }
     }
@@ -269,17 +264,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
     console.log('Applying filters from modal:', filters);
     console.log('Treatment categories selected:', filters.treatmentCategories);
     console.log('Efficacies selected:', filters.efficacies);
-    
-    // Create a clean copy of the filters
-    const cleanedFilters: Partial<FilterState> = { ...filters };
-    
-    // Log the filter values being applied
-    console.log('Google Reviews filter:', cleanedFilters.googleReviews);
-    console.log('Yelp Reviews filter:', cleanedFilters.yelpReviews);
-    console.log('Google Stars filter:', cleanedFilters.googleStars);
-    console.log('Yelp Stars filter:', cleanedFilters.yelpStars);
-    
-    onApplyFilters(cleanedFilters);
+    onApplyFilters(filters);
     onClose();
   };
 

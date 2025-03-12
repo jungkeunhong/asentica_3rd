@@ -19,22 +19,11 @@ interface UserProfile {
   created_at: string;
 }
 
-// Define MedSpa type for recently viewed and favorites
-interface MedSpa {
-  id: string;
-  medspa_name: string;
-  image_url1?: string;
-  address?: string;
-  location?: string;
-  village?: string;
-}
-
 export default function MyPage() {
   const { favorites } = useFavorites();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [recentlyViewed, setRecentlyViewed] = useState<MedSpa | null>(null);
   const router = useRouter();
   
   // Check authentication status when component mounts
@@ -75,22 +64,6 @@ export default function MyPage() {
     
     checkAuth();
     
-    // Get recently viewed MedSpa from localStorage
-    const getRecentlyViewed = () => {
-      if (typeof window !== 'undefined') {
-        const recentMedspa = localStorage.getItem('recentlyViewedMedspa');
-        if (recentMedspa) {
-          try {
-            setRecentlyViewed(JSON.parse(recentMedspa));
-          } catch (error) {
-            console.error('Error parsing recently viewed MedSpa:', error);
-          }
-        }
-      }
-    };
-    
-    getRecentlyViewed();
-    
     // 인증 상태 변경 감지
     const supabase = createClient();
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -127,11 +100,9 @@ export default function MyPage() {
   const handleLoginSuccess = () => {
     console.log('로그인 성공 처리');
     setShowLoginModal(false);
-    
-    // 로그인 성공 후 사용자 정보 업데이트
+    // 로그인 성공 후 페이지 새로고침 대신 상태 업데이트
     const checkAuth = async () => {
       try {
-        setLoading(true);
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
         
@@ -150,15 +121,9 @@ export default function MyPage() {
           });
           
           console.log('로그인 성공 후 사용자 정보 업데이트:', authUser.email);
-        } else {
-          console.error('로그인 성공 처리 중 세션을 찾을 수 없음');
-          // 세션이 없으면 모달 다시 표시
-          setShowLoginModal(true);
         }
       } catch (error) {
         console.error('로그인 성공 후 사용자 정보 업데이트 오류:', error);
-      } finally {
-        setLoading(false);
       }
     };
     
@@ -223,13 +188,13 @@ export default function MyPage() {
               <ChevronLeftIcon className="h-6 w-6" />
             </Link>
             <h1 className="text-3xl font-semibold ml-auto mr-auto">Profile</h1>
-            <Link href="/my-page/edit" className="text-black font-medium underline">
+            <Link href="/edit-profile" className="text-black font-medium underline">
               Edit
             </Link>
           </div>
           
           {/* Profile Card */}
-          <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
               {/* Profile Image */}
               <div className="relative">
@@ -266,7 +231,7 @@ export default function MyPage() {
           </div>
           
           {/* Verified Information */}
-          <div className="bg-white rounded-xl p-8 mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
             <h2 className="text-2xl font-semibold mb-6">{user.name}&apos;s confirmed information</h2>
             <div className="space-y-4">
               <div className="flex items-center">
@@ -288,7 +253,7 @@ export default function MyPage() {
                 <p className="text-lg">Phone number</p>
               </div>
             </div>
-            <div className="mt-6">
+            <div className="mt-6 border-t border-gray-200 pt-6">
               <Link href="/identity-verification" className="text-black underline font-medium">
                 Learn about identity verification
               </Link>
@@ -307,69 +272,26 @@ export default function MyPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Recently Viewed */}
               <div>
-                {recentlyViewed ? (
-                  <Link href={`/medspa/${recentlyViewed.id}`} className="block">
-                    <div className="relative h-64 w-full rounded-xl overflow-hidden mb-2 hover:opacity-90 transition-opacity">
-                      <Image 
-                        src={recentlyViewed.image_url1 || '/placeholder-medspa.jpg'} 
-                        alt={recentlyViewed.medspa_name || 'Recently Viewed MedSpa'} 
-                        fill
-                        className="object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                        <h4 className="text-white font-medium text-lg">{recentlyViewed.medspa_name}</h4>
-                      </div>
-                    </div>
-                  </Link>
-                ) : (
-                  <div className="relative h-64 w-full rounded-xl overflow-hidden bg-gray-200 mb-2">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-16 h-16">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
+                <div className="relative h-64 w-full rounded-xl overflow-hidden bg-gray-200 mb-2">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-16 h-16">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                   </div>
-                )}
+                </div>
                 <h3 className="text-xl font-medium">Recently viewed</h3>
               </div>
               
               {/* Saved Medspas */}
               {favorites.length > 0 ? (
                 <div>
-                  <div className="relative">
-                    {favorites.length === 1 ? (
-                      <Link href={`/medspa/${favorites[0].id}`} className="block">
-                        <div className="relative h-64 w-full rounded-xl overflow-hidden mb-2 hover:opacity-90 transition-opacity">
-                          <Image
-                            src={favorites[0].image_url1 || '/placeholder-medspa.jpg'}
-                            alt={favorites[0].medspa_name || 'MedSpa'}
-                            fill
-                            className="object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                            <h4 className="text-white font-medium text-lg">{favorites[0].medspa_name}</h4>
-                          </div>
-                        </div>
-                      </Link>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-2 mb-2">
-                        {favorites.slice(0, 4).map((favorite, index) => (
-                          <Link key={favorite.id} href={`/medspa/${favorite.id}`} className="block">
-                            <div className={`relative ${index < 2 ? 'h-32' : 'h-28'} w-full rounded-xl overflow-hidden hover:opacity-90 transition-opacity`}>
-                              <Image
-                                src={favorite.image_url1 || '/placeholder-medspa.jpg'}
-                                alt={favorite.medspa_name || 'MedSpa'}
-                                fill
-                                className="object-cover"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-2">
-                                <h4 className="text-white font-medium text-xs">{favorite.medspa_name}</h4>
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
+                  <div className="relative h-64 w-full rounded-xl overflow-hidden mb-2">
+                    <Image
+                      src={favorites[0].image_url1 || '/placeholder-medspa.jpg'}
+                      alt={favorites[0].medspa_name || 'MedSpa'}
+                      fill
+                      className="object-cover"
+                    />
                   </div>
                   <h3 className="text-xl font-medium">Favorite MedSpas</h3>
                   <p className="text-gray-600">{favorites.length} saved</p>

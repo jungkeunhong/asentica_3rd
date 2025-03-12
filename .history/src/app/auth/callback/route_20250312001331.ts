@@ -10,20 +10,14 @@ export async function GET(request: Request) {
   // 디버깅을 위한 로그
   console.log('Auth callback triggered');
   console.log('Code present:', !!code);
-  console.log('Request URL:', request.url);
-  
-  // 현재 호스트 추출 - 항상 요청의 origin을 사용 (.env 파일의 URL 무시)
-  const host = requestUrl.origin;
-  console.log('Current host:', host);
   
   // 기본 리다이렉트 URL 설정
-  const redirectTo = `${host}/my-page`;
-  console.log('Redirect target:', redirectTo);
+  const redirectTo = '/my-page';
   
   // 코드가 없으면 리다이렉트
   if (!code) {
     console.log('No code provided, redirecting to:', redirectTo);
-    return NextResponse.redirect(redirectTo);
+    return NextResponse.redirect(new URL(redirectTo, request.url));
   }
 
   // Supabase 클라이언트 초기화
@@ -35,13 +29,13 @@ export async function GET(request: Request) {
     
     if (error) {
       console.error('Error exchanging code for session:', error.message);
-      return NextResponse.redirect(`${host}/auth/auth-error`);
+      return NextResponse.redirect(new URL('/auth/auth-error', request.url));
     }
     
     console.log('Successfully exchanged code for session, redirecting to:', redirectTo);
-    return NextResponse.redirect(redirectTo);
+    return NextResponse.redirect(new URL(redirectTo, request.url));
   } catch (error) {
     console.error('Unexpected error in auth callback:', error);
-    return NextResponse.redirect(`${host}/auth/auth-error`);
+    return NextResponse.redirect(new URL('/auth/auth-error', request.url));
   }
 }

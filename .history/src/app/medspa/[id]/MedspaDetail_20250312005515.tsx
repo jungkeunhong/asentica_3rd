@@ -40,8 +40,8 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
         medspa_name: medspa.medspa_name,
         image_url1: medspa.image_url1,
         address: medspa.address,
-        location: medspa.location,
-        village: medspa.village
+        city: medspa.city,
+        state: medspa.state
       };
       
       localStorage.setItem('recentlyViewedMedspa', JSON.stringify(recentMedspa));

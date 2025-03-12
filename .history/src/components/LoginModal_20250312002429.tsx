@@ -181,18 +181,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
       const redirectUrl = getRedirectUrl();
       console.log('Google login with redirect URL:', redirectUrl);
       
-      // 현재 브라우저의 origin을 사용하여 state 파라미터 생성
-      const currentHost = window.location.origin;
-      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
           queryParams: {
             prompt: 'select_account',
-            access_type: 'offline',
-            // 명시적으로 site_url 설정
-            site_url: currentHost
+            access_type: 'offline'
           }
         }
       });

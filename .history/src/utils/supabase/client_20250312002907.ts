@@ -1,12 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr';
 
-// 현재 브라우저의 origin을 전역 변수로 설정
-if (typeof window !== 'undefined') {
-  // @ts-ignore - 전역 객체에 사용자 정의 속성 추가
-  window.SITE_URL = window.location.origin;
-  console.log('Setting global SITE_URL:', window.location.origin);
-}
-
 // Supabase 클라이언트 생성
 export const createClient = () => {
   try {
@@ -15,6 +8,10 @@ export const createClient = () => {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       throw new Error('Missing Supabase configuration');
     }
+
+    // 현재 브라우저의 origin을 사이트 URL로 사용
+    const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+    console.log('Using site URL for Supabase client:', siteUrl);
 
     const client = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -25,6 +22,8 @@ export const createClient = () => {
           detectSessionInUrl: true,
           autoRefreshToken: true,
           persistSession: true,
+          // 사이트 URL 설정 추가
+          site_url: siteUrl,
           storage: {
             getItem: (key) => {
               if (typeof window === 'undefined') return null;
@@ -53,33 +52,25 @@ export const createClient = () => {
 
 // ✅ 검색 함수 추가 (Trigram Index 기반 검색)
 export const searchTreatments = async (query: string) => {
-  try {
-    const supabase = createClient();
+  const supabase = createClient();
 
-    if (!query.trim()) return [];
+  if (!query.trim()) return [];
 
-    console.log('Searching for treatments with query:', query);
+  const { data, error } = await supabase
+    .from('price_test')
+    .select('*')
+    .or(`
+      treatment_name.ilike.%${query}%,
+      treatment_category.ilike.%${query}%,
+      efficacy.ilike.%${query}%
+    `)
+    .limit(10);
 
-    const { data, error } = await supabase
-      .from('price_test')
-      .select('*')
-      .or(`
-        treatment_name.ilike.%${query}%,
-        treatment_category.ilike.%${query}%,
-        efficacy.ilike.%${query}%
-      `)
-      .limit(10);
-
-    if (error) {
-      console.error('Error fetching price data:', error);
-      console.error('Error details:', JSON.stringify(error, null, 2));
-      return [];
-    }
-
-    console.log('🔎 Search results:', data?.length || 0, 'items found');
-    return data || [];
-  } catch (err) {
-    console.error('Unexpected error in searchTreatments:', err);
+  if (error) {
+    console.error('Error fetching price data:', error);
     return [];
   }
+
+  console.log('🔎 Search results:', data);
+  return data;
 };

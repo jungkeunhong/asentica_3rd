@@ -270,8 +270,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
     console.log('Treatment categories selected:', filters.treatmentCategories);
     console.log('Efficacies selected:', filters.efficacies);
     
-    // Create a clean copy of the filters
-    const cleanedFilters: Partial<FilterState> = { ...filters };
+    // Create a clean copy of the filters, removing null values for review counts
+    const cleanedFilters = { ...filters };
     
     // Log the filter values being applied
     console.log('Google Reviews filter:', cleanedFilters.googleReviews);

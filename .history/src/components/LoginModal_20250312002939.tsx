@@ -193,7 +193,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
             access_type: 'offline',
             // 명시적으로 site_url 설정
             site_url: currentHost
-          }
+          },
+          // 추가 메타데이터 설정
+          emailRedirectTo: redirectUrl
         }
       });
 

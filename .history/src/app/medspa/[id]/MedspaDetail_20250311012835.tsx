@@ -30,25 +30,6 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   // Create an array of available images
   const imageArray = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
 
-  // Save this MedSpa as recently viewed
-  useEffect(() => {
-    // Save to localStorage
-    if (typeof window !== 'undefined' && medspa) {
-      // Create a simplified version of the MedSpa object to save in localStorage
-      const recentMedspa = {
-        id: medspa.id,
-        medspa_name: medspa.medspa_name,
-        image_url1: medspa.image_url1,
-        address: medspa.address,
-        location: medspa.location,
-        village: medspa.village
-      };
-      
-      localStorage.setItem('recentlyViewedMedspa', JSON.stringify(recentMedspa));
-      console.log('Saved MedSpa to recently viewed:', medspa.medspa_name);
-    }
-  }, [medspa]);
-
   // Add Intersection Observer to update current image index when scrolling
   useEffect(() => {
     const container = document.querySelector('.snap-x');

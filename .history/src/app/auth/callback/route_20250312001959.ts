@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   console.log('Code present:', !!code);
   console.log('Request URL:', request.url);
   
-  // 현재 호스트 추출 - 항상 요청의 origin을 사용 (.env 파일의 URL 무시)
+  // 현재 호스트 추출
   const host = requestUrl.origin;
   console.log('Current host:', host);
   

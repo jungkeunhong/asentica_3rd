@@ -92,9 +92,9 @@ interface FilterState {
   distance: number | null;
   treatmentCategories: string[];
   efficacies: string[];
-  googleReviews: number | null;
-  yelpReviews: number | null;
-  freeConsultation: boolean | null;
+  googleReviews?: number;
+  yelpReviews?: number;
+  freeConsultation?: boolean;
 }
 
 export default function SearchContent({
@@ -127,6 +127,19 @@ export default function SearchContent({
   const [selectedFilter, setSelectedFilter] = useState<FilterType>(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Partial<FilterState>>({});
+  const [advancedFilters] = useState<FilterState>({
+    priceRange: [0, 1000],
+    googleStars: [],
+    yelpStars: [],
+    villages: [],
+    facilities: [],
+    distance: null,
+    treatmentCategories: [],
+    efficacies: [],
+    googleReviews: undefined,
+    yelpReviews: undefined,
+    freeConsultation: undefined
+  });
 
   // Favorites context
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
@@ -668,7 +681,7 @@ export default function SearchContent({
       console.log(`Filtered to ${medspasCopy.length} medspas by distance`);
     }
     
-    // Apply filters
+    // Apply advanced filters
     if (activeFilters) {
       // Filter by price range
       if (activeFilters.priceRange && activeFilters.priceRange.length === 2) {
@@ -689,7 +702,7 @@ export default function SearchContent({
         medspasCopy = medspasCopy.filter(medspa => {
           const rating = medspa.google_star || 0;
           // Check if the rating is greater than or equal to any of the selected minimum ratings
-          return activeFilters.googleStars!.some(minRating => rating >= minRating);
+          return activeFilters.googleStars.some(minRating => rating >= minRating);
         });
         console.log(`Filtered to ${medspasCopy.length} medspas by Google stars`);
       }
@@ -700,7 +713,7 @@ export default function SearchContent({
         medspasCopy = medspasCopy.filter(medspa => {
           const rating = medspa.yelp_star || 0;
           // Check if the rating is greater than or equal to any of the selected minimum ratings
-          return activeFilters.yelpStars!.some(minRating => rating >= minRating);
+          return activeFilters.yelpStars.some(minRating => rating >= minRating);
         });
         console.log(`Filtered to ${medspasCopy.length} medspas by Yelp stars`);
       }
@@ -726,13 +739,22 @@ export default function SearchContent({
       }
       
       // Filter by free consultation
-      if (activeFilters.freeConsultation !== null && activeFilters.freeConsultation !== undefined) {
+      if (activeFilters.freeConsultation !== null) {
         console.log(`Filtering by free consultation: ${activeFilters.freeConsultation}`);
         medspasCopy = medspasCopy.filter(medspa => {
           const hasConsultation = medspa.free_consultation === 'Yes';
           return activeFilters.freeConsultation === hasConsultation;
         });
         console.log(`Filtered to ${medspasCopy.length} medspas by free consultation`);
+      }
+      
+      // Filter by villages/locations from activeFilters
+      if (activeFilters.villages && activeFilters.villages.length > 0) {
+        console.log(`Filtering by villages:`, activeFilters.villages);
+        medspasCopy = medspasCopy.filter(medspa => {
+          return medspa.village && activeFilters.villages!.includes(medspa.village);
+        });
+        console.log(`Filtered to ${medspasCopy.length} medspas by villages`);
       }
     }
     

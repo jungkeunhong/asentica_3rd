@@ -346,9 +346,6 @@ export default function MyPage() {
                             fill
                             className="object-cover"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                            <h4 className="text-white font-medium text-lg">{favorites[0].medspa_name}</h4>
-                          </div>
                         </div>
                       </Link>
                     ) : (
@@ -362,9 +359,6 @@ export default function MyPage() {
                                 fill
                                 className="object-cover"
                               />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-2">
-                                <h4 className="text-white font-medium text-xs">{favorite.medspa_name}</h4>
-                              </div>
                             </div>
                           </Link>
                         ))}

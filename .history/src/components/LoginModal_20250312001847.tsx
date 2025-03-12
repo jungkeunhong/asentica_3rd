@@ -46,8 +46,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
     }
     
     // 현재 호스트 URL 가져오기 (로컬 또는 프로덕션)
-    // .env 파일의 NEXT_PUBLIC_SITE_URL이나 NEXT_PUBLIC_VERCEL_URL을 무시하고
-    // 항상 현재 브라우저의 origin을 사용
     const currentHost = window.location.origin;
     console.log('Current host for redirect:', currentHost);
     
@@ -109,21 +107,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
           throw error;
         }
 
-        // 이메일 확인이 필요한 경우
-        if (data?.user?.identities?.length === 0) {
-          setError('이미 등록된 이메일입니다. 로그인을 시도해보세요.');
-          return;
-        }
-
         if (data.user) {
           console.log('Signup successful, user:', data.user.id);
-          
-          // 이메일 확인이 필요한 경우
-          if (!data.user.email_confirmed_at) {
-            setError('이메일 인증 링크를 발송했습니다. 이메일을 확인해주세요.');
-            return;
-          }
-          
           showConfetti();
           onLoginSuccess();
           onClose();
@@ -157,10 +142,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
           setError('이메일 인증이 완료되지 않았습니다. 이메일을 확인해주세요.');
         } else if (err.message.includes('User already registered')) {
           setError('이미 등록된 이메일입니다. 로그인을 시도해보세요.');
-        } else if (err.message.includes('Password should be at least')) {
-          setError('비밀번호는 최소 6자 이상이어야 합니다.');
-        } else if (err.message.includes('rate limit')) {
-          setError('너무 많은 시도가 있었습니다. 잠시 후 다시 시도해주세요.');
         } else {
           setError(err.message);
         }
@@ -181,18 +162,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
       const redirectUrl = getRedirectUrl();
       console.log('Google login with redirect URL:', redirectUrl);
       
-      // 현재 브라우저의 origin을 사용하여 state 파라미터 생성
-      const currentHost = window.location.origin;
-      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
           queryParams: {
             prompt: 'select_account',
-            access_type: 'offline',
-            // 명시적으로 site_url 설정
-            site_url: currentHost
+            access_type: 'offline'
           }
         }
       });
@@ -310,11 +286,29 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
               )}
             </button>
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mt-4">
-                {error}
-              </div>
-            )}
+            {/* 페이스북 버튼 비활성화   
+            <button
+              onClick={handleFacebookLogin}
+              className={button({ variant: 'facebook' })}
+              aria-label="Continue with Facebook"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              Continue with Facebook
+            </button>
+
+            <button
+                className={button({ variant: 'apple' })}
+                aria-label="Continue with Apple"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black">
+                  <path d="M17.05 20.28c-.98.95-2.05.86-3.08.38-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.38C2.79 15.2 3.51 7.08 9.05 6.74c1.79.04 3.07 1.2 4.08 1.2 1 0 2.87-1.47 4.84-1.25 2.49.38 4.29 2.26 4.29 2.26-3.92 2.22-3.32 7.41.56 9.71-.89 1.34-1.93 2.69-3.77 1.62zM12.03 6.54c-.24-2.67 2.04-5.02 4.89-5.28.41 3.09-2.7 5.19-4.89 5.28z"/>
+                </svg>
+                Continue with Apple
+            </button>
+            */}
+
 
             <div className="mt-4 text-center">
               <p className="text-gray-600 text-sm">
@@ -413,7 +407,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
                 </button>
               </div>
               {error && (
-                <div className="text-red-500 text-sm mt-3 p-2 bg-red-50 border border-red-100 rounded-md">
+                <div className="text-red-500 text-sm mt-1">
                   {error}
                 </div>
               )}
