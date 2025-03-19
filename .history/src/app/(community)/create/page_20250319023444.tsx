@@ -277,7 +277,7 @@ export default function CreatePostPage() {
         </div>
 
         {/* Attachment Options */}
-        <div className="flex gap-4 px-4 py-2 border-t border-b-0">
+        <div className="px-4 py-2 flex gap-4 border-t">
           <button 
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             onClick={handleUrlInsert}
@@ -385,10 +385,10 @@ export default function CreatePostPage() {
       </main>
       
       {/* Fixed Footer - Options */}
-      <footer className="border-t-0">
+      <footer>
         <div className="divide-y">
           <button 
-            className="flex items-center p-4 w-full text-left border-t"
+            className="flex items-center p-4 w-full text-left"
             onClick={() => setShowLocationDialog(true)}
           >
             <MapPin className="h-6 w-6 mr-3" />
