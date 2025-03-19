@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Gotu, Geist, Geist_Mono } from "next/font/google";
+import { Gotu, Inter, Roboto_Mono } from "next/font/google";
 import { Cormorant } from 'next/font/google'
 import "./globals.css";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { Analytics } from "@vercel/analytics/react"
 
 
-const geistSans = Geist({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-geist-sans',
+  variable: '--font-inter',
 });
-const geistMono = Geist_Mono({
+const robotoMono = Roboto_Mono({
   subsets: ['latin'],
-  variable: '--font-geist-mono',
+  variable: '--font-roboto-mono',
 });
 const gotu = Gotu({
   weight: '400',
@@ -42,7 +42,7 @@ export default function RootLayout({
         <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased ${gotu.variable} ${cormorant.variable} bg-white`}
+        className={`${inter.variable} ${robotoMono.variable} antialiased ${gotu.variable} ${cormorant.variable} bg-white`}
         suppressHydrationWarning
       >
         <FavoritesProvider>
