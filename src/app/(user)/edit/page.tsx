@@ -1,6 +1,9 @@
 "use client"
 
 import React, { useState } from "react"
+
+// Mark as dynamically rendered to avoid static build errors
+export const dynamic = 'force-dynamic'
 import Link from "next/link"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -19,7 +22,35 @@ import { UserData } from "@/types/user"
 type EditSection = "profile" | "photos" | "preferences" | "social";
 
 const ProfileEditPage = () => {
-  const initialData = getMockUserData();
+  const profileData = getMockUserData();
+  // Convert UserProfile to UserData format
+  const initialData: UserData = {
+    id: profileData.id || '',
+    username: profileData.username || '',
+    displayName: profileData.displayName || '',
+    bio: profileData.bio || '',
+    profileImage: profileData.profileImage || '',
+    coverImage: profileData.coverImage,
+    joinDate: profileData.joinDate || new Date().toISOString(),
+    location: profileData.location,
+    verifiedStatus: profileData.verifiedStatus || false,
+    followingCount: profileData.followingCount || 0,
+    followerCount: profileData.followerCount || 0,
+    stats: {
+      postsCount: profileData.stats?.posts || 0,
+      reviewsCount: profileData.stats?.reviews || 0,
+      upvotesReceived: profileData.stats?.likes || 0,
+      streakDays: 0
+    },
+    activity: {
+      posts: [],
+      reviews: [],
+      comments: [],
+      likes: []
+    },
+    badges: profileData.badges || []
+  };
+  
   const [userData, setUserData] = useState<UserData>(initialData);
   const [activeTab, setActiveTab] = useState<EditSection>("profile");
   const [saving, setSaving] = useState(false);

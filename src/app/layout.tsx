@@ -30,6 +30,9 @@ export const metadata: Metadata = {
   description: 'Discover and book the best medical spa treatments near you.',
 };
 
+// Force dynamic rendering for all routes to avoid build errors
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
   children,
 }: {

@@ -339,7 +339,7 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
               <div className="relative h-32 w-full mb-2">
                 <Image
                   src={selectedMedspa.image_url1 || '/placeholder-medspa.jpg'}
-                  alt={selectedMedspa.name || selectedMedspa.medspa_name || 'MedSpa'}
+                  alt={selectedMedspa.medspa_name || 'MedSpa'}
                   fill
                   className="object-cover rounded-t-lg"
                 />
@@ -361,7 +361,7 @@ export default function DynamicMap({ medspas, onMedspaSelect }: DynamicMapProps)
                 </button>
               </div>
               <h3 className="cormorant font-semibold text-lg truncate text-black">
-                {selectedMedspa.name || selectedMedspa.medspa_name}
+                {selectedMedspa.medspa_name}
               </h3>
               
               {/* Combined Reviews - Google (yellow) and Yelp (red) displayed horizontally */}

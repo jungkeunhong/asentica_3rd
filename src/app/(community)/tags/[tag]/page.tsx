@@ -20,15 +20,18 @@ import CommunityFeedSkeleton from '@/components/community/CommunityFeedSkeleton'
 import { mockPopularTags, mockTrendingTags, mockTagCategories } from '../mock-data';
 import { postsApi } from '@/lib/supabase';
 
+import { use } from 'react';
+
 interface TagPageProps {
-  params: {
+  params: Promise<{
     tag: string;
-  }
+  }>
 }
 
 export default function TagPage({ params }: TagPageProps) {
   const router = useRouter();
-  const tagName = decodeURIComponent(params.tag);
+  const resolvedParams = use(params);
+  const tagName = decodeURIComponent(resolvedParams.tag);
   
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
@@ -123,7 +126,7 @@ export default function TagPage({ params }: TagPageProps) {
     };
     
     fetchTagData();
-  }, [tagName]);
+  }, [tagName, postsApi]);
 
   // Toggle follow status
   const toggleFollow = () => {

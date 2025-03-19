@@ -69,7 +69,7 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
                 isVerified: false
               },
               createdAt: '2023-09-16T10:30:00.000Z',
-              upvoteCount: 5
+              likeCount: 5
             },
             {
               id: '2',
@@ -81,7 +81,7 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
                 isVerified: true
               },
               createdAt: '2023-09-17T14:15:00.000Z',
-              upvoteCount: 3
+              likeCount: 3
             }
           ];
           
@@ -160,7 +160,7 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
           isVerified: false
         },
         createdAt: new Date().toISOString(),
-        upvoteCount: 0
+        likeCount: 0
       };
       
       setComments(prev => [newComment, ...prev]);
@@ -380,7 +380,7 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
                       className="h-6 px-2 text-xs text-gray-500"
                     >
                       <Heart size={14} className="mr-1" />
-                      <span>{comment.upvoteCount}</span>
+                      <span>{comment.likeCount}</span>
                     </Button>
                     <Button 
                       variant="ghost" 

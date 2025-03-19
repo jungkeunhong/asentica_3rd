@@ -48,7 +48,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   
   return (
     <>
-      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+      <Sidebar isOpen={isSidebarOpen} onCloseAction={closeSidebar} />
       <div className={`transition-all duration-300 ${
         isSidebarOpen && !isMobile ? 'ml-64' : 'ml-0'
       }`}>

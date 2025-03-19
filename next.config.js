@@ -39,7 +39,9 @@ const nextConfig = {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     // 리다이렉트 URL 설정 - localhost 대신 상대 경로 사용
     NEXT_PUBLIC_SUPABASE_REDIRECT_URL: '/auth/callback',
-  }
+  },
+  // Disable static generation for user routes that cause build errors
+  output: "standalone"
 };
 
 module.exports = nextConfig;
