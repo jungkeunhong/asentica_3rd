@@ -1,21 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MapPin, Tags, X, Link2, Image, Video } from 'lucide-react';
+import { ArrowLeft, User, MapPin, Tags, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TagSelector from '../../../components/community/TagSelector';
 import { usePostDraft } from '../../../hooks/usePostDraft';
 import { postsApi } from '@/lib/supabase';
 import { PostFormat } from '@/types/community';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-
-interface Location {
-  id: string;
-  name: string;
-  address: string;
-}
 
 export default function CreatePostPage() {
   const router = useRouter();
@@ -24,11 +16,6 @@ export default function CreatePostPage() {
   const [showTagSelector, setShowTagSelector] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<PostFormat>('discussion');
-  const [showLocationDialog, setShowLocationDialog] = useState(false);
-  const [locationSearch, setLocationSearch] = useState('');
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
 
   // Handle title change
   const handleTitleChange = (title: string) => {
@@ -45,81 +32,6 @@ export default function CreatePostPage() {
   const handleTagsChange = (tags: string[]) => {
     updateDraft({ tags });
     setShowTagSelector(false);
-  };
-
-  // URL 삽입 핸들러
-  const handleUrlInsert = () => {
-    const url = prompt('Enter URL:');
-    if (url && contentRef.current) {
-      const start = contentRef.current.selectionStart;
-      const end = contentRef.current.selectionEnd;
-      const currentContent = draft.content || '';
-      const newContent = currentContent.substring(0, start) + url + currentContent.substring(end);
-      updateDraft({ content: newContent });
-      
-      // 커서 위치 조정
-      setTimeout(() => {
-        contentRef.current?.setSelectionRange(start + url.length, start + url.length);
-        contentRef.current?.focus();
-      }, 0);
-    }
-  };
-
-  // 이미지 업로드 핸들러
-  const handleImageUpload = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        // TODO: 이미지 업로드 로직 구현
-        console.log('Image upload:', file);
-      }
-    };
-    input.click();
-  };
-
-  // 비디오 업로드 핸들러
-  const handleVideoUpload = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'video/*';
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        // TODO: 비디오 업로드 로직 구현
-        console.log('Video upload:', file);
-      }
-    };
-    input.click();
-  };
-
-  // 위치 검색 핸들러
-  const handleLocationSearch = async (query: string) => {
-    setLocationSearch(query);
-    if (query.length >= 2) {
-      // TODO: 실제 위치 검색 API 연동
-      const mockLocations: Location[] = [
-        { id: '1', name: query + ' City', address: '123 Main St' },
-        { id: '2', name: query + ' Town', address: '456 Oak Ave' },
-        { id: '3', name: query + ' Village', address: '789 Pine Rd' },
-      ];
-      setLocations(mockLocations);
-    } else {
-      setLocations([]);
-    }
-  };
-
-  // 위치 선택 핸들러
-  const handleLocationSelect = (location: Location) => {
-    setSelectedLocation(location);
-    // location 정보를 content에 추가
-    const locationText = `📍 ${location.name}\n`;
-    updateDraft({ 
-      content: draft.content ? `${locationText}${draft.content}` : locationText 
-    });
-    setShowLocationDialog(false);
   };
 
   // Handle publish post
@@ -268,40 +180,11 @@ export default function CreatePostPage() {
             onChange={(e) => handleTitleChange(e.target.value)}
           />
           <textarea
-            ref={contentRef}
             placeholder="body text (optional)"
             className="w-full text-[16px] text-gray-600 min-h-[150px] resize-none border-none focus:outline-none"
             value={draft.content || ''}
             onChange={(e) => updateDraft({ content: e.target.value })}
           />
-        </div>
-
-        {/* Attachment Options */}
-        <div className="px-4 py-2 flex gap-4 border-t border-b">
-          <button 
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            onClick={handleUrlInsert}
-            title="Add URL"
-            aria-label="Add URL"
-          >
-            <Link2 className="h-6 w-6 text-gray-600" />
-          </button>
-          <button 
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            onClick={handleImageUpload}
-            title="Upload Image"
-            aria-label="Upload Image"
-          >
-            <Image className="h-6 w-6 text-gray-600" />
-          </button>
-          <button 
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            onClick={handleVideoUpload}
-            title="Upload Video"
-            aria-label="Upload Video"
-          >
-            <Video className="h-6 w-6 text-gray-600" />
-          </button>
         </div>
         
         {/* Tags */}
@@ -354,34 +237,6 @@ export default function CreatePostPage() {
             </div>
           </div>
         )}
-
-        {/* Location Dialog */}
-        <Dialog open={showLocationDialog} onOpenChange={setShowLocationDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add location</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <Input
-                placeholder="Search for a location..."
-                value={locationSearch}
-                onChange={(e) => handleLocationSearch(e.target.value)}
-              />
-              <div className="space-y-2">
-                {locations.map((location) => (
-                  <button
-                    key={location.id}
-                    className="w-full text-left p-2 hover:bg-gray-50 rounded-md"
-                    onClick={() => handleLocationSelect(location)}
-                  >
-                    <div className="font-medium">{location.name}</div>
-                    <div className="text-sm text-gray-500">{location.address}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
       </main>
       
       {/* Fixed Footer - Options */}
@@ -389,15 +244,16 @@ export default function CreatePostPage() {
         <div className="divide-y">
           <button 
             className="flex items-center p-4 w-full text-left"
-            onClick={() => setShowLocationDialog(true)}
+            onClick={() => setShowTagSelector(true)}
           >
+            <User className="h-6 w-6 mr-3" />
+            <span className="text-base">Tag people</span>
+            <span className="ml-auto">›</span>
+          </button>
+          
+          <button className="flex items-center p-4 w-full text-left">
             <MapPin className="h-6 w-6 mr-3" />
             <span className="text-base">Add location</span>
-            {selectedLocation && (
-              <span className="ml-2 text-sm text-gray-500">
-                {selectedLocation.name}
-              </span>
-            )}
             <span className="ml-auto">›</span>
           </button>
           

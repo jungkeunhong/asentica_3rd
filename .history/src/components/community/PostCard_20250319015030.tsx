@@ -93,7 +93,7 @@ export default function PostCard({ post }: PostCardProps) {
   return (
     <Link href={`/post/${post.id}`} className="block">
       <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300 h-full">
-        <CardContent className="p-0 pb-0">
+        <CardContent className="p-0">
           {/* Post Image (if available) */}
           {post.imageUrl && (
             <div className="relative h-60 w-full">
@@ -107,7 +107,7 @@ export default function PostCard({ post }: PostCardProps) {
           )}
 
           {/* Post Content */}
-          <div className="p-5 pb-2">
+          <div className="p-5">
             {/* Author Info */}
             <div className="flex items-center mb-3">
               <div 
@@ -135,25 +135,19 @@ export default function PostCard({ post }: PostCardProps) {
             {/* Post Title */}
             <h3 className="text-lg font-semibold mb-1 line-clamp-2">{post.title}</h3>
             
-            {/* Post Excerpt - 확실히 본문 내용이 보이도록 수정 */}
+            {/* Post Excerpt */}
             <p className="text-gray-600 text-sm mb-2 line-clamp-2">
               {post.excerpt}
-              <span className="text-gray-500 font-medium ml-1 inline-block">...more</span>
+              <span className="text-gray-500 font-medium ml-1">...more</span>
             </p>
 
-            {/* Tags - 클릭 가능하도록 수정 */}
+            {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-1">
               {post.tags.map(tag => (
                 <Badge 
                   key={tag.id} 
                   variant="outline"
-                  className="text-xs bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100 cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // 태그 클릭 시 동작 구현 (예: 해당 태그로 필터링)
-                    // 필요한 경우 여기에 태그 클릭 핸들러 추가
-                  }}
+                  className="text-xs bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100"
                 >
                   {tag.name}
                 </Badge>
@@ -162,7 +156,7 @@ export default function PostCard({ post }: PostCardProps) {
           </div>
         </CardContent>
 
-        <CardFooter className="flex justify-between py-3 px-5 mt-0 border-t">
+        <CardFooter className="flex justify-between p-2">
           <div className="flex items-center space-x-4">
             {/* Like Button */}
             <Button 

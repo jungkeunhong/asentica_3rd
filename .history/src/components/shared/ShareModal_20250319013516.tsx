@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Copy, Check, Facebook, Twitter, Instagram, Video } from 'lucide-react';
+import { Copy, Check, Facebook, Twitter, Linkedin, Mail, Instagram, Video } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ShareModalProps {

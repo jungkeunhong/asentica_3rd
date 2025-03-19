@@ -93,10 +93,10 @@ export default function PostCard({ post }: PostCardProps) {
   return (
     <Link href={`/post/${post.id}`} className="block">
       <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300 h-full">
-        <CardContent className="p-0 pb-0">
+        <CardContent className="p-0">
           {/* Post Image (if available) */}
           {post.imageUrl && (
-            <div className="relative h-60 w-full">
+            <div className="relative h-48 w-full">
               <Image
                 src={post.imageUrl}
                 alt={post.title}
@@ -107,7 +107,7 @@ export default function PostCard({ post }: PostCardProps) {
           )}
 
           {/* Post Content */}
-          <div className="p-5 pb-2">
+          <div className="p-5">
             {/* Author Info */}
             <div className="flex items-center mb-3">
               <div 
@@ -133,27 +133,18 @@ export default function PostCard({ post }: PostCardProps) {
             </div>
 
             {/* Post Title */}
-            <h3 className="text-lg font-semibold mb-1 line-clamp-2">{post.title}</h3>
-            
-            {/* Post Excerpt - 확실히 본문 내용이 보이도록 수정 */}
-            <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-              {post.excerpt}
-              <span className="text-gray-500 font-medium ml-1 inline-block">...more</span>
-            </p>
+            <h3 className="text-lg font-semibold mb-2 line-clamp-2">{post.title}</h3>
 
-            {/* Tags - 클릭 가능하도록 수정 */}
-            <div className="flex flex-wrap gap-2 mb-1">
+            {/* Post Excerpt */}
+            <p className="text-gray-600 text-sm mb-3 line-clamp-3">{post.excerpt}</p>
+
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2 mb-3">
               {post.tags.map(tag => (
                 <Badge 
                   key={tag.id} 
                   variant="outline"
-                  className="text-xs bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100 cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // 태그 클릭 시 동작 구현 (예: 해당 태그로 필터링)
-                    // 필요한 경우 여기에 태그 클릭 핸들러 추가
-                  }}
+                  className="text-xs bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100"
                 >
                   {tag.name}
                 </Badge>
@@ -162,48 +153,46 @@ export default function PostCard({ post }: PostCardProps) {
           </div>
         </CardContent>
 
-        <CardFooter className="flex justify-between py-3 px-5 mt-0 border-t">
-          <div className="flex items-center space-x-4">
-            {/* Like Button */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleLike}
-              className={`flex items-center gap-1 p-0 ${isLiked ? 'text-amber-900' : 'text-gray-600'}`}
-            >
-              <Heart size={20} className={isLiked ? 'fill-amber-900' : ''} />
-              <span className="text-sm font-bold">{likeCount}</span>
-            </Button>
+        <CardFooter className="flex justify-between">
+          {/* Like Button */}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleLike}
+            className={`flex items-center gap-1 text-xs ${isLiked ? 'text-amber-900' : 'text-gray-600'}`}
+          >
+            <Heart size={16} className={isLiked ? 'fill-amber-900' : ''} />
+            <span>{likeCount}</span>
+          </Button>
 
-            {/* Comment Button */}
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="flex items-center gap-1 p-0 text-gray-600"
-            >
-              <MessageCircle size={20} />
-              <span className="text-sm font-bold">{post.commentCount}</span>
-            </Button>
+          {/* Comment Button */}
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="flex items-center gap-1 text-xs text-gray-600"
+          >
+            <MessageCircle size={16} />
+            <span>{post.commentCount}</span>
+          </Button>
 
-            {/* Share Button */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleShare}
-              className="flex items-center gap-1 p-0 text-gray-600"
-            >
-              <Share2 size={20} />
-            </Button>
-          </div>
-
-          {/* Save Button - moved to right */}
+          {/* Save Button */}
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={handleSave}
-            className={`flex items-center gap-1 p-0 ${isSaved ? 'text-amber-900' : 'text-gray-600'}`}
+            className={`flex items-center gap-1 text-xs ${isSaved ? 'text-amber-900' : 'text-gray-600'}`}
           >
-            <Bookmark size={20} className={isSaved ? 'fill-amber-900' : ''} />
+            <Bookmark size={16} className={isSaved ? 'fill-amber-900' : ''} />
+          </Button>
+
+          {/* Share Button */}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleShare}
+            className="flex items-center gap-1 text-xs text-gray-600"
+          >
+            <Share2 size={16} />
           </Button>
         </CardFooter>
 

@@ -118,14 +118,14 @@ export default function CommunityPage() {
   return (
     <MainLayout>
       <Navbar />
-      <div className="container mx-auto px-2 py-5">        
+      <div className="container mx-auto px-4 py-6">        
         {/* 탭과 필터 그룹 */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
-          <div className="flex flex-row gap-2 w-full sm:w-auto">
+          <div className="flex flex-row gap-4 w-full sm:w-auto">
             <Tabs defaultValue="latest" value={activeTab} onValueChange={handleTabChange} className="w-full sm:w-auto">
               <TabsList>
-                <TabsTrigger value="latest" className="flex items-center gap-1 text-black data-[state=active]:text-black data-[state=active]:font-medium">Latest</TabsTrigger>
-                <TabsTrigger value="popular" className="flex items-center gap-1 text-black data-[state=active]:text-black data-[state=active]:font-medium"><TrendingUp size={14} />Popular</TabsTrigger>
+                <TabsTrigger value="latest" className="flex items-center gap-1">Latest</TabsTrigger>
+                <TabsTrigger value="popular" className="flex items-center gap-1"><TrendingUp size={14} />Popular</TabsTrigger>
               </TabsList>
             </Tabs>
             
@@ -141,11 +141,9 @@ export default function CommunityPage() {
             
             <Link href="/create">
               <Button 
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1"
+                className={`flex items-center gap-2 rounded-md bg-white border border-black ${filterOption !== 'all' ? 'bg-primary/10 text-primary' : ''} h-10`}
               >
-                <span className="text-lg font-light">+</span>
+                <span className="text-2xl font-light text-black">+</span>
               </Button>
             </Link>
           </div>

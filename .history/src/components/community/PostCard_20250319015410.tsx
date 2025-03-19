@@ -93,7 +93,7 @@ export default function PostCard({ post }: PostCardProps) {
   return (
     <Link href={`/post/${post.id}`} className="block">
       <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300 h-full">
-        <CardContent className="p-0 pb-0">
+        <CardContent className="p-0 -mb-6">
           {/* Post Image (if available) */}
           {post.imageUrl && (
             <div className="relative h-60 w-full">

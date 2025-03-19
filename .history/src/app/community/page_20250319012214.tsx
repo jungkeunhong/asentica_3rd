@@ -118,36 +118,92 @@ export default function CommunityPage() {
   return (
     <MainLayout>
       <Navbar />
-      <div className="container mx-auto px-2 py-5">        
+      <div className="container mx-auto px-4 py-6">
+        {/* 상단 헤더 */}
+        <div className="flex justify-between items-center mb-6">
+          <Link href="/create">
+            <Button className="flex items-center gap-2">
+              <span className="text-lg">+</span>
+            </Button>
+          </Link>
+        </div>
+        
         {/* 탭과 필터 그룹 */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
-          <div className="flex flex-row gap-2 w-full sm:w-auto">
-            <Tabs defaultValue="latest" value={activeTab} onValueChange={handleTabChange} className="w-full sm:w-auto">
-              <TabsList>
-                <TabsTrigger value="latest" className="flex items-center gap-1 text-black data-[state=active]:text-black data-[state=active]:font-medium">Latest</TabsTrigger>
-                <TabsTrigger value="popular" className="flex items-center gap-1 text-black data-[state=active]:text-black data-[state=active]:font-medium"><TrendingUp size={14} />Popular</TabsTrigger>
-              </TabsList>
-            </Tabs>
-            
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <Tabs defaultValue="latest" value={activeTab} onValueChange={handleTabChange} className="w-full sm:w-auto">
+            <TabsList>
+              <TabsTrigger value="latest" className="flex items-center gap-1">
+                Latest
+              </TabsTrigger>
+              <TabsTrigger value="popular" className="flex items-center gap-1">
+                <TrendingUp size={14} />
+                Popular
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          
+          <div className="flex flex-wrap gap-2">
             <div className="relative">
-              <Button variant="outline" size="sm" className="flex items-center gap-1" onClick={() => setShowTagsFilter(!showTagsFilter)}>
-                <TagsIcon size={14} />{selectedTag ? `#${selectedTag}` : "Tags"}{selectedTag && <span className="ml-1 cursor-pointer" onClick={(e) => { e.stopPropagation(); setSelectedTag(null); }}>✕</span>}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-1"
+                onClick={() => setShowTagsFilter(!showTagsFilter)}
+              >
+                <TagsIcon size={14} />
+                {selectedTag ? `#${selectedTag}` : "Tags"}
+                {selectedTag && (
+                  <span 
+                    className="ml-1 cursor-pointer" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedTag(null);
+                    }}
+                  >
+                    ✕
+                  </span>
+                )}
               </Button>
+              
+              {showTagsFilter && (
+                <div className="absolute z-10 mt-1 w-56 rounded-md bg-popover shadow-lg border border-border">
+                  <div className="p-2 max-h-64 overflow-y-auto">
+                    <div className="flex flex-wrap gap-1">
+                      {mockPopularTags.slice(0, 20).map((tag) => (
+                        <Button
+                          key={tag.id}
+                          variant="ghost"
+                          size="sm"
+                          className={`text-xs rounded-full ${
+                            selectedTag === tag.name
+                              ? 'bg-primary/20 text-primary'
+                              : 'hover:bg-primary/10'
+                          }`}
+                          onClick={() => handleTagSelect(tag.name)}
+                        >
+                          #{tag.name}
+                        </Button>
+                      ))}
+                    </div>
+                    <div className="mt-2 pt-2 border-t border-border">
+                      <Link href="/tags" className="text-xs text-primary hover:underline">
+                        View all topics
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
-            <Button variant="outline" size="sm" className={`flex items-center gap-1 ${filterOption !== 'all' ? 'bg-primary/10 text-primary' : ''}`} onClick={() => handleFilterChange(filterOption === 'all' ? 'questions' : 'all')}>
-              <Filter size={14} />Filter
+            <Button 
+              variant="outline" 
+              size="sm"
+              className={`flex items-center gap-1 ${filterOption !== 'all' ? 'bg-primary/10 text-primary' : ''}`}
+              onClick={() => handleFilterChange(filterOption === 'all' ? 'questions' : 'all')}
+            >
+              <Filter size={14} />
+              Filter
             </Button>
-            
-            <Link href="/create">
-              <Button 
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1"
-              >
-                <span className="text-lg font-light">+</span>
-              </Button>
-            </Link>
           </div>
         </div>
         

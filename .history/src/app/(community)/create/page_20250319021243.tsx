@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MapPin, Tags, X, Link2, Image, Video } from 'lucide-react';
+import { ArrowLeft, User, MapPin, Tags, X, Link2, Image, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TagSelector from '../../../components/community/TagSelector';
 import { usePostDraft } from '../../../hooks/usePostDraft';

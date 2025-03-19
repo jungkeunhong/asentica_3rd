@@ -124,8 +124,8 @@ export default function CommunityPage() {
           <div className="flex flex-row gap-2 w-full sm:w-auto">
             <Tabs defaultValue="latest" value={activeTab} onValueChange={handleTabChange} className="w-full sm:w-auto">
               <TabsList>
-                <TabsTrigger value="latest" className="flex items-center gap-1 text-black data-[state=active]:text-black data-[state=active]:font-medium">Latest</TabsTrigger>
-                <TabsTrigger value="popular" className="flex items-center gap-1 text-black data-[state=active]:text-black data-[state=active]:font-medium"><TrendingUp size={14} />Popular</TabsTrigger>
+                <TabsTrigger value="latest" className="flex items-center gap-1 text-black">Latest</TabsTrigger>
+                <TabsTrigger value="popular" className="flex items-center gap-1 text-black"><TrendingUp size={14} />Popular</TabsTrigger>
               </TabsList>
             </Tabs>
             

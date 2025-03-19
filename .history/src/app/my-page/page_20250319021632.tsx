@@ -173,12 +173,12 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 pb-4">
+    <div className="container mx-auto pt-4 px-4 sm:px-6">
       {/* Inject the animation styles */}
       <style jsx global>{animateFadeInOut}</style>
       
       {/* Profile Header Section */}
-      <div className="mb-6 relative">
+      <div className="mb-8 relative">
         <ProfileHeader user={user} isCurrentUser={true} />
         
         {/* Share success notification */}
@@ -188,8 +188,8 @@ export default function ProfilePage() {
           </div>
         )}
         
-        {/* Action Buttons */}
-        <div className="absolute top-4 right-4 flex gap-2">
+        {/* Overlay a Share button on the ProfileHeader */}
+        <div className="absolute top-4 right-4">
           <Button 
             variant="outline" 
             size="sm" 
@@ -203,20 +203,32 @@ export default function ProfilePage() {
       </div>
 
       {/* Content Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
         {/* Sidebar - GlowStats */}
-        <div className="lg:col-span-4 space-y-6">
+        <div className="lg:col-span-1 space-y-6">
           <GlowStats stats={glowStats} />
+          
+          {/* Quick links */}
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="font-medium mb-3">Quick Links</h3>
+              <div className="space-y-2">
+                <Button variant="outline" className="w-full justify-start" asChild>
+                  <Link href="/my-page/drafts">My Drafts</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main content area */}
-        <div className="lg:col-span-8">
-          <Tabs defaultValue="content" className="w-full">
-            <TabsList className="mb-4 w-full flex overflow-x-auto no-scrollbar">
-              <TabsTrigger value="content" className="flex-1">Content</TabsTrigger>
-              <TabsTrigger value="activity" className="flex-1">Activity</TabsTrigger>
-              <TabsTrigger value="badges" className="flex-1">Badges</TabsTrigger>
-              <TabsTrigger value="saved" className="flex-1">Saved</TabsTrigger>
+        <div className="lg:col-span-2">
+          <Tabs defaultValue="content">
+            <TabsList className="mb-4">
+              <TabsTrigger value="content">Content</TabsTrigger>
+              <TabsTrigger value="activity">Activity</TabsTrigger>
+              <TabsTrigger value="badges">Badges</TabsTrigger>
+              <TabsTrigger value="saved">Saved</TabsTrigger>
             </TabsList>
 
             <TabsContent value="content" className="mt-6">
@@ -235,22 +247,22 @@ export default function ProfilePage() {
             <TabsContent value="badges" className="mt-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {user.badges && user.badges.length > 0 ? (
-                  user.badges.slice(0, 6).map((badge) => (
+                  user.badges.slice(0, 8).map((badge) => (
                     <Link 
                       key={badge.id} 
                       href="/my-page/badges"
                       className="block"
                     >
                       <Card className="h-full hover:shadow-md transition-shadow">
-                        <CardContent className="p-4 flex flex-col items-center text-center">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
+                        <CardContent className="p-6 flex flex-col items-center text-center">
+                          <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
                             badge.name?.includes("Expert") 
                               ? "bg-amber-100" 
                               : badge.name?.includes("Community") 
                                 ? "bg-blue-100" 
                                 : "bg-green-100"
                           }`}>
-                            <span className={`text-xl ${
+                            <span className={`text-2xl ${
                               badge.name?.includes("Expert") 
                                 ? "text-amber-600" 
                                 : badge.name?.includes("Community") 
@@ -260,15 +272,15 @@ export default function ProfilePage() {
                               {badge.name && badge.name.length > 0 ? badge.name.charAt(0) : '?'}
                             </span>
                           </div>
-                          <h3 className="font-medium text-sm mb-1">{badge.name || 'Unknown Badge'}</h3>
-                          <p className="text-xs text-gray-500 line-clamp-2">{badge.description || ''}</p>
+                          <h3 className="font-medium mb-1">{badge.name || 'Unknown Badge'}</h3>
+                          <p className="text-sm text-gray-500">{badge.description || ''}</p>
                         </CardContent>
                       </Card>
                     </Link>
                   ))
                 ) : (
-                  <div className="col-span-full text-center py-8">
-                    <p className="text-base mb-2">No badges yet</p>
+                  <div className="col-span-full text-center py-12">
+                    <p className="text-lg mb-2">No badges yet</p>
                     <p className="text-sm text-gray-500 mb-4">
                       Earn badges by being active in the community
                     </p>
@@ -276,7 +288,7 @@ export default function ProfilePage() {
                   </div>
                 )}
                 
-                {user.badges && user.badges.length > 6 && (
+                {user.badges && user.badges.length > 8 && (
                   <div className="col-span-full mt-4 text-center">
                     <Button asChild variant="outline">
                       <Link href="/my-page/badges">View All Badges</Link>
@@ -287,7 +299,7 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="saved" className="mt-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {user.savedContent && user.savedContent.length > 0 ? (
                   user.savedContent.slice(0, 6).map((item) => (
                     <Card key={item.id} className="overflow-hidden hover:shadow-md transition-shadow">
@@ -303,11 +315,11 @@ export default function ProfilePage() {
                         )}
                       </div>
                       <CardContent className="p-4">
-                        <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">
+                        <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">
                           {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
                         </p>
-                        <h3 className="font-medium text-sm mb-2 line-clamp-2">{item.title}</h3>
-                        <p className="text-xs text-gray-600 line-clamp-2 mb-2">{item.excerpt}</p>
+                        <h3 className="font-medium mb-2 line-clamp-2">{item.title}</h3>
+                        <p className="text-sm text-gray-600 line-clamp-2 mb-3">{item.excerpt}</p>
                         <div className="flex justify-between items-center">
                           <span className="text-xs text-gray-500">
                             {safeFormatDate(item.date)}
@@ -320,8 +332,8 @@ export default function ProfilePage() {
                     </Card>
                   ))
                 ) : (
-                  <div className="col-span-full text-center py-8">
-                    <p className="text-base mb-2">No saved content</p>
+                  <div className="col-span-full text-center py-12">
+                    <p className="text-lg mb-2">No saved content</p>
                     <p className="text-sm text-gray-500 mb-4">
                       Save posts, products and reviews to find them later
                     </p>

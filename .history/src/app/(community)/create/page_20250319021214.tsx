@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MapPin, Tags, X, Link2, Image, Video } from 'lucide-react';
+import { ArrowLeft, User, MapPin, Tags, X, Link2, Image, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TagSelector from '../../../components/community/TagSelector';
 import { usePostDraft } from '../../../hooks/usePostDraft';
@@ -114,11 +114,7 @@ export default function CreatePostPage() {
   // 위치 선택 핸들러
   const handleLocationSelect = (location: Location) => {
     setSelectedLocation(location);
-    // location 정보를 content에 추가
-    const locationText = `📍 ${location.name}\n`;
-    updateDraft({ 
-      content: draft.content ? `${locationText}${draft.content}` : locationText 
-    });
+    updateDraft({ location: location.name });
     setShowLocationDialog(false);
   };
 
@@ -281,24 +277,18 @@ export default function CreatePostPage() {
           <button 
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             onClick={handleUrlInsert}
-            title="Add URL"
-            aria-label="Add URL"
           >
             <Link2 className="h-6 w-6 text-gray-600" />
           </button>
           <button 
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             onClick={handleImageUpload}
-            title="Upload Image"
-            aria-label="Upload Image"
           >
             <Image className="h-6 w-6 text-gray-600" />
           </button>
           <button 
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             onClick={handleVideoUpload}
-            title="Upload Video"
-            aria-label="Upload Video"
           >
             <Video className="h-6 w-6 text-gray-600" />
           </button>
