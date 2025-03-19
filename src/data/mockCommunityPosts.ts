@@ -55,7 +55,7 @@ export const mockCommunityPosts: CommunityPost[] = [
     id: '3',
     title: 'How I finally cured my fungal acne after years of struggle',
     content: '<p>After battling fungal acne for over 3 years and trying countless products, I finally found a routine that worked for me! Here\'s my full journey and the products that saved my skin.</p><h3>What didn\'t work</h3><ul><li>Regular anti-acne products with salicylic acid</li><li>Benzoyl peroxide</li><li>Niacinamide serums</li></ul><h3>What finally worked</h3><ul><li>Nizoral (ketoconazole) used as a mask 2x weekly</li><li>Completely cutting out oils and fatty alcohols from my routine</li><li>Squalane as my only moisturizer</li><li>Consistent use of sunscreen without fungal acne triggers</li></ul><p>The most important thing I learned is that fungal acne requires a completely different approach than bacterial acne. Check ingredients carefully!</p>',
-    imageUrl: 'https://images.unsplash.com/photo-1573461160357-28c261f0f769?q=80&w=1024&auto=format&fit=crop',
+    imageUrl: 'https://images.unsplash.com/photo-1508184964240-ee96bb9677a7?q=80&w=1024&auto=format&fit=crop',
     createdAt: '2023-05-25T14:20:00Z',
     author: {
       id: 'user3',
@@ -131,7 +131,7 @@ export const mockCommunityPosts: CommunityPost[] = [
     author: {
       id: 'user6',
       username: 'budget_beauty',
-      avatarUrl: 'https://images.unsplash.com/photo-1563620915-8478189e41c1?q=80&w=256&auto=format&fit=crop',
+      avatarUrl: 'https://images.unsplash.com/photo-1531123414780-f74242c2b052?q=80&w=256&auto=format&fit=crop',
       isVerified: false,
       glow: 132
     },
