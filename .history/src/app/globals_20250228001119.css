@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Gotu&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --font-cormorant: 'Cormorant', serif;
+  --beige-bg: #f8f6f4;
+  --beige-darker: #f0ebe6;
+  --pill-bg: #ffffff;
+  --title-color: #333333;
+  --text-color: #666666;
+  --text-light: #999999;
+  --accent-orange: #F9A826;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+    --foreground: #171717;
+  }
+}
+
+@layer base {
+  h1, h2, h3 {
+    font-family: 'Gotu', sans-serif;
+  }
+
+  p, button, input, span {
+    font-family: system-ui, sans-serif;
+  }
+
+  .cormorant {
+    font-family: var(--font-cormorant);
+  }
+
+  .gotu {
+    font-family: 'Gotu', sans-serif;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

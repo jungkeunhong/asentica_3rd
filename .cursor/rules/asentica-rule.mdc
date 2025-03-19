@@ -1,0 +1,501 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+# Frontend Project Coding Standards and Guidelines
+
+## Tech Stack
+
+- **Framework**: Next.js 15.2.2
+- **UI Library**: React 19
+- **Styling**: Tailwind CSS 4.0
+- **Type System**: TypeScript 5.4+
+- **State Management**: Zustand + TanStack Query
+- **Form Management**: React Hook Form + Zod
+- **UI Components**: ShadCN UI + Headless UI
+- **Animation**: Framer Motion
+- **Package Manager**: pnpm 8.11.0+
+- **Node.js**: 20.10.0 LTS
+
+## Project Structure
+
+```
+/src
+├── /app (Next.js App Router)
+│   ├── /api (Server Actions, API Routes)
+│   ├── /(community) (Community Feed, Discussions)
+│   ├── /(marketplace) (Marketplace Listings)
+│   ├── /auth (Login, Registration, Profile Management)
+│   ├── /settings (User Preferences, Notifications)
+│   ├── layout.tsx (Root Layout)
+│   └── page.tsx (Homepage)
+├── /components 
+│   ├── /ui (Base UI components)
+│   ├── /compound (Combined components)
+│   ├── /layout (Layout components)
+│   └── /features (Feature-specific components)
+├── /lib (Core utilities)
+│   ├── /api (API client)
+│   ├── /utils (Helper functions)
+│   └── /constants (App constants)
+├── /hooks (Custom React hooks)
+├── /store (Global state management)
+└── /types (TypeScript types and interfaces)
+```
+
+## Component Organization
+
+```
+/components/ui/button/
+├── Button.tsx         # Component implementation
+├── button-variants.ts # Style variants using cva
+├── Button.test.tsx    # Component tests
+└── index.ts           # Export file for cleaner imports
+```
+
+## TypeScript and Type Safety
+
+1. **Use explicit typing**
+   - Define interfaces/types for all props, state, and function parameters/returns
+   - Avoid `any` type; use `unknown` with proper type narrowing when necessary
+
+   ```typescript
+   // Good
+   interface UserProfileProps {
+     user: User;
+     onUpdate?: (userId: string, data: UpdateData) => Promise<void>;
+     isEditable?: boolean;
+   }
+   
+   function UserProfile({ user, onUpdate, isEditable = false }: UserProfileProps) {
+     // Implementation
+   }
+   
+   // Bad
+   function UserProfile(props: any) {
+     // Implementation using props.user, etc.
+   }
+   ```
+
+2. **Create centralized type definitions**
+   - Define domain models in `/types` directory
+   - Use Zod schemas for runtime validation
+
+   ```typescript
+   // /types/user.ts
+   import { z } from 'zod';
+   
+   export const UserSchema = z.object({
+     id: z.string().uuid(),
+     name: z.string().min(2),
+     email: z.string().email(),
+     role: z.enum(['admin', 'user']),
+   });
+   
+   export type User = z.infer<typeof UserSchema>;
+   ```
+
+3. **Handle null and undefined properly**
+   - Use optional chaining (`?.`) and nullish coalescing (`??`)
+   - Implement proper null checks
+
+   ```typescript
+   // Good
+   const displayName = user?.profile?.displayName ?? user?.name ?? 'Anonymous';
+   
+   // Bad
+   const displayName = user && user.profile && user.profile.displayName 
+     ? user.profile.displayName 
+     : (user && user.name ? user.name : 'Anonymous');
+   ```
+
+## Component Design Principles
+
+1. **Follow single responsibility principle**
+   - Each component should do one thing well
+   - Break complex components into smaller ones
+
+2. **Use composition over prop drilling**
+   - Use children, render props, or composition patterns
+   - Extract reusable logic into custom hooks
+
+   ```tsx
+   // Good
+   function DataList({ children, isLoading }) {
+     if (isLoading) return <Skeleton />;
+     return <div className="divide-y">{children}</div>;
+   }
+   
+   <DataList isLoading={isLoading}>
+     {items.map(item => <ItemRow key={item.id} item={item} />)}
+   </DataList>
+   
+   // Bad
+   function DataList({ items, isLoading, onItemClick, itemClassName }) {
+     if (isLoading) return <Skeleton />;
+     return (
+       <div className="divide-y">
+         {items.map(item => (
+           <div 
+             key={item.id} 
+             className={itemClassName}
+             onClick={() => onItemClick(item)}
+           >
+             {item.name}
+           </div>
+         ))}
+       </div>
+     );
+   }
+   ```
+
+3. **Separate UI and logic concerns**
+   - Use container/presentational pattern
+   - Extract data fetching logic into custom hooks
+   - Style definitions should be separated from component logic
+
+## State Management Guidelines
+
+1. **Choose the right state management solution**
+   - Component state: `useState`, `useReducer`
+   - Shared/global state: Zustand
+   - Server state: TanStack Query
+   - Form state: React Hook Form
+
+2. **Define clear state ownership**
+   - Lift state only as high as needed
+   - Avoid redundant state
+
+3. **Implement proper data fetching patterns**
+   - Use React Query for server state
+   - Implement optimistic updates
+   - Handle loading and error states
+
+   ```tsx
+   // Good pattern with React Query
+   function UserList() {
+     const { data, isLoading, error } = useQuery({
+       queryKey: ['users'],
+       queryFn: fetchUsers,
+     });
+   
+     if (isLoading) return <Skeleton />;
+     if (error) return <ErrorMessage error={error} />;
+   
+     return (
+       <ul>
+         {data.map(user => (
+           <UserItem key={user.id} user={user} />
+         ))}
+       </ul>
+     );
+   }
+   ```
+
+## Dependency Management
+
+1. **Minimize external dependencies**
+   - Evaluate necessity before adding new packages
+   - Consider bundle size impact
+   - Use tree-shakable libraries when possible
+
+2. **Version control**
+   - Pin exact versions in package.json (no ^ or ~ prefixes)
+   - Update dependencies on a schedule, not ad-hoc
+
+3. **Import organization**
+   - Follow consistent import ordering
+   - Group imports by type (React, external, internal)
+
+   ```typescript
+   // Good import order
+   import { useState, useEffect } from 'react';
+   import { useQuery } from '@tanstack/react-query';
+   
+   import { Button } from '@/components/ui/button';
+   import { useAuth } from '@/hooks/useAuth';
+   import { fetchUserData } from '@/lib/api';
+   
+   import type { User } from '@/types/user';
+   ```
+
+## DOM and Rendering Optimization
+
+1. **Prevent unnecessary re-renders**
+   - Use React DevTools Profiler to identify issues
+   - Implement `React.memo` for expensive components
+   - Use `useMemo` and `useCallback` appropriately
+
+2. **Avoid direct DOM manipulation**
+   - Use refs (`useRef`) when DOM access is necessary
+   - Never use `document.querySelector` or similar methods
+   - Avoid `innerHTML` due to XSS risks
+
+3. **Handle side effects properly**
+   - Clean up all side effects in `useEffect`
+   - Include all dependencies in dependency arrays
+   - Split unrelated effects into separate `useEffect` calls
+
+   ```tsx
+   // Good
+   useEffect(() => {
+     const controller = new AbortController();
+     const { signal } = controller;
+   
+     fetchData(signal)
+       .then(data => setData(data))
+       .catch(err => {
+         if (!err.name === 'AbortError') {
+           setError(err);
+         }
+       });
+   
+     return () => controller.abort();
+   }, [fetchData]);
+   ```
+
+## Code Quality and Linting
+
+1. **ESLint configuration**
+   - Extend from recommended configs: `next/core-web-vitals`, `airbnb-typescript`
+   - Enforce consistent code style
+
+2. **Prettier configuration**
+   ```json
+   {
+     "semi": true,
+     "singleQuote": true,
+     "tabWidth": 2,
+     "printWidth": 100,
+     "trailingComma": "es5"
+   }
+   ```
+
+3. **Pre-commit hooks**
+   - Use Husky and lint-staged
+   - Run linters, type checks and tests before commits
+
+4. **Code review checklist**
+   - Consistent naming conventions
+   - No prop drilling or state duplications
+   - Error handling implementation
+   - Test coverage for critical paths
+
+## Performance Best Practices
+
+1. **Implement code splitting**
+   - Use dynamic imports for large components
+   - Lazy load below-the-fold content
+
+   ```tsx
+   // Good
+   import dynamic from 'next/dynamic';
+   
+   const HeavyComponent = dynamic(() => import('@/components/HeavyComponent'), {
+     loading: () => <Skeleton />,
+   });
+   ```
+
+2. **Image optimization**
+   - Use Next.js Image component
+   - Set correct sizes and priority
+   - Use modern formats (WebP)
+
+3. **Reduce JavaScript payload**
+   - Monitor bundle size with tools like `@next/bundle-analyzer`
+   - Optimize third-party dependencies
+   - Implement tree-shaking
+
+## Design System Implementation
+
+1. **Color system**
+   ```typescript
+   // /lib/design-tokens.ts
+   export const colors = {
+     primary: {
+       50: '#f0f9ff',
+       100: '#e0f2fe',
+       // ... more shades
+       900: '#0c4a6e',
+     },
+     // ... more color categories
+   };
+   ```
+
+2. **Typography scale**
+   ```typescript
+   export const typography = {
+     fontSizes: {
+       xs: '0.75rem',    // 12px
+       sm: '0.875rem',   // 14px
+       base: '1rem',     // 16px
+       lg: '1.125rem',   // 18px
+       xl: '1.25rem',    // 20px
+       '2xl': '1.5rem',  // 24px
+       // ... larger sizes
+     },
+     // ... other typography tokens
+   };
+   ```
+
+3. **Spacing system**
+   - Follow 4px (0.25rem) base grid
+   - Use consistent spacing values from design system
+
+4. **Component variants**
+   - Implement using class-variance-authority (cva)
+   - Define all variants in separate files
+
+   ```typescript
+   // button-variants.ts
+   import { cva } from 'class-variance-authority';
+   
+   export const buttonVariants = cva(
+     "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none",
+     {
+       variants: {
+         variant: {
+           default: "bg-primary-600 text-white hover:bg-primary-700",
+           secondary: "bg-neutral-200 text-neutral-800 hover:bg-neutral-300",
+           // ... more variants
+         },
+         size: {
+           sm: "h-8 px-3 py-1.5 text-sm",
+           md: "h-10 px-4 py-2",
+           lg: "h-12 px-6 py-3 text-lg",
+         },
+       },
+       defaultVariants: {
+         variant: "default",
+         size: "md",
+       },
+     }
+   );
+   ```
+
+## Accessibility Standards
+
+1. **Semantic HTML**
+   - Use appropriate elements (`button`, `nav`, `article`, etc.)
+   - Implement proper heading hierarchy
+   - Use landmarks (`main`, `header`, `footer`, etc.)
+
+2. **Keyboard navigation**
+   - Ensure all interactive elements are keyboard accessible
+   - Implement focus management for modals and popovers
+   - Use logical tab order
+
+3. **ARIA attributes**
+   - Use only when necessary to enhance native HTML semantics
+   - Test with screen readers
+
+## Error Handling
+
+1. **Implement error boundaries**
+   ```tsx
+   import { ErrorBoundary } from 'react-error-boundary';
+   
+   function ErrorFallback({ error, resetErrorBoundary }) {
+     return (
+       <div role="alert" className="p-4 border border-red-200 bg-red-50 rounded-md">
+         <h2 className="text-lg font-medium text-red-800">Something went wrong</h2>
+         <p className="text-sm text-red-600">{error.message}</p>
+         <button
+           onClick={resetErrorBoundary}
+           className="mt-2 px-3 py-1 bg-red-100 text-red-700 rounded-md"
+         >
+           Try again
+         </button>
+       </div>
+     );
+   }
+   
+   <ErrorBoundary FallbackComponent={ErrorFallback}>
+     <MyComponent />
+   </ErrorBoundary>
+   ```
+
+2. **API error handling**
+   - Implement centralized error handling for API requests
+   - Display user-friendly error messages
+   - Log detailed errors for debugging
+
+3. **Form validation errors**
+   - Use Zod with React Hook Form
+   - Show inline validation errors
+   - Provide clear error messages
+
+## Testing Strategy
+
+1. **Unit testing**
+   - Test components in isolation
+   - Focus on behavior, not implementation details
+   - Use React Testing Library
+
+   ```tsx
+   // Button.test.tsx
+   import { render, screen, fireEvent } from '@testing-library/react';
+   import { Button } from './Button';
+   
+   describe('Button', () => {
+     test('renders correctly', () => {
+       render(<Button>Click me</Button>);
+       expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
+     });
+   
+     test('calls onClick when clicked', () => {
+       const handleClick = jest.fn();
+       render(<Button onClick={handleClick}>Click me</Button>);
+       fireEvent.click(screen.getByRole('button'));
+       expect(handleClick).toHaveBeenCalledTimes(1);
+     });
+   
+     test('supports different variants', () => {
+       render(<Button variant="secondary">Secondary</Button>);
+       const button = screen.getByRole('button');
+       expect(button).toHaveClass('bg-neutral-200');
+     });
+   });
+   ```
+
+2. **Integration testing**
+   - Test component interactions
+   - Mock API responses
+   - Test user flows
+
+3. **E2E testing**
+   - Use Playwright for critical user journeys
+   - Test across different browsers
+   - Verify production builds
+
+## Common Pitfalls to Avoid
+
+1. **DOM manipulation anti-patterns**
+   - Avoid direct DOM manipulation with `document.querySelector`
+   - Don't use `innerHTML` due to XSS vulnerabilities
+   - Don't mix imperative and declarative approaches
+
+2. **Re-render problems**
+   - Creating new objects/functions in render (use `useMemo`/`useCallback`)
+   - Missing dependency arrays in hooks
+   - Unnecessarily complex component trees
+
+3. **State management mistakes**
+   - Storing derived state that can be calculated
+   - Duplicating state across components
+   - Using global state when local state would suffice
+
+4. **Performance issues**
+   - Large component bundles without code-splitting
+   - Unoptimized images
+   - Excessive third-party libraries
+
+## Conclusion
+
+These guidelines aim to create a consistent, maintainable, and efficient codebase. By following these standards, we'll build a high-quality application that provides excellent user experience while being maintainable by the development team.
+
+Remember that these guidelines are living documents - we should update them as we learn and as best practices evolve.
