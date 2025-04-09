@@ -9,6 +9,7 @@ import Image from 'next/image';
 
 // Import ImageSlider directly with a relative path
 import { ImageSlider } from '../ui/ImageSlider';
+import { getPlacePhotoUrl } from '@/utils/imageUtils';
 
 interface MedspaCardProps {
   medspa: Medspa;
@@ -34,7 +35,13 @@ export const MedspaCard = ({
   calculateDistance
 }: MedspaCardProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const imageUrls = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
+  const imageUrls = [
+    medspa.image_url1,
+    medspa.image_url2,
+    medspa.image_url3,
+  ]
+    .filter(Boolean)
+    .map(photoReference => getPlacePhotoUrl(photoReference)) as string[];
 
   // Function to handle phone call
   const handleCall = (phoneNumber: string | undefined, e: React.MouseEvent) => {

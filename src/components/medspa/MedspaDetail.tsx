@@ -7,6 +7,7 @@ import { ChevronLeftIcon, Phone, ChevronRightIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { Medspa } from '@/types';
 import ConsultationModal from '@/components/ConsultationModal';
+import { getPlacePhotoUrl } from '@/utils/imageUtils';
 
 // Dynamically import the map component (client-side only)
 const DynamicMap = dynamic(() => import('@/components/DynamicMap'), {
@@ -28,7 +29,13 @@ export default function MedspaDetail({ medspa }: MedspaDetailProps) {
   const [selectedMedspa, setSelectedMedspa] = useState<Medspa | null>(null);
 
   // Create an array of available images
-  const imageArray = [medspa.image_url1, medspa.image_url2, medspa.image_url3].filter(Boolean) as string[];
+  const imageArray = [
+    medspa.image_url1,
+    medspa.image_url2,
+    medspa.image_url3
+  ]
+  .map(ref => getPlacePhotoUrl(ref)) // Convert references to API URLs
+  .filter(url => url !== ''); // Filter out empty strings from invalid refs
 
   // Save this MedSpa as recently viewed
   useEffect(() => {
